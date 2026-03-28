@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "Gui for carpet",
+  "authors": [
+    "CarpetGUI"
+  ],
+  "license": "MIT",
+  "icon": "assets/carpetgui/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "ml.mypals.carpetgui.CarpetGUI"
+    ],
+    "client": [
+      "ml.mypals.carpetgui.CarpetGUIClient"
+    ]
+  },
+  "mixins": [
+    "carpetgui.mixins.json"
+  ],
+  "accessWidener": "carpetgui.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.15",
+    "minecraft": "${minecraft}",
+	"fabric-api": "*"
+  }
+}
