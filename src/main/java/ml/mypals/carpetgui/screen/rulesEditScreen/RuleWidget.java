@@ -1,9 +1,6 @@
 package ml.mypals.carpetgui.screen.rulesEditScreen;
 
 import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.DropdownComponent;
-import io.wispforest.owo.ui.component.TextBoxComponent;
-import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
@@ -15,19 +12,17 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.PlainTextContents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
 import java.util.Map;
 import java.util.Objects;
 
-import static ml.mypals.carpetgui.CarpetGUI.MOD_ID;
-import static ml.mypals.carpetgui.CarpetGUIClient.*;
+import static ml.mypals.carpetgui.CarpetGUIClient.defaultRules;
+import static ml.mypals.carpetgui.CarpetGUIClient.favoriteRules;
 import static ml.mypals.carpetgui.screen.ScreenUtils.*;
 
 
 public class RuleWidget {
-
 
 
     private final RuleData ruleData;
@@ -39,17 +34,19 @@ public class RuleWidget {
     private boolean isLocked;
     private boolean isFavorited;
     private boolean currentBoolValue;
+
     public RuleWidget(RuleData ruleData, RulesEditScreen screen, String query) {
         this(ruleData, screen);
         this.query = query;
     }
+
     public RuleWidget(RuleData ruleData, RulesEditScreen screen) {
-        this.ruleData  = ruleData;
-        this.screen    = screen;
-        this.orgName   = ruleData.name;
+        this.ruleData = ruleData;
+        this.screen = screen;
+        this.orgName = ruleData.name;
         isGamerule = ruleData.isGamerule;
-        isLocked       = defaultRules.contains(orgName);
-        isFavorited    = favoriteRules.contains(orgName);
+        isLocked = defaultRules.contains(orgName);
+        isFavorited = favoriteRules.contains(orgName);
         currentBoolValue = ruleData.value.equalsIgnoreCase("true");
 
         isTrueFalseRule = ruleData.suggestions.size() == 2
@@ -94,14 +91,17 @@ public class RuleWidget {
             buildTextInput(rightCol);
         }
 
-        if(!Objects.equals(ruleData.value, ruleData.defaultValue)){
+        if (!Objects.equals(ruleData.value, ruleData.defaultValue)) {
 
             rightCol.child(buildSpriteToggle(
                     RESET, 10, 11,
                     (wrapper) -> {
-                        String cmd=
+                        /*if(isLocked){
+                            sendCommand(ruleData.manager + " " + "removeDefault " + orgName);
+                        }*/
+                        String cmd =
                                 !isGamerule && isLocked ?
-                                        ruleData.manager + " " + "setDefault "  : ruleData.manager + " ";
+                                        ruleData.manager + " " + "setDefault " : ruleData.manager + " ";
                         sendCommand(cmd + orgName + " " + ruleData.defaultValue);
                         ruleData.value = ruleData.defaultValue;
                         screen.refreshScreen();
@@ -109,16 +109,19 @@ public class RuleWidget {
             ));
         }
 
-        if(!isGamerule) {
+        if (!isGamerule) {
 
             rightCol.child(buildSpriteToggle(
                     isLocked ? LOCK_ON : LOCK_OFF, 10, 11,
                     (wrapper) -> {
                         isLocked = !isLocked;
 
-                        String cmd = isLocked ? ruleData.manager + " " + "setDefault "  : ruleData.manager + " ";
-
+                        if(!isLocked){
+                            sendCommand(ruleData.manager + " " + "removeDefault " + orgName);
+                        }
+                        String cmd = isLocked ? ruleData.manager + " " + "setDefault " : ruleData.manager + " ";
                         sendCommand(cmd + orgName + " " + ruleData.value);
+
                         if (isLocked) defaultRules.add(orgName);
                         else defaultRules.remove(orgName);
                         if (Objects.equals(screen.currentCategory, RulesEditScreen.DefaultCategory.DEFAULT.getName()))
@@ -149,13 +152,14 @@ public class RuleWidget {
         row.child(rightCol);
         return row;
     }
+
     private static Component highlight(String text, String query) {
         if (query == null || query.isEmpty()) {
             return Component.nullToEmpty(text);
         }
 
         var result = Component.empty().copy();
-        String lowerText  = text.toLowerCase();
+        String lowerText = text.toLowerCase();
         String lowerQuery = query.toLowerCase();
         int start = 0;
 
@@ -184,12 +188,13 @@ public class RuleWidget {
 
         return result;
     }
+
     private FlowLayout buildBoolToggle() {
         var wrapper = Containers.horizontalFlow(Sizing.fixed(30), Sizing.fixed(13));
         wrapper.cursorStyle(CursorStyle.HAND);
         wrapper.child(makeTexture(currentBoolValue ? TRUE_TEX : FALSE_TEX, 30, 13));
         wrapper.mouseDown().subscribe((x, y, btn) -> {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK,1));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
             currentBoolValue = !currentBoolValue;
 
             sendCommand(ruleData.manager + " " + orgName + " " + currentBoolValue);
@@ -226,7 +231,7 @@ public class RuleWidget {
             );
         }
         box.focusGained().subscribe((focusSource) -> {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK,1));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
             box.setSuggestion("");
         });
         box.focusLost().subscribe(() -> {
@@ -267,24 +272,24 @@ public class RuleWidget {
     private Component buildTooltip() {
         var tip = MutableComponent.create(
                 PlainTextContents.EMPTY);
-            tip
-                .append(highlight(ruleData.localName.isEmpty()?ruleData.name:ruleData.localName, query)
+        tip
+                .append(highlight(ruleData.localName.isEmpty() ? ruleData.name : ruleData.localName, query)
                         .copy().withStyle(ChatFormatting.WHITE)).append("\n")
-                .append(highlight(ruleData.localDescription.isEmpty()?ruleData.description:ruleData.localDescription, query)
+                .append(highlight(ruleData.localDescription.isEmpty() ? ruleData.description : ruleData.localDescription, query)
                         .copy().withStyle(ChatFormatting.GRAY)).append("\n")
                 .append(Component.translatable("gui.screen.tooltip.defaultValue").withStyle(ChatFormatting.DARK_GREEN))
                 .append(": " + ruleData.defaultValue).append("\n")
                 .append(Component.translatable("gui.screen.tooltip.currentValue").withStyle(ChatFormatting.DARK_GREEN))
                 .append(": " + ruleData.value).append("\n")
                 .append(Component.translatable("gui.screen.tooltip.suggestions").withStyle(ChatFormatting.BLUE)).append(":");
-            tip.append(" [");
-            for (int i = 0; i < ruleData.suggestions.size(); i++) {
-                tip.append( Component.literal(
-                        ruleData.suggestions.get(i) +
-                        (i+1 < ruleData.suggestions.size() ? ", ":"")
-                ).withStyle(ChatFormatting.GRAY));
-            }
-            tip.append("]");
+        tip.append(" [");
+        for (int i = 0; i < ruleData.suggestions.size(); i++) {
+            tip.append(Component.literal(
+                    ruleData.suggestions.get(i) +
+                            (i + 1 < ruleData.suggestions.size() ? ", " : "")
+            ).withStyle(ChatFormatting.GRAY));
+        }
+        tip.append("]");
         return tip;
     }
 

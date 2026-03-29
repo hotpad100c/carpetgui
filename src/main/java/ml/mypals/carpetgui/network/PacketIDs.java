@@ -29,4 +29,6 @@ public class PacketIDs {
     public static final ResourceLocation REQUEST_RULES_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "request_rules");
     public static final ResourceLocation SYNC_RULES_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "sync_rules");
     public static final ResourceLocation HELLO_PACKET = ResourceLocation.fromNamespaceAndPath(MOD_ID, "hello");
+    public static final ResourceLocation REQUEST_RULE_STACK_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "request_rule_stack");
+    public static final ResourceLocation RULE_STACK_SYNC_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "rule_stack_sync");
 }

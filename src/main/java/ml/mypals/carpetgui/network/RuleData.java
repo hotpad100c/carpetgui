@@ -24,8 +24,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
+import java.util.Map;
 //#endif
 
 public class RuleData {
@@ -38,9 +38,10 @@ public class RuleData {
     public String localDescription;
     public Class<?> type;
     public List<String> suggestions;
-    public List<Map.Entry<String,String>> categories;
+    public List<Map.Entry<String, String>> categories;
     public boolean isGamerule = false;
-    public RuleData(){
+
+    public RuleData() {
         this.manager = "";
         this.name = "";
         this.localName = "";
@@ -52,7 +53,8 @@ public class RuleData {
         this.suggestions = List.of();
         this.categories = List.of();
     }
-    public RuleData(String manager, String name,String localName, Class<?> type, String defaultValue, String value, String description, String localDescription, List<String> suggestions, List<Map.Entry<String,String>>  categories) {
+
+    public RuleData(String manager, String name, String localName, Class<?> type, String defaultValue, String value, String description, String localDescription, List<String> suggestions, List<Map.Entry<String, String>> categories) {
         this.manager = manager;
         this.name = name;
         this.localName = localName;
@@ -83,7 +85,7 @@ public class RuleData {
         buf.writeUtf(this.localDescription);
 
         buf.writeCollection(suggestions, FriendlyByteBuf::writeUtf);
-        buf.writeCollection(categories, (bf,entry)->{
+        buf.writeCollection(categories, (bf, entry) -> {
             bf.writeUtf(entry.getKey());
             bf.writeUtf(entry.getValue());
         });
@@ -100,9 +102,9 @@ public class RuleData {
                 buf.readUtf(), //desc
                 buf.readUtf(), //localDesc
                 buf.readList(FriendlyByteBuf::readUtf), //suggestions
-                buf.readList((bf)-> Map.entry(bf.readUtf(), bf.readUtf())) //categories
+                buf.readList((bf) -> Map.entry(bf.readUtf(), bf.readUtf())) //categories
         );
-        if(this.categories.getFirst().getKey().equals("gamerule")){
+        if (this.categories.getFirst().getKey().equals("gamerule")) {
             isGamerule = true;
             this.localDescription = Component.translatable(localDescription).getString();
             String[] ct = this.categories.getFirst().getValue().split(" : ");

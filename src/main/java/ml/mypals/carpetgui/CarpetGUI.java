@@ -10,11 +10,17 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import ml.mypals.carpetgui.mixin.accessors.GameRulesAccessor;
 import ml.mypals.carpetgui.mixin.accessors.TypeAccessor;
 import ml.mypals.carpetgui.network.RuleData;
+import ml.mypals.carpetgui.network.client.RequestRuleStackPayload;
 import ml.mypals.carpetgui.network.client.RequestRulesPayload;
 import ml.mypals.carpetgui.network.server.HelloPacketPayload;
+import ml.mypals.carpetgui.network.server.RuleStackSyncPayload;
 import ml.mypals.carpetgui.network.server.RulesPacketPayload;
+import ml.mypals.carpetgui.ruleStack.Prefab;
+import ml.mypals.carpetgui.ruleStack.PrefabManager;
+import ml.mypals.carpetgui.ruleStack.RuleStackCommand;
 import ml.mypals.carpetgui.translate.TranslationHelper;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -38,7 +44,7 @@ import static ml.mypals.carpetgui.settings.GamerulesDefaultValueSorter.gamerules
 import static ml.mypals.carpetgui.translate.TranslationHelper.getDescTranslation;
 import static ml.mypals.carpetgui.translate.TranslationHelper.getNameTranslation;
 
-public class CarpetGUI implements ModInitializer {
+public class CarpetGUI implements ModInitializer, CarpetExtension {
     private static final Gson GSON = new Gson();
 
     public static final String MOD_ID = "carpetgui";
@@ -46,12 +52,21 @@ public class CarpetGUI implements ModInitializer {
     public static final String VERSION = /*$ mod_version*/ "1.0.0";
     public static final String MINECRAFT = /*$ minecraft*/ "1.21.1";
 
+    private static PrefabManager prefabManager;
+
     @Override
     public void onInitialize() {
+        CarpetServer.manageExtension(this);
+        CommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext, commandSelection) -> {
+            RuleStackCommand.register(commandDispatcher, commandBuildContext);
+        }));
         PayloadTypeRegistry.playC2S().register(RequestRulesPayload.ID, RequestRulesPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(RequestRuleStackPayload.ID, RequestRuleStackPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(RulesPacketPayload.ID, RulesPacketPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(HelloPacketPayload.ID, HelloPacketPayload.CODEC);
-        ServerPlayConnectionEvents.JOIN.register((impl, sender, server)->{
+        PayloadTypeRegistry.playS2C().register(RuleStackSyncPayload.ID, RuleStackSyncPayload.CODEC);
+
+        ServerPlayConnectionEvents.JOIN.register((impl, sender, server) -> {
             sender.sendPacket(new HelloPacketPayload());
         });
         ServerPlayNetworking.registerGlobalReceiver(RequestRulesPayload.ID,
@@ -66,29 +81,64 @@ public class CarpetGUI implements ModInitializer {
 
                 })
         );
+
+        ServerPlayNetworking.registerGlobalReceiver(RequestRuleStackPayload.ID,
+
+                (payload, context) -> context.server().execute(() -> {
+                    ServerPlayer player = context.player();
+                    PrefabManager mgr = CarpetGUI.getPrefabManager();
+                    if (mgr == null) return;
+                    Prefab active = mgr.getActivePrefab();
+
+                    List<RuleStackSyncPayload.LayerInfo> layerInfos = active.getLayers().stream()
+                            .map(layer -> new RuleStackSyncPayload.LayerInfo(
+                                    layer.getId(), layer.getMessage(), layer.getTimestamp(),
+                                    layer.getChanges().stream()
+                                            .map(c -> new RuleStackSyncPayload.ChangeInfo(
+                                                    c.ruleKey(),
+                                                    c.previousSnapshot().value(), c.previousSnapshot().isDefault(),
+                                                    c.newSnapshot().value(), c.newSnapshot().isDefault()))
+                                            .toList()))
+                            .toList();
+
+                    List<RuleStackSyncPayload.ChangeInfo> pending = mgr.getPendingChanges().stream()
+                            .map(c -> new RuleStackSyncPayload.ChangeInfo(
+                                    c.ruleKey(),
+                                    c.previousSnapshot().value(), c.previousSnapshot().isDefault(),
+                                    c.newSnapshot().value(), c.newSnapshot().isDefault()))
+                            .toList();
+
+                    ServerPlayNetworking.send(player, new RuleStackSyncPayload(
+                            mgr.getActiveName(),
+                            mgr.getAllPrefabs().stream().map(Prefab::getName).toList(),
+                            layerInfos, pending));
+                })
+        );
     }
+
     public List<RuleData> getRules(String lang) {
         List<RuleData> rules = new ArrayList<>(getRules(CarpetServer.settingsManager, lang));
-        for(CarpetExtension carpetExtension : CarpetServer.extensions){
+        for (CarpetExtension carpetExtension : CarpetServer.extensions) {
             SettingsManager settingsManager = carpetExtension.extensionSettingsManager();
-            if(settingsManager != null && !settingsManager.equals(CarpetServer.settingsManager)){
+            if (settingsManager != null && !settingsManager.equals(CarpetServer.settingsManager)) {
                 rules.addAll(getRules(settingsManager, lang));
             }
         }
         rules.addAll(getGamerulesAsRules());
         return rules;
     }
-    public List<RuleData> getGamerulesAsRules(){
+
+    public List<RuleData> getGamerulesAsRules() {
         List<RuleData> fakeCarpetRules = new ArrayList<>();
         MinecraftServer server = CarpetServer.minecraft_server;
-        if(server == null){
+        if (server == null) {
             return new ArrayList<>();
         }
         GameRulesAccessor rulesAccessor = ((GameRulesAccessor) server.getGameRules());
-        for(Map.Entry<GameRules.Key<?>, GameRules.Value<?>> entry : rulesAccessor.carpetGUI$getRules().entrySet()){
+        for (Map.Entry<GameRules.Key<?>, GameRules.Value<?>> entry : rulesAccessor.carpetGUI$getRules().entrySet()) {
             GameRules.Key<?> rule = entry.getKey();
             GameRules.Value<?> value = entry.getValue();
-            GameRules.Type<?> type = ((TypeAccessor)value).carpetGUI$getType();
+            GameRules.Type<?> type = ((TypeAccessor) value).carpetGUI$getType();
             RequiredArgumentBuilder<CommandSourceStack, ?> argumentBuilder = type.createArgument("");
 
             fakeCarpetRules.add(new RuleData(
@@ -106,25 +156,26 @@ public class CarpetGUI implements ModInitializer {
         }
         return fakeCarpetRules;
     }
+
     public List<RuleData> getRules(SettingsManager settingsManager, String lang) {
         List<RuleData> rules = new ArrayList<>();
         String managerID = settingsManager.identifier();
         settingsManager.getCarpetRules().forEach(rule -> {
             if (rule instanceof CarpetRule<?>) {
                 String orName = rule.name();
-                String localName = lang.equals("en_us")?orName:
+                String localName = lang.equals("en_us") ? orName :
                         getNameTranslation(lang, managerID, rule.name());
                 String orgDesc = RuleHelper.translatedDescription(rule);
                 String localDescription =
-                        lang.equals("en_us")?orgDesc:
-                        getDescTranslation(lang, managerID, rule.name());
+                        lang.equals("en_us") ? orgDesc :
+                                getDescTranslation(lang, managerID, rule.name());
 
-                List<Map.Entry<String,String>> translatedCategories = rule.categories().stream().map(
+                List<Map.Entry<String, String>> translatedCategories = rule.categories().stream().map(
                         cat -> {
-                            String translated = TranslationHelper.getCategoryTranslation(lang,managerID,cat);
+                            String translated = TranslationHelper.getCategoryTranslation(lang, managerID, cat);
                             return Map.entry(cat, translated);
                         }
-                        ).toList();
+                ).toList();
 
                 rules.add(
                         new RuleData(
@@ -143,15 +194,16 @@ public class CarpetGUI implements ModInitializer {
         });
         return rules;
     }
+
     public String getDefaults() {
         StringBuilder defaults = new StringBuilder();
-        readSettingsFromConf(getConfigFile()).forEach(c -> {
+        readDefaultSettingsFromConf(getCarpetDefaultsConfigFile()).forEach(c -> {
             defaults.append(c).append(";");
         });
         return defaults.toString();
     }
 
-    private List<String> readSettingsFromConf(Path path) {
+    public static List<String> readDefaultSettingsFromConf(Path path) {
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String line = "";
             List<String> result = new ArrayList<>();
@@ -170,9 +222,23 @@ public class CarpetGUI implements ModInitializer {
             return new ArrayList<>();
         }
     }
-    private Path getConfigFile() {
+
+    public static Path getCarpetDefaultsConfigFile() {
         return CarpetServer.minecraft_server.getWorldPath(LevelResource.ROOT).resolve(CarpetServer.settingsManager.identifier() + ".conf");
     }
 
+    @Override
+    public void onServerLoadedWorlds(MinecraftServer server) {
+        prefabManager = new PrefabManager(server);
+        prefabManager.init();
+    }
 
+    @Override
+    public void onServerClosed(MinecraftServer server) {
+        prefabManager = null;
+    }
+
+    public static PrefabManager getPrefabManager() {
+        return prefabManager;
+    }
 }

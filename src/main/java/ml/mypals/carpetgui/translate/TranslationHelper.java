@@ -3,7 +3,6 @@ package ml.mypals.carpetgui.translate;
 import carpet.CarpetExtension;
 import carpet.CarpetServer;
 import carpet.utils.TranslationKeys;
-import carpet.utils.Translations;
 import com.google.gson.JsonObject;
 import ml.mypals.carpetgui.CarpetGUI;
 import net.fabricmc.loader.api.FabricLoader;
@@ -12,15 +11,12 @@ import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static net.fabricmc.fabric.impl.resource.loader.ModResourcePackUtil.GSON;
@@ -28,7 +24,7 @@ import static net.fabricmc.fabric.impl.resource.loader.ModResourcePackUtil.GSON;
 public class TranslationHelper {
     private static final Map<String, Map<String, String>> TRANSLATION_CACHE = new HashMap<>();
 
-    public static String getCategoryTranslation(String lang,String manager, @NotNull String originalName) {
+    public static String getCategoryTranslation(String lang, String manager, @NotNull String originalName) {
         String key = TranslationKeys.CATEGORY_PATTERN.formatted(manager, originalName);
         String baseName = resolveBaseName(key, originalName);
         try {
@@ -37,10 +33,12 @@ public class TranslationHelper {
             if (translation != null && !translation.equals(baseName)) {
                 return translation;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         return baseName;
     }
+
     public static String getNameTranslation(String lang, String manager, @NotNull String originalName) {
         String key = TranslationKeys.RULE_NAME_PATTERN.formatted(manager, originalName);
         String baseName = resolveBaseName(key, originalName);
@@ -50,7 +48,8 @@ public class TranslationHelper {
             if (translation != null && !translation.equals(baseName)) {
                 return translation;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         return baseName;
     }
@@ -67,10 +66,12 @@ public class TranslationHelper {
             if (!extras.isEmpty()) full = full.isEmpty() ? extras : full + "\n" + extras;
             return full;
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         return "";
     }
+
     private static String collectExtras(Map<String, String> translations, String prefix) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; ; i++) {
@@ -83,6 +84,7 @@ public class TranslationHelper {
         }
         return sb.toString();
     }
+
     public static void clearCache() {
         TRANSLATION_CACHE.clear();
     }
@@ -92,9 +94,11 @@ public class TranslationHelper {
         try {
             String enTranslation = getTranslations("en_us").get(key);
             if (enTranslation != null) return enTranslation;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return key.replace("rule.", "").replace(".name", "").replace(".desc", "");
     }
+
     private static Map<String, String> getTranslations(String lang) {
         String cacheKey = lang;
         if (TRANSLATION_CACHE.containsKey(cacheKey)) {
@@ -129,10 +133,7 @@ public class TranslationHelper {
             }
         }
         translations.keySet().removeIf(key -> {
-            if (key.startsWith("//")) {
-                return true;
-            }
-            return false;
+            return key.startsWith("//");
         });
 
         TRANSLATION_CACHE.put(cacheKey, translations);

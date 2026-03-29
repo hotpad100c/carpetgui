@@ -6,9 +6,14 @@ import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,17 +30,18 @@ public class RulesCacheManager {
             .resolve("cache");
     private static final Path KNOWN_MANAGERS_FILE = CACHE_DIR.resolve("known_managers.json");
     private static final Path RULES_FILE = CACHE_DIR.resolve("base_cache.json");
+
     public static void saveCache(List<RuleData> newRules,
                                  String defaults,
                                  String currentLanguage) {
         try {
             Files.createDirectories(CACHE_DIR);
 
-            Map<String, JsonObject> oldLocalNames   = new HashMap<>();
-            Map<String, JsonObject> oldLocalDescs   = new HashMap<>();
+            Map<String, JsonObject> oldLocalNames = new HashMap<>();
+            Map<String, JsonObject> oldLocalDescs = new HashMap<>();
             Map<String, JsonObject> oldCategoryValues = new LinkedHashMap<>();
-            List<RuleData> oldRules    = List.of();
-            String mergedDefaults      = defaults;
+            List<RuleData> oldRules = List.of();
+            String mergedDefaults = defaults;
 
             Path file = RULES_FILE;
             if (Files.exists(file)) {
@@ -65,8 +71,8 @@ public class RulesCacheManager {
                         for (JsonElement el : oldRulesArr) {
                             JsonObject obj = el.getAsJsonObject();
                             String name = obj.get("name").getAsString();
-                            extractLocaleMap(obj, "localName",        name, oldLocalNames);
-                            extractLocaleMap(obj, "localDescription",  name, oldLocalDescs);
+                            extractLocaleMap(obj, "localName", name, oldLocalNames);
+                            extractLocaleMap(obj, "localDescription", name, oldLocalDescs);
                         }
                         oldRules = deserializeRules(oldRulesArr, oldCategoryValues, currentLanguage);
                     }
@@ -87,7 +93,7 @@ public class RulesCacheManager {
 
             for (RuleData rule : newRules) {
                 for (Map.Entry<String, String> entry : rule.categories) {
-                    String catKey   = entry.getKey();
+                    String catKey = entry.getKey();
                     String localVal = entry.getValue();
                     JsonObject langMap = oldCategoryValues.computeIfAbsent(catKey, k -> new JsonObject());
                     langMap.addProperty(currentLanguage, localVal);
@@ -95,8 +101,8 @@ public class RulesCacheManager {
             }
 
             JsonObject root = new JsonObject();
-            root.addProperty("defaults",      mergedDefaults);
-            root.add("rules",      serializeRules(mergedRules, oldLocalNames, oldLocalDescs, currentLanguage));
+            root.addProperty("defaults", mergedDefaults);
+            root.add("rules", serializeRules(mergedRules, oldLocalNames, oldLocalDescs, currentLanguage));
             root.add("categories", serializeTopLevelCategories(oldCategoryValues));
 
             Path target = RULES_FILE;
@@ -122,15 +128,15 @@ public class RulesCacheManager {
 
         try (Reader r = new InputStreamReader(Files.newInputStream(file), StandardCharsets.UTF_8)) {
 
-            JsonObject root     = GSON.fromJson(r, JsonObject.class);
-            String     defaults = root.has("defaults") ? root.get("defaults").getAsString() : "";
+            JsonObject root = GSON.fromJson(r, JsonObject.class);
+            String defaults = root.has("defaults") ? root.get("defaults").getAsString() : "";
 
             Map<String, JsonObject> categoryValues = new LinkedHashMap<>();
             JsonArray catsArr = root.getAsJsonArray("categories");
             if (catsArr != null) {
                 for (JsonElement el : catsArr) {
                     JsonObject obj = el.getAsJsonObject();
-                    String     key = obj.get("key").getAsString();
+                    String key = obj.get("key").getAsString();
                     JsonElement val = obj.get("value");
                     if (val != null && val.isJsonObject()) {
                         categoryValues.put(key, val.getAsJsonObject());
@@ -147,6 +153,7 @@ public class RulesCacheManager {
             return Optional.empty();
         }
     }
+
     public static void saveKnownManagers(Set<String> newManagers) {
         try {
             Files.createDirectories(CACHE_DIR);
@@ -171,6 +178,7 @@ public class RulesCacheManager {
             LOGGER.error("Failed to save known_managers.json", ex);
         }
     }
+
     public static List<String> loadKnownManagers() {
         if (!Files.exists(KNOWN_MANAGERS_FILE)) return List.of("carpet");
 
@@ -192,6 +200,7 @@ public class RulesCacheManager {
             return List.of("carpet");
         }
     }
+
     private static JsonArray serializeRules(List<RuleData> rules,
                                             Map<String, JsonObject> oldLocalNames,
                                             Map<String, JsonObject> oldLocalDescs,
@@ -199,12 +208,12 @@ public class RulesCacheManager {
         JsonArray arr = new JsonArray();
         for (RuleData r : rules) {
             JsonObject obj = new JsonObject();
-            obj.addProperty("name",         r.name);
-            obj.addProperty("type",         r.type.getName());
-            obj.addProperty("description",  r.description);
+            obj.addProperty("name", r.name);
+            obj.addProperty("type", r.type.getName());
+            obj.addProperty("description", r.description);
             obj.addProperty("defaultValue", r.defaultValue);
-            obj.addProperty("isGamerule",   r.isGamerule);
-            obj.addProperty("manager",      r.manager);
+            obj.addProperty("isGamerule", r.isGamerule);
+            obj.addProperty("manager", r.manager);
 
             obj.add("localName",
                     mergeLocaleMap(oldLocalNames.get(r.name), currentLanguage, r.localName));
@@ -247,10 +256,10 @@ public class RulesCacheManager {
         for (JsonElement el : arr) {
             JsonObject obj = el.getAsJsonObject();
 
-            String name        = obj.get("name").getAsString();
+            String name = obj.get("name").getAsString();
             String description = obj.get("description").getAsString();
 
-            String localName        = resolveLocale(obj.get("localName"),        currentLanguage, name);
+            String localName = resolveLocale(obj.get("localName"), currentLanguage, name);
             String localDescription = resolveLocale(obj.get("localDescription"), currentLanguage, description);
 
             RuleData rd = new RuleData(
@@ -276,8 +285,8 @@ public class RulesCacheManager {
             JsonArray catKeys = obj.getAsJsonArray("categories");
             if (catKeys != null) {
                 catKeys.forEach(c -> {
-                    String key     = c.getAsString();
-                    JsonObject lm  = categoryValues.get(key);
+                    String key = c.getAsString();
+                    JsonObject lm = categoryValues.get(key);
                     String localVal = (lm != null)
                             ? resolveLocale(lm, currentLanguage, key)
                             : key;
@@ -291,12 +300,12 @@ public class RulesCacheManager {
         return list;
     }
 
-   private static JsonObject mergeLocaleMap(JsonObject oldMap,
+    private static JsonObject mergeLocaleMap(JsonObject oldMap,
                                              String lang,
                                              String newValue) {
         JsonObject merged = new JsonObject();
         if (oldMap != null) {
-             for (Map.Entry<String, JsonElement> e : oldMap.entrySet()) {
+            for (Map.Entry<String, JsonElement> e : oldMap.entrySet()) {
                 merged.add(e.getKey(), e.getValue());
             }
         }
@@ -305,10 +314,11 @@ public class RulesCacheManager {
         }
         return merged;
     }
-   private static String resolveLocale(JsonElement localeEl, String language, String fallback) {
+
+    private static String resolveLocale(JsonElement localeEl, String language, String fallback) {
         if (localeEl == null) return fallback;
         if (localeEl.isJsonPrimitive()) return localeEl.getAsString();
-        if (!localeEl.isJsonObject())   return fallback;
+        if (!localeEl.isJsonObject()) return fallback;
 
         JsonObject map = localeEl.getAsJsonObject();
         if (map.has(language)) return map.get(language).getAsString();
@@ -337,5 +347,6 @@ public class RulesCacheManager {
         return CACHE_DIR.resolve(sanitize(serverAddress) + ".json");
     }
 
-    public record CacheResult(List<RuleData> rules, String defaults) {}
+    public record CacheResult(List<RuleData> rules, String defaults) {
+    }
 }

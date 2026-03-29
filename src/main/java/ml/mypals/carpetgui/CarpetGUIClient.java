@@ -3,11 +3,15 @@ package ml.mypals.carpetgui;
 import com.mojang.blaze3d.platform.InputConstants;
 import ml.mypals.carpetgui.localChache.RulesCacheManager;
 import ml.mypals.carpetgui.network.RuleData;
+import ml.mypals.carpetgui.network.client.RequestRuleStackPayload;
 import ml.mypals.carpetgui.network.client.RequestRulesPayload;
 import ml.mypals.carpetgui.network.server.HelloPacketPayload;
+import ml.mypals.carpetgui.network.server.RuleStackSyncPayload;
 import ml.mypals.carpetgui.network.server.RulesPacketPayload;
 import ml.mypals.carpetgui.screen.ScreenSwitcherScreen;
 import ml.mypals.carpetgui.screen.ruleGroup.RuleGroupScreen;
+import ml.mypals.carpetgui.screen.ruleStack.RuleStackData;
+import ml.mypals.carpetgui.screen.ruleStack.RuleStackScreen;
 import ml.mypals.carpetgui.screen.rulesEditScreen.RulesEditScreen;
 import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -26,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CarpetGUIClient implements ClientModInitializer {
@@ -36,6 +39,7 @@ public class CarpetGUIClient implements ClientModInitializer {
     public static final String MINECRAFT = /*$ minecraft*/ "1.21.1";
 
     public static KeyMapping carpetRulesKeyBind;
+    public static RuleStackData cachedRuleStackData;
     public static List<RuleData> cachedRules = new ArrayList<>();
     public static List<RuleData> rulesFromServer = new ArrayList<>();
     public static List<String> cachedCategories = new ArrayList<>();
@@ -51,21 +55,27 @@ public class CarpetGUIClient implements ClientModInitializer {
         CarpetGUIConfigManager.initializeConfig();
 
         ScreenSwitcherScreen.registerEntry(
-                Component.translatable("carpetgui.screen.rules"),
+                Component.translatable("gui.screen.rules"),
                 new ItemStack(Items.KNOWLEDGE_BOOK),
                 () -> openRuleEditScreen(true)
         );
         ScreenSwitcherScreen.registerEntry(
-                Component.translatable("carpetgui.screen.rule_groups"),
+                Component.translatable("gui.screen.rule_groups"),
                 new ItemStack(Items.DRIED_KELP_BLOCK),
                 () -> {
                     Minecraft.getInstance().setScreen(new RuleGroupScreen());
                 }
         );
         ScreenSwitcherScreen.registerEntry(
-                Component.translatable("carpetgui.screen.rule_stack"),
+                Component.translatable("gui.screen.rule_stack"),
                 new ItemStack(Items.NETHERITE_SCRAP),
-                () -> {}
+                () -> {
+
+                    if(hasModOnServer){
+                        Minecraft.getInstance().setScreen(new RuleStackScreen());
+                        ClientPlayNetworking.send(new RequestRuleStackPayload());
+                    }
+                }
         );
 
 
@@ -90,9 +100,16 @@ public class CarpetGUIClient implements ClientModInitializer {
         });
         ClientPlayNetworking.registerGlobalReceiver(HelloPacketPayload.ID,
                 (payload, context) -> context.client().execute(() -> {
-                hasModOnServer = true;
+                    hasModOnServer = true;
                 })
         );
+        ClientPlayNetworking.registerGlobalReceiver(RuleStackSyncPayload.ID,
+                (payload, context) ->  context.client().execute(() -> {
+            cachedRuleStackData = new RuleStackData(payload.activePrefabName(), payload.allPrefabNames(), payload.layers(), payload.pendingChanges());
+            if(RuleStackScreen.INSTANCE != null){
+                RuleStackScreen.INSTANCE.onSync();
+            }
+        }));
 
 
         ClientPlayNetworking.registerGlobalReceiver(RulesPacketPayload.ID,
@@ -127,7 +144,7 @@ public class CarpetGUIClient implements ClientModInitializer {
                     cachedCategories.addAll(categories);
 
                     defaultRules.clear();
-                    if(!fromRuleGroupScreen){
+                    if (!fromRuleGroupScreen) {
                         defaultRules.addAll(Arrays.stream(payload.defaults().split(";")).toList());
                     }
 
@@ -135,7 +152,7 @@ public class CarpetGUIClient implements ClientModInitializer {
                     favoriteRules.addAll(CarpetGUIConfigManager.readFavoriteRules());
                     String lang = client.getLanguageManager().getSelected();
                     Thread.ofVirtual().name("carpetgui-cache-save").start(
-                            () ->{
+                            () -> {
                                 RulesCacheManager.saveCache(cachedRules, payload.defaults(), lang);
                                 cachedManagers = RulesCacheManager.loadKnownManagers();
                             }
@@ -145,7 +162,8 @@ public class CarpetGUIClient implements ClientModInitializer {
                     client.setScreen(new RulesEditScreen(!fromRuleGroupScreen));
                 }));
     }
-    public static void openRuleEditScreen(boolean instantAffect){
+
+    public static void openRuleEditScreen(boolean instantAffect) {
         Minecraft client = Minecraft.getInstance();
         if (hasModOnServer) {
             String lang = client.getLanguageManager().getSelected();
@@ -155,6 +173,7 @@ public class CarpetGUIClient implements ClientModInitializer {
             openScreenFromCache(client, instantAffect);
         }
     }
+
     private static void openScreenFromCache(Minecraft client, boolean instantAffect) {
         String addr = getServerAddress(client);
         if (addr == null) return;

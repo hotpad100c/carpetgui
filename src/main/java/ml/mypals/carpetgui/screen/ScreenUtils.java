@@ -20,32 +20,35 @@ import java.util.function.Consumer;
 import static ml.mypals.carpetgui.CarpetGUI.MOD_ID;
 
 public class ScreenUtils {
-    public static final ResourceLocation RESET    = rl("ui/reset.png");
-    public static final ResourceLocation NO    = rl("ui/x.png");
-    public static final ResourceLocation LOCK_ON    = rl("ui/lock.png");
-    public static final ResourceLocation LOCK_OFF   = rl("ui/unlock.png");
-    public static final ResourceLocation LOVE_ON    = rl("ui/loved.png");
-    public static final ResourceLocation LOVE_OFF   = rl("ui/love.png");
-    public static final ResourceLocation TRUE_TEX   = rl("ui/true_t.png");
-    public static final ResourceLocation FALSE_TEX  = rl("ui/false_t.png");
+    public static final ResourceLocation RESET = rl("ui/reset.png");
+    public static final ResourceLocation NO = rl("ui/x.png");
+    public static final ResourceLocation LOCK_ON = rl("ui/lock.png");
+    public static final ResourceLocation LOCK_OFF = rl("ui/unlock.png");
+    public static final ResourceLocation LOVE_ON = rl("ui/loved.png");
+    public static final ResourceLocation LOVE_OFF = rl("ui/love.png");
+    public static final ResourceLocation TRUE_TEX = rl("ui/true_t.png");
+    public static final ResourceLocation FALSE_TEX = rl("ui/false_t.png");
+
     public static FlowLayout buildSpriteToggle(ResourceLocation initTex, int w, int h,
-                                         java.util.function.Consumer<FlowLayout> onClick) {
-        var wrapper = Containers.horizontalFlow(Sizing.fixed(w + 2), Sizing.fixed(h ));
+                                               java.util.function.Consumer<FlowLayout> onClick) {
+        var wrapper = Containers.horizontalFlow(Sizing.fixed(w + 2), Sizing.fixed(h));
         wrapper.verticalAlignment(VerticalAlignment.CENTER);
         wrapper.horizontalAlignment(HorizontalAlignment.CENTER);
         wrapper.cursorStyle(CursorStyle.HAND);
         wrapper.child(makeTexture(initTex, w, h));
         wrapper.mouseDown().subscribe((x, y, btn) -> {
 
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK,1));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
             onClick.accept(wrapper);
             return true;
         });
         return wrapper;
     }
+
     public static ResourceLocation rl(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
+
     public static void swapTexture(FlowLayout wrapper, ResourceLocation newTex, int w, int h) {
         wrapper.clearChildren();
         wrapper.child(makeTexture(newTex, w, h));
@@ -63,7 +66,7 @@ public class ScreenUtils {
                 .alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
 
         saveDialog.child(
-                Components.label(Component.translatable(  "carpetgui.rulegroups.save_group"))
+                Components.label(Component.translatable("gui.rulegroups.save_group"))
                         .color(Color.WHITE)
                         .shadow(true)
         );
@@ -76,11 +79,11 @@ public class ScreenUtils {
         FlowLayout buttons = Containers.horizontalFlow(Sizing.fill(80), Sizing.fixed(26));
         buttons.gap(8).horizontalAlignment(HorizontalAlignment.CENTER);
 
-        ButtonComponent cancel = Components.button(Component.translatable("carpetgui.rulegroups.cancel"),
+        ButtonComponent cancel = Components.button(Component.translatable("gui.rulegroups.cancel"),
                 b -> cancelAction.accept(""));
         cancel.sizing(Sizing.fill(40), Sizing.fixed(22));
 
-        ButtonComponent saveBtn = Components.button(Component.translatable("carpetgui.rulegroups.save"),
+        ButtonComponent saveBtn = Components.button(Component.translatable("gui.rulegroups.save"),
                 b -> {
                     String groupName = nameBox.getValue().trim();
                     if (groupName.isEmpty()) groupName = "modified_" + System.currentTimeMillis();
@@ -117,6 +120,7 @@ public class ScreenUtils {
 
     public record DialogResult(OverlayContainer<FlowLayout> overlay, FlowLayout dialog) {
     }
+
     public static String truncateWithEllipsis(String text, Font font, int maxWidth) {
         if (font.width(text) <= maxWidth) return text;
 
@@ -128,5 +132,23 @@ public class ScreenUtils {
             }
         }
         return text.charAt(0) + ellipsis;
+    }
+    public static FlowLayout btn(Component label,Sizing ws,Sizing hs, Runnable action) {
+        var b = Containers.horizontalFlow(ws, hs);
+        b.surface(Surface.flat(0x35FFFFFF).and(Surface.outline(0x55FFFFFF)));
+        b.verticalAlignment(VerticalAlignment.CENTER);
+        b.horizontalAlignment(HorizontalAlignment.CENTER);
+        b.cursorStyle(CursorStyle.HAND);
+        b.padding(Insets.of(0,0,2,2));
+        b.child(Components.label(label).color(Color.WHITE));
+        b.mouseEnter().subscribe(()-> b.surface(Surface.flat(0x35FFFFFF).and(Surface.outline(0xFFFFFFFF))));
+        b.mouseLeave().subscribe(()-> b.surface(Surface.flat(0x35FFFFFF).and(Surface.outline(0x55FFFFFF))));
+        b.mouseDown().subscribe((x, y, bt) -> {
+            Minecraft.getInstance().getSoundManager()
+                    .play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
+            action.run();
+            return true;
+        });
+        return b;
     }
 }

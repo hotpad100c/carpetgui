@@ -9,7 +9,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.debug.GameModeSwitcherScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -17,14 +16,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Environment(EnvType.CLIENT)
 public class ScreenSwitcherScreen extends Screen {
 
     static final ResourceLocation SLOT_SPRITE = ResourceLocation.withDefaultNamespace("gamemode_switcher/slot");
     static final ResourceLocation SELECTION_SPRITE = ResourceLocation.withDefaultNamespace("gamemode_switcher/selection");
 
-    private static final int SLOT_AREA        = 26;
-    private static final int SLOT_PADDING     = 5;
+    private static final int SLOT_AREA = 26;
+    private static final int SLOT_PADDING = 5;
     private static final int SLOT_AREA_PADDED = 31;
 
     private static final int ICON_OFFSET = 5;
@@ -46,14 +46,14 @@ public class ScreenSwitcherScreen extends Screen {
 
     private ScreenEntry currentlyHovered;
 
-    private int  firstMouseX, firstMouseY;
+    private int firstMouseX, firstMouseY;
     private boolean setFirstMousePos = false;
 
     private final List<ScreenSlot> slots = Lists.newArrayList();
 
     public ScreenSwitcherScreen() {
         super(net.minecraft.client.GameNarrator.NO_TITLE);
-        this.allSlotsWidth   = ENTRIES.isEmpty() ? 0 : ENTRIES.size() * SLOT_AREA_PADDED - SLOT_PADDING;
+        this.allSlotsWidth = ENTRIES.isEmpty() ? 0 : ENTRIES.size() * SLOT_AREA_PADDED - SLOT_PADDING;
         this.currentlyHovered = ENTRIES.isEmpty() ? null : ENTRIES.get(0);
     }
 
@@ -62,8 +62,8 @@ public class ScreenSwitcherScreen extends Screen {
         super.init();
         this.slots.clear();
 
-        int startX = this.width  / 2 - this.allSlotsWidth / 2;
-        int slotY  = this.height / 2 - SLOT_AREA;
+        int startX = this.width / 2 - this.allSlotsWidth / 2;
+        int slotY = this.height / 2 - SLOT_AREA;
 
         for (ScreenEntry entry : ENTRIES) {
             int x = startX + entry.index() * SLOT_AREA_PADDED;
@@ -81,14 +81,14 @@ public class ScreenSwitcherScreen extends Screen {
             guiGraphics.drawCenteredString(
                     this.font,
                     this.currentlyHovered.name(),
-                    this.width  / 2,
+                    this.width / 2,
                     this.height / 2 - SLOT_AREA - 14,
                     0xFFFFFF);
         }
 
         if (!this.setFirstMousePos) {
-            this.firstMouseX    = mouseX;
-            this.firstMouseY    = mouseY;
+            this.firstMouseX = mouseX;
+            this.firstMouseY = mouseY;
             this.setFirstMousePos = true;
         }
         boolean mouseSteady = (this.firstMouseX == mouseX && this.firstMouseY == mouseY);
@@ -103,7 +103,8 @@ public class ScreenSwitcherScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {}
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    }
 
     @Override
     public boolean isPauseScreen() {
@@ -111,7 +112,7 @@ public class ScreenSwitcherScreen extends Screen {
     }
 
     private boolean checkToClose() {
-        if(minecraft == null) return false;
+        if (minecraft == null) return false;
         boolean keyStillHeld = triggerKey != null && InputConstants.isKeyDown(
                 this.minecraft.getWindow().getWindow(),
                 triggerKey.getDefaultKey().getValue());
@@ -134,7 +135,8 @@ public class ScreenSwitcherScreen extends Screen {
             Component name,
             ItemStack icon,
             Runnable factory
-    ) {}
+    ) {
+    }
 
     @Environment(EnvType.CLIENT)
     public static class ScreenSlot extends AbstractWidget {
@@ -160,6 +162,7 @@ public class ScreenSwitcherScreen extends Screen {
         public void updateWidgetNarration(NarrationElementOutput output) {
             this.defaultButtonNarrationText(output);
         }
+
         @Override
         public boolean isHoveredOrFocused() {
             return super.isHoveredOrFocused() || this.isSelected;

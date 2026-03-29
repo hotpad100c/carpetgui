@@ -7,7 +7,6 @@ import io.wispforest.owo.ui.component.TextBoxComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import io.wispforest.owo.ui.core.Color;
 import ml.mypals.carpetgui.localChache.RulesCacheManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +17,10 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,29 +47,23 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
     @Override
     protected void build(FlowLayout root) {
         cachedManagers = RulesCacheManager.loadKnownManagers();
-        root.surface(Surface.blur(10,10));
+        root.surface(Surface.blur(10, 10));
 
         List<RuleGroup> groups = RuleGroupLoader.loadAll();
-
-        if (groups.isEmpty()) {
-            root.child(
-                    Containers.verticalFlow(Sizing.fill(100), Sizing.fill(100))
-                            .horizontalAlignment(HorizontalAlignment.CENTER)
-            );
-            return;
-        }
 
         FlowLayout main = Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
 
         this.leftContent = Containers.verticalFlow(Sizing.fill(100), Sizing.content());
         this.leftContent.gap(2);
 
-        RuleGroup selected = groups.getFirst();
-        this.currentGroup = selected;
-        this.currentBoxes = new ArrayList<>();
+        if(!groups.isEmpty()){
+            RuleGroup selected = groups.getFirst();
+            this.currentGroup = selected;
+            this.currentBoxes = new ArrayList<>();
 
-        for (RuleCommand cmd : selected.commands()) {
-            this.leftContent.child(buildRow(cmd, this.currentBoxes));
+            for (RuleCommand cmd : selected.commands()) {
+                this.leftContent.child(buildRow(cmd, this.currentBoxes));
+            }
         }
 
         var rulesScroll = Containers.verticalScroll(
@@ -80,7 +77,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
 
         FlowLayout leftPanel = Containers.verticalFlow(Sizing.fill(80), Sizing.fill(100));
         leftPanel.child(rulesScroll.sizing(Sizing.fill(100), Sizing.fill(90)));
-        leftPanel.child(bottomBar.positioning(Positioning.relative(0,99))
+        leftPanel.child(bottomBar.positioning(Positioning.relative(0, 99))
                 .sizing(Sizing.fill(100), Sizing.fill(6)));
         leftPanel.surface(Surface.flat(0x77000000));
 
@@ -104,36 +101,43 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
         root.child(main);
     }
 
+    @Override
+    public void onFilesDrop(@NotNull List<Path> files) {
+        Path saveDir = RuleGroupLoader.GROUPS_DIR;
+        for (Path path : files) {
+            try {
+                Files.copy(path, saveDir.resolve(path.getFileName()));
+            } catch (IOException ignored) {
+            }
+        }
+        this.rebuildRightPanel();
+    }
     private FlowLayout buildBottomBar() {
         FlowLayout bar = Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
 
         bar.surface(Surface.flat(0x30000000).and(Surface.outline(0x60000000)));
         bar.verticalAlignment(VerticalAlignment.CENTER);
         bar.gap(6);
-
-        ButtonComponent exec = Components.button(
-                Component.translatable("carpetgui.rulegroups.execute"),
-                btn -> executeCurrent()
+        FlowLayout exec = btn(
+                Component.translatable("gui.rulegroups.execute"),
+                Sizing.content(), Sizing.fill(100),
+                this::executeCurrent
         );
-        exec.sizing(Sizing.content(), Sizing.fill(100));
-
-        ButtonComponent file = Components.button(
-                Component.translatable("carpetgui.rulegroups.file"),
-                btn -> Util.getPlatform().openFile(RuleGroupLoader.GROUPS_DIR.toFile())
+        FlowLayout file = btn(
+                Component.translatable("gui.rulegroups.file"),
+                Sizing.content(), Sizing.fill(100),
+                ()->Util.getPlatform().openFile(RuleGroupLoader.GROUPS_DIR.toFile())
         );
-        file.sizing(Sizing.content(), Sizing.fill(100));
-
-        ButtonComponent newGroup = Components.button(
-                Component.translatable("carpetgui.rulegroups.new"),
-                btn -> openRuleEditScreen(false)
+        FlowLayout newGroup = btn(
+                Component.translatable("gui.rulegroups.new"),
+                Sizing.content(), Sizing.fill(100),
+                () -> openRuleEditScreen(false)
         );
-        newGroup.sizing(Sizing.content(), Sizing.fill(100));
-
-        ButtonComponent addCmd = Components.button(
-                Component.translatable("carpetgui.rulegroups.addcommand"),
-                btn -> addCommandToCurrentGroup()
+        FlowLayout addCmd = btn(
+                Component.translatable("gui.rulegroups.addcommand"),
+                Sizing.content(), Sizing.fill(100),
+                this::addCommandToCurrentGroup
         );
-        addCmd.sizing(Sizing.content(), Sizing.fill(100));
         bar.child(exec);
         bar.child(addCmd);
         bar.child(file);
@@ -141,9 +145,10 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
 
         return bar;
     }
+
     private void addCommandToCurrentGroup() {
         if (currentGroup == null) return;
-        int id = !currentGroup.commands().isEmpty() ?currentGroup.commands().getLast().id()+1 : 0;
+        int id = !currentGroup.commands().isEmpty() ? currentGroup.commands().getLast().id() + 1 : 0;
         RuleCommand blank = new RuleCommand(
                 id,
                 null,
@@ -161,7 +166,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
         if (currentGroup == null) return;
         List<RuleCommand> updated = new ArrayList<>();
 
-        for(int i = 0; i < currentGroup.commands().size(); i++){
+        for (int i = 0; i < currentGroup.commands().size(); i++) {
             RuleCommand cm = currentGroup.commands().get(i);
             updated.add(new RuleCommand(
                     cm.id(),
@@ -187,9 +192,9 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
             String val = i < currentBoxes.size() ? currentBoxes.get(i).getValue() : null;
 
             String result = cmd.toCommand(val);
-            if(result.startsWith("/")){
+            if (result.startsWith("/")) {
                 mc.getConnection().sendCommand(result.substring(1));
-            }else {
+            } else {
                 mc.getConnection().sendChat(result);
             }
         }
@@ -203,7 +208,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
         row.horizontalAlignment(HorizontalAlignment.CENTER);
         row.cursorStyle(CursorStyle.HAND);
 
-        String displayName = truncateWithEllipsis(group.name(),Minecraft.getInstance().font, 150);
+        String displayName = truncateWithEllipsis(group.name(), Minecraft.getInstance().font, 150);
         var nameLabel = Components.label(Component.literal(displayName))
                 .color(Color.WHITE)
                 .horizontalSizing(Sizing.fill(80));
@@ -212,7 +217,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
         row.child(nameLabel);
 
         row.mouseDown().subscribe((mx, my, btn) -> {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK,1));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
             setGroup(group);
             rebuildRightPanel();
             return true;
@@ -236,10 +241,11 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
 
         return row;
     }
+
     private void rebuildRightPanel() {
         rightContent.clearChildren();
         for (RuleGroup group : RuleGroupLoader.loadAll()) {
-            if(currentGroup == null)currentGroup = group;
+            if (currentGroup == null) currentGroup = group;
             rightContent.child(buildGroupEntry(group));
         }
     }
@@ -261,28 +267,28 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
 
         String text = cmd.value() != null ? cmd.value() : "";
         TextBoxComponent box;
-        if(cmd.prefix() != null){
+        if (cmd.prefix() != null) {
             row.child(
                     Components.label(Component.literal(cmd.prefix()).withStyle(ChatFormatting.BLUE))
                             .horizontalSizing(Sizing.fill(12))
             );
 
-            String displayName = truncateWithEllipsis(cmd.ruleName(),Minecraft.getInstance().font, 150);
+            String displayName = truncateWithEllipsis(cmd.ruleName(), Minecraft.getInstance().font, 150);
 
             var nameLabel = Components.label(Component.literal(displayName))
-                    .color(cmd.locked()?Color.ofArgb(0xFFFFD700):Color.WHITE)
+                    .color(cmd.locked() ? Color.ofArgb(0xFFFFD700) : Color.WHITE)
                     .horizontalSizing(Sizing.fill(50));
 
-            String defaultHint = cmd.locked()?Component.translatable("gui.tip.default").getString():"";
+            String defaultHint = cmd.locked() ? Component.translatable("gui.tip.default").getString() : "";
             nameLabel.tooltip(Component.literal(defaultHint + cmd.ruleName()));
             row.child(nameLabel);
 
             box = Components.textBox(Sizing.fill(30));
-        }else {
+        } else {
             box = Components.textBox(Sizing.fill(92));
         }
         box.focusGained().subscribe((focusSource) -> {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK,1));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
         });
         box.focusLost().subscribe(this::saveCurrent);
         box.setMaxLength(114514);
@@ -299,7 +305,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
                 }
         );
 
-        delRow.sizing(Sizing.fixed(12), Sizing.fixed(10)).positioning(Positioning.relative(100,0));
+        delRow.sizing(Sizing.fixed(12), Sizing.fixed(10)).positioning(Positioning.relative(100, 0));
         row.child(delRow);
 
         return row;

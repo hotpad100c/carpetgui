@@ -7,8 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 
 public final class RuleGroupLoader {
@@ -20,7 +23,8 @@ public final class RuleGroupLoader {
             .resolve("carpetgui")
             .resolve("groups");
 
-    private RuleGroupLoader() {}
+    private RuleGroupLoader() {
+    }
 
     public static List<RuleGroup> loadAll() {
         try {
@@ -34,13 +38,13 @@ public final class RuleGroupLoader {
 
         try (Stream<Path> files = Files.list(GROUPS_DIR)) {
             files.filter(p -> p.getFileName().toString().endsWith(".txt"))
-                 .sorted(Comparator.comparing(p -> p.getFileName().toString()))
-                 .forEach(path -> {
-                     RuleGroup group = loadFile(path);
-                     if (group != null) {
-                         groups.add(group);
-                     }
-                 });
+                    .sorted(Comparator.comparing(p -> p.getFileName().toString()))
+                    .forEach(path -> {
+                        RuleGroup group = loadFile(path);
+                        if (group != null) {
+                            groups.add(group);
+                        }
+                    });
         } catch (IOException e) {
             LOGGER.error("Failed to list groups directory", e);
         }
@@ -68,14 +72,16 @@ public final class RuleGroupLoader {
             return null;
         }
     }
+
     public static void delete(RuleGroup group) {
         Path file = GROUPS_DIR.resolve(group.name() + ".txt");
-        try{
+        try {
             Files.deleteIfExists(file);
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
         }
 
     }
+
     public static boolean save(RuleGroup group) {
         if (group == null || group.filePath() == null) {
             return false;

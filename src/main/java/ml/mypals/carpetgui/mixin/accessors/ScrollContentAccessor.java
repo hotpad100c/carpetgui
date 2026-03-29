@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface ScrollContentAccessor {
     @Accessor("scrollOffset")
     double getScrollOffset();
+
     @Accessor("maxScroll")
     int getMaxScroll();
 }

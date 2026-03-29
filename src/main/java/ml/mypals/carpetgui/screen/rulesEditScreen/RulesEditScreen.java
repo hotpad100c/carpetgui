@@ -1,7 +1,9 @@
 package ml.mypals.carpetgui.screen.rulesEditScreen;
 
 import io.wispforest.owo.ui.base.BaseOwoScreen;
-import io.wispforest.owo.ui.component.*;
+import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.LabelComponent;
+import io.wispforest.owo.ui.component.TextBoxComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
@@ -22,6 +24,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
+
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
@@ -35,10 +38,11 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
     private OverlayContainer<FlowLayout> dialogOverlay;
     public double lastCategoryScroll = 0;
     public double lastRuleListScroll = 0;
-    public String currentCategory        = "unknown";
+    public String currentCategory = "unknown";
     public String lastCategoryBeforeSearching = currentCategory;
-    public boolean searching             = false;
-    public static enum DefaultCategory {
+    public boolean searching = false;
+
+    public enum DefaultCategory {
         ALL("all"),
         SEARCHING("searching"),
         DEFAULT("default"),
@@ -46,15 +50,18 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         FAVORITE("favorite"),
         MODIFIED("modified");
         private final String name;
+
         DefaultCategory(String name) {
             this.name = name;
         }
+
         public String getName() {
             return name;
         }
+
         public static Component getDisplayName(String name) {
-            for(DefaultCategory df : DefaultCategory.values()){
-                if(df.getName().equals(name)){
+            for (DefaultCategory df : DefaultCategory.values()) {
+                if (df.getName().equals(name)) {
                     return Component.translatable("gui.category." + name);
                 }
             }
@@ -82,7 +89,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     protected void build(FlowLayout root) {
-        root.surface(Surface.blur(10,10));
+        root.surface(Surface.blur(10, 10));
 
         var leftPanel = Containers.verticalFlow(Sizing.fill(66), Sizing.content());
 
@@ -102,8 +109,8 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         searchBox.setMaxLength(100);
 
         searchBox.onChanged().subscribe(this::onSearch);
-        searchBox.focusGained().subscribe(source->this.onSearch(searchBox.getValue()));
-        searchBox.charTyped().subscribe((chr,scanCode)->{
+        searchBox.focusGained().subscribe(source -> this.onSearch(searchBox.getValue()));
+        searchBox.charTyped().subscribe((chr, scanCode) -> {
             if (chr == '\r') {
                 this.setCurrentCategory(lastCategoryBeforeSearching);
                 return true;
@@ -114,7 +121,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         leftPanel.child(searchRow);
         leftPanel.allowOverflow();
         rulesListLayout = Containers.verticalFlow(Sizing.fill(99), Sizing.content());
-        rulesScroll  = Containers.verticalScroll(
+        rulesScroll = Containers.verticalScroll(
                 Sizing.fill(), Sizing.fill(), rulesListLayout);
         rulesScroll.surface(Surface.flat(0x19000000));
         rulesScroll.scrollbar(ScrollContainer.Scrollbar.flat(Color.WHITE));
@@ -145,13 +152,13 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
 
         ScreenUtils.DialogResult dialogResult = ScreenUtils.createSaveGroupDialog(
                 this::saveModifiedRulesAsGroup,
-                (ingnored)->{
+                (ingnored) -> {
                     ScreenUtils.hideSaveDialog(this.uiAdapter.rootComponent, dialogOverlay);
-                    if(!this.instantAffect){
+                    if (!this.instantAffect) {
                         instantAffect = true;
                         Minecraft.getInstance().setScreen(new RuleGroupScreen());
                     }
-                } );
+                });
 
         saveDialog = dialogResult.dialog();
         dialogOverlay = dialogResult.overlay();
@@ -173,7 +180,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         List<RuleCommand> commands = modifiedRules.stream()
                 .map(rule -> {
                     String prefix = rule.isGamerule ? "gamerule" : rule.manager;
-                    return new RuleCommand(-1, prefix, rule.name, rule.value, defaultRules.contains(rule.name) , true);
+                    return new RuleCommand(-1, prefix, rule.name, rule.value, defaultRules.contains(rule.name), true);
                 })
                 .toList();
 
@@ -183,13 +190,14 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         boolean success = RuleGroupLoader.save(group);
 
         if (success) {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.RESPAWN_ANCHOR_CHARGE,5));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.RESPAWN_ANCHOR_CHARGE, 5));
         }
     }
 
-    public void onSearch(String input){
-        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK,1));
-        if(!Objects.equals(currentCategory, DefaultCategory.SEARCHING.getName())) lastCategoryBeforeSearching = currentCategory;
+    public void onSearch(String input) {
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
+        if (!Objects.equals(currentCategory, DefaultCategory.SEARCHING.getName()))
+            lastCategoryBeforeSearching = currentCategory;
         if (input.isEmpty()) {
             searching = false;
             setCurrentCategory(lastCategoryBeforeSearching);
@@ -208,28 +216,30 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
                         parts.addAll(r.categories.stream().map(Map.Entry::getValue).toList());
                         return matchesRule(parts, input);
                     })
-                    ,searchBox.getValue()
+                    , searchBox.getValue()
             );
         }
     }
-    public void refreshScreen(){
-        if(Objects.equals(currentCategory, DefaultCategory.SEARCHING.getName())){
+
+    public void refreshScreen() {
+        if (Objects.equals(currentCategory, DefaultCategory.SEARCHING.getName())) {
             onSearch(searchBox.getValue());
-        }else {
+        } else {
             setCurrentCategory(this.currentCategory);
         }
     }
+
     public void setCurrentCategory(String category) {
         double offset = ((ScrollContentAccessor) this.categoriesScroll).getScrollOffset();
-        double max    = ((ScrollContentAccessor) this.categoriesScroll).getMaxScroll();
+        double max = ((ScrollContentAccessor) this.categoriesScroll).getMaxScroll();
         lastCategoryScroll = max == 0 ? 0 : offset / max;
 
         boolean justRefresh = Objects.equals(category, currentCategory);
-        if(justRefresh){
+        if (justRefresh) {
             double roffset = ((ScrollContentAccessor) this.rulesScroll).getScrollOffset();
-            double rmax    = ((ScrollContentAccessor) this.rulesScroll).getMaxScroll();
+            double rmax = ((ScrollContentAccessor) this.rulesScroll).getMaxScroll();
             lastRuleListScroll = rmax == 0 ? 0 : roffset / rmax;
-        }else {
+        } else {
             lastRuleListScroll = 0;
         }
 
@@ -254,7 +264,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
 
         rebuildRulesList(stream, "");
         this.categoriesScroll.scrollTo(lastCategoryScroll);
-        if(justRefresh){
+        if (justRefresh) {
             this.rulesScroll.scrollTo(lastRuleListScroll);
         }
     }
@@ -274,11 +284,11 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
             });
         } else if (Objects.equals(currentCategory, DefaultCategory.MODIFIED.getName())) {
             stream = cachedRules.stream().filter(r -> !r.defaultValue.equals(r.value));
-        }else if (Objects.equals(currentCategory, DefaultCategory.GAMERULES.getName())) {
+        } else if (Objects.equals(currentCategory, DefaultCategory.GAMERULES.getName())) {
             stream = cachedRules.stream().filter(r -> r.categories.getFirst().getKey().equals("gamerule"));
-        }else if (Objects.equals(currentCategory, DefaultCategory.ALL.getName())) {
+        } else if (Objects.equals(currentCategory, DefaultCategory.ALL.getName())) {
             stream = cachedRules.stream().filter(r -> !r.categories.getFirst().getKey().equals("gamerule"));
-        }else {
+        } else {
             stream = cachedRules.stream().filter(r -> r.categories.stream().anyMatch(e -> Objects.equals(e.getValue(), currentCategory)));
         }
         return stream;
@@ -307,7 +317,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
 
         row.mouseDown().subscribe((mx, my, btn) -> {
             setCurrentCategory(name);
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK,1));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
             return true;
         });
         return row;
@@ -321,11 +331,12 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         }
         return false;
     }
+
     @Override
     public void onClose() {
-        if(!this.instantAffect){
+        if (!this.instantAffect) {
             ScreenUtils.showSaveGroupDialog(this.uiAdapter.rootComponent, dialogOverlay);
-        }else {
+        } else {
             super.onClose();
         }
     }

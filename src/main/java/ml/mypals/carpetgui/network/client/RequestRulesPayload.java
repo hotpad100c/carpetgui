@@ -24,7 +24,8 @@ import ml.mypals.carpetgui.network.PacketIDs;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-public record  RequestRulesPayload(String lang) implements CustomPacketPayload {
+
+public record RequestRulesPayload(String lang) implements CustomPacketPayload {
     public static final Type<RequestRulesPayload> ID = new Type<>(PacketIDs.REQUEST_RULES_ID);
     public static final StreamCodec<FriendlyByteBuf, RequestRulesPayload> CODEC = StreamCodec.ofMember(RequestRulesPayload::write, RequestRulesPayload::new);
 
@@ -33,7 +34,7 @@ public record  RequestRulesPayload(String lang) implements CustomPacketPayload {
     }
 
     public void write(FriendlyByteBuf buf) {
-         buf.writeUtf(this.lang);
+        buf.writeUtf(this.lang);
     }
 
     @Override

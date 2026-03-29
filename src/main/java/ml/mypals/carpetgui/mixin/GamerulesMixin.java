@@ -12,9 +12,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class GamerulesMixin {
     @Unique
     private static GameRules.GameRuleTypeVisitor DETECTOR;
-    @Inject(method = "register",at = @At("RETURN"))
+
+    @Inject(method = "register", at = @At("RETURN"))
     private static <T extends GameRules.Value<T>> void register(String string, GameRules.Category category, GameRules.Type<T> type, CallbackInfoReturnable<GameRules.Key<T>> cir) {
-        if(DETECTOR == null){
+        if (DETECTOR == null) {
             DETECTOR = new GameRules.GameRuleTypeVisitor() {
                 @Override
                 public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
@@ -25,7 +26,7 @@ public class GamerulesMixin {
                 public void visitBoolean(GameRules.Key<GameRules.BooleanValue> key, GameRules.Type<GameRules.BooleanValue> type) {
                     GamerulesDefaultValueSorter.gamerulesDefaultValues.put(
                             key,
-                            type.createRule().get()?"true":"false"
+                            type.createRule().get() ? "true" : "false"
                     );
                     GameRules.GameRuleTypeVisitor.super.visitBoolean(key, type);
                 }

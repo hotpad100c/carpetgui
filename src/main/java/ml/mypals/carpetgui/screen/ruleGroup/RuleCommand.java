@@ -24,7 +24,7 @@ public record RuleCommand(
             finalValue = this.value != null ? this.value.trim() : "";
         }
 
-        String setDefault = !this.prefix().equals("gamerule") && this.locked ? " setDefault" :"";
+        String setDefault = !this.prefix().equals("gamerule") && this.locked ? " setDefault" : "";
 
         return "/" + prefix + setDefault + " " + ruleName + " " + finalValue;
     }
@@ -55,8 +55,8 @@ public record RuleCommand(
         }
 
         boolean isLocked = parts[1].equals("setDefault");
-        String name = isLocked? parts[2]:parts[1];
-        String value = isLocked? parts[3]:parts[2];
+        String name = isLocked ? parts[2] : parts[1];
+        String value = isLocked ? parts[3] : parts[2];
 
         return new RuleCommand(
                 linecode,
