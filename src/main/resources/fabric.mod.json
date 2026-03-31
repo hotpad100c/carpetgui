@@ -7,6 +7,10 @@
   "authors": [
     "Ryan100C"
   ],
+  "contact": {
+    "homepage": "https://github.com/hotpad100c/carpetgui",
+    "sources": "https://github.com/hotpad100c/carpetgui"
+  },
   "license": "MIT",
   "icon": "assets/carpetgui/icon.png",
   "environment": "*",
