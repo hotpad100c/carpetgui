@@ -48,9 +48,8 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
     protected void build(FlowLayout root) {
 
         var outline = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
-        outline.surface(Surface.outline(0xAAFFFFFF));
-        outline.padding(Insets.of(2));
-
+        outline.surface(Surface.flat(0x77000000).and(Surface.outline(0x66AFAFAF)));
+        outline.padding(Insets.of(1));
 
         root.padding(Insets.of(20,20,10,10));
         cachedManagers = RulesCacheManager.loadKnownManagers();
@@ -61,6 +60,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
 
         this.leftContent = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(100), Sizing.content());
         this.leftContent.gap(2);
+        leftContent.padding(Insets.of(2));
 
         if(!groups.isEmpty()){
             RuleGroup selected = groups.getFirst();
@@ -77,15 +77,15 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
                 Sizing.fill(80),
                 this.leftContent
         );
-        rulesScroll.surface(Surface.flat(0x19000000));
 
+        rulesScroll.surface(Surface.outline(0x550F0F0F));
         FlowLayout bottomBar = buildBottomBar();
 
         FlowLayout leftPanel = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(80), Sizing.fill(99));
+        leftPanel.padding(Insets.of(2));
         leftPanel.child(rulesScroll.sizing(Sizing.fill(100), Sizing.fill(90)));
         leftPanel.child(bottomBar.positioning(Positioning.relative(0, 99))
-                .sizing(Sizing.fill(100), Sizing.fill(6)));
-        leftPanel.surface(Surface.flat(0x77000000));
+                .sizing(Sizing.fill(99), Sizing.fill(8)));
 
         this.rightContent = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(90), Sizing.content());
         rightContent.gap(2);
@@ -99,8 +99,6 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
                 Sizing.fill(99),
                 rightContent
         );
-        rightScroll.surface(Surface.flat(0x66000000));
-
 
         outline.child(leftPanel);
         outline.child(rightScroll);
@@ -121,8 +119,9 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
     private FlowLayout buildBottomBar() {
         FlowLayout bar = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
 
-        bar.surface(Surface.flat(0x30000000).and(Surface.outline(0x60000000)));
         bar.verticalAlignment(VerticalAlignment.CENTER);
+        bar.horizontalAlignment(HorizontalAlignment.CENTER);
+        bar.padding(Insets.of(2));
         bar.gap(6);
         FlowLayout exec = btn(
                 Component.translatable("gui.rulegroups.execute"),

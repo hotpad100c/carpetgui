@@ -78,7 +78,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
         root.padding(Insets.of(20,20,10,10));
 
         var outline = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
-        outline.surface(Surface.outline(0xAAFFFFFF));
+        outline.surface(Surface.flat(0x77000000).and(Surface.outline(0x66AFAFAF)));
         outline.padding(Insets.of(1));
 
         outline.child(buildLeftPanel());
@@ -94,7 +94,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
         changesLayout = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(99), Sizing.content());
         ScrollContainer<FlowLayout> scroll =
                 /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalScroll(Sizing.fill(100), Sizing.fill(100), changesLayout);
-        scroll.surface(Surface.flat(0x66000000));
+        scroll.surface(Surface.outline(0x66000000));
         scroll.scrollbar(ScrollContainer.Scrollbar.flat(Color.WHITE));
         scroll.padding(Insets.of(2,2,2,2));
         panel.child(scroll);
@@ -103,7 +103,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
 
     private FlowLayout buildRightPanel() {
         FlowLayout panel = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(34), Sizing.fill(100));
-        panel.surface(Surface.flat(0x66000000));
+        panel.surface(Surface.outline(0x66000000));
         panel.padding(Insets.of(2));
 
         FlowLayout prefabSection =
@@ -136,7 +136,6 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
         timelineLayout = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(100), Sizing.content());
         ScrollContainer<FlowLayout> timelineScroll =
                 /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalScroll(Sizing.fill(100), Sizing.fill(60), timelineLayout);
-        timelineScroll.surface(Surface.flat(0x15000000));
         timelineScroll.scrollbar(ScrollContainer.Scrollbar.flat(Color.WHITE));
         panel.child(timelineScroll);
 

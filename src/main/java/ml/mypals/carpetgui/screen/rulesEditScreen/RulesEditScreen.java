@@ -98,7 +98,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
 
 
         var outline = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
-        outline.surface(Surface.outline(0xAAFFFFFF));
+        outline.surface(Surface.flat(0x77000000).and(Surface.outline(0x66AFAFAF)));
         outline.padding(Insets.of(1));
 
         ScreenUtils.DialogResult dialogResult = ScreenUtils.createSaveGroupDialog(
@@ -117,7 +117,6 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         root.surface(Surface.blur(10, 10));
 
         var leftPanel = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(66), Sizing.fill(100));
-        leftPanel.surface(Surface.flat(0x99000000));
         leftPanel.padding(Insets.of(5));
 
 
@@ -142,13 +141,12 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         rulesListLayout = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(99), Sizing.content());
         rulesScroll = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalScroll(
                 Sizing.fill(100), Sizing.fill(100), rulesListLayout);
-        rulesScroll.surface(Surface.flat(0x19000000));
         rulesScroll.scrollbar(ScrollContainer.Scrollbar.flat(Color.WHITE));
         leftPanel.child(rulesScroll);
 
 
         var rightPanel = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(34), Sizing.fill(100));
-        rightPanel.surface(Surface.flat(0x0F060606));
+
         rightPanel.padding(Insets.of(5));
 
         currentCategoryLabel = /*? if <1.21.11 {*/Components/*?} else {*//*UIComponents*//*?}*/.label(Component.nullToEmpty(currentCategory));
