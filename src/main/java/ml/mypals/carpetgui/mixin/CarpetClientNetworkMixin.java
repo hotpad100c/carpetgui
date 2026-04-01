@@ -21,14 +21,14 @@ public class CarpetClientNetworkMixin {
         CompoundTag ruleNBT = (CompoundTag) original.call(instance, string);
         if (ruleNBT.contains("Manager")) {
             //? if >=1.21.5 {
-            /*String ruleName = ruleNBT.getString("Rule").get();
+            String ruleName = ruleNBT.getString("Rule").get();
             String managerName = ruleNBT.getString("Manager").get();
             String value = ruleNBT.getString("Value").get();
-            *///?} else {
-            String ruleName = ruleNBT.getString("Rule");
+            //?} else {
+            /*String ruleName = ruleNBT.getString("Rule");
             String managerName = ruleNBT.getString("Manager");
             String value = ruleNBT.getString("Value");
-            //?}
+            *///?}
 
             RuleData ruleData = new RuleData();
             ruleData.manager = managerName;

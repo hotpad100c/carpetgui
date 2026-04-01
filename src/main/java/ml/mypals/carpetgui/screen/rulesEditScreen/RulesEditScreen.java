@@ -1,10 +1,10 @@
 package ml.mypals.carpetgui.screen.rulesEditScreen;
 
 import io.wispforest.owo.ui.base.BaseOwoScreen;
-import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.component.TextBoxComponent;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.container.ScrollContainer;
@@ -12,6 +12,7 @@ import io.wispforest.owo.ui.core.*;
 import ml.mypals.carpetgui.mixin.accessors.ScrollContentAccessor;
 import ml.mypals.carpetgui.network.RuleData;
 import ml.mypals.carpetgui.screen.ScreenSwitcherScreen;
+import ml.mypals.carpetgui.screen.ScreenTabBar;
 import ml.mypals.carpetgui.screen.ScreenUtils;
 import ml.mypals.carpetgui.screen.ruleGroup.RuleCommand;
 import ml.mypals.carpetgui.screen.ruleGroup.RuleGroup;
@@ -21,7 +22,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -34,6 +35,7 @@ import java.util.stream.Stream;
 
 import static ml.mypals.carpetgui.CarpetGUI.MOD_ID;
 import static ml.mypals.carpetgui.CarpetGUIClient.*;
+import static ml.mypals.carpetgui.screen.ScreenUtils.makeMasterContainer;
 
 public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
     private static final Logger log = LoggerFactory.getLogger(RulesEditScreen.class);
@@ -88,18 +90,15 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/::horizontalFlow);
+        return OwoUIAdapter.create(this, /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/::verticalFlow);
     }
-
     @Override
     protected void build(FlowLayout root) {
+        ScreenTabBar.build(buildMain(root), ScreenTabBar.Tab.RULES);
+    }
+    protected FlowLayout buildMain(FlowLayout root) {
 
-        root.padding(Insets.of(20,20,10,10));
-
-
-        var outline = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
-        outline.surface(Surface.flat(0x77000000).and(Surface.outline(0x66AFAFAF)));
-        outline.padding(Insets.of(1));
+        var master = makeMasterContainer(this.width, this.height, root);
 
         ScreenUtils.DialogResult dialogResult = ScreenUtils.createSaveGroupDialog(
                 this::saveModifiedRulesAsGroup,
@@ -114,56 +113,54 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         saveDialog = dialogResult.dialog();
         dialogOverlay = dialogResult.overlay();
 
-        root.surface(Surface.blur(10, 10));
-
-        var leftPanel = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(66), Sizing.fill(100));
+        var leftPanel = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalFlow(Sizing.fill(66), Sizing.fill(100));
         leftPanel.padding(Insets.of(5));
 
 
-        var searchRow = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fixed(14));
+        var searchRow = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fixed(14));
         searchRow.verticalAlignment(VerticalAlignment.CENTER);
         searchRow.padding(Insets.of(2, 2, 4, 4));
         searchRow.surface(Surface.flat(0x0AAAAAAA));
 
-        var searchIcon = /*? if <1.21.11 {*/Components/*?} else {*//*UIComponents*//*?}*/.texture(
-                ResourceLocation.fromNamespaceAndPath(MOD_ID, "ui/search.png"),
+        var searchIcon = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.texture(
+                Identifier.fromNamespaceAndPath(MOD_ID, "ui/search.png"),
                 0, 0, 10, 11, 10, 11);
         searchIcon.sizing(Sizing.fixed(10), Sizing.fixed(11));
         searchRow.child(searchIcon);
 
-        searchBox = /*? if <1.21.11 {*/Components/*?} else {*//*UIComponents*//*?}*/.textBox(Sizing.fill(100));
+        searchBox = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.textBox(Sizing.fill(100));
         searchBox.setMaxLength(100);
 
         searchBox.onChanged().subscribe(this::onSearch);
         searchBox.focusGained().subscribe(source -> this.onSearch(searchBox.getValue()));
         searchRow.child(searchBox);
         leftPanel.child(searchRow);
-        rulesListLayout = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(99), Sizing.content());
-        rulesScroll = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalScroll(
+        rulesListLayout = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalFlow(Sizing.fill(99), Sizing.content());
+        rulesScroll = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalScroll(
                 Sizing.fill(100), Sizing.fill(100), rulesListLayout);
         rulesScroll.scrollbar(ScrollContainer.Scrollbar.flat(Color.WHITE));
         leftPanel.child(rulesScroll);
 
 
-        var rightPanel = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(34), Sizing.fill(100));
+        var rightPanel = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalFlow(Sizing.fill(34), Sizing.fill(100));
 
         rightPanel.padding(Insets.of(5));
 
-        currentCategoryLabel = /*? if <1.21.11 {*/Components/*?} else {*//*UIComponents*//*?}*/.label(Component.nullToEmpty(currentCategory));
+        currentCategoryLabel = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.label(Component.nullToEmpty(currentCategory));
         currentCategoryLabel.color(Color.WHITE);
         currentCategoryLabel.margins(Insets.of(2, 6, 4, 0));
         rightPanel.child(currentCategoryLabel);
 
-        categoriesListLayout = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalFlow(Sizing.fill(98), Sizing.content());
-        categoriesScroll = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.verticalScroll(
+        categoriesListLayout = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalFlow(Sizing.fill(98), Sizing.content());
+        categoriesScroll = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalScroll(
                 Sizing.fill(100), Sizing.fill(100), categoriesListLayout);
         categoriesScroll.scrollbar(ScrollContainer.Scrollbar.flat(Color.WHITE));
         categoriesScroll.surface(Surface.flat(0x19000000));
         categoriesScroll.scrollbarThiccness(10);
         rightPanel.child(categoriesScroll);
 
-        outline.child(leftPanel);
-        outline.child(rightPanel);
+        master.getValue().child(leftPanel);
+        master.getValue().child(rightPanel);
 
 
 
@@ -171,25 +168,26 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
         root.horizontalAlignment(HorizontalAlignment.CENTER);
         root.verticalAlignment(VerticalAlignment.CENTER);
 
-        root.child(outline );
+        root.child(master.getKey());
 
         setCurrentCategory(cachedCategories.getFirst());
 
 
 
         //? if <1.21.9 {
-        ScreenKeyboardEvents.afterKeyPress(this).register((screen, key, scancode, modifiers) -> {
+        /*ScreenKeyboardEvents.afterKeyPress(this).register((screen, key, scancode, modifiers) -> {
             if ((modifiers & GLFW.GLFW_MOD_CONTROL) != 0 && key == GLFW.GLFW_KEY_S) {
                 ScreenUtils.showSaveGroupDialog(this.uiAdapter.rootComponent, dialogOverlay);
             }
         });
-        //?} else {
-        /*ScreenKeyboardEvents.afterKeyPress(this).register((screen, key) -> {
+        *///?} else {
+        ScreenKeyboardEvents.afterKeyPress(this).register((screen, key) -> {
             if ((key.input() & GLFW.GLFW_MOD_CONTROL) != 0 && key.key() == GLFW.GLFW_KEY_S) {
                 ScreenUtils.showSaveGroupDialog(this.uiAdapter.rootComponent, dialogOverlay);
             }
         });
-        *///?}
+        //?}
+        return master.getKey();
     }
 
     private void saveModifiedRulesAsGroup(String groupName) {
@@ -345,20 +343,20 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
     private FlowLayout buildCategoryRow(String name) {
         boolean selected = Objects.equals(name, currentCategory);
 
-        var row = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fixed(22));
+        var row = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fixed(22));
         row.surface(Surface.flat(selected ? 0x50060606 : 0x20060606));
         row.padding(Insets.of(4, 4, 6, 0));
         row.verticalAlignment(VerticalAlignment.CENTER);
         row.cursorStyle(CursorStyle.HAND);
 
-        var label = /*? if <1.21.11 {*/Components/*?} else {*//*UIComponents*//*?}*/.label(DefaultCategory.getDisplayName(name));
+        var label = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.label(DefaultCategory.getDisplayName(name));
         label.color(Color.WHITE);
         row.child(label);
         //? if <1.21.9 {
-        row.mouseDown().subscribe((x, y, btn) -> {
-        //?} else {
-        /*row.mouseDown().subscribe((mouseButtonEvent, btn) -> {
-        *///?}
+        /*row.mouseDown().subscribe((x, y, btn) -> {
+        *///?} else {
+        row.mouseDown().subscribe((mouseButtonEvent, btn) -> {
+        //?}
 
             setCurrentCategory(name);
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
@@ -380,8 +378,8 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
     public void onClose() {
         if (!this.instantAffect) {
             ScreenUtils.showSaveGroupDialog(this.uiAdapter.rootComponent, dialogOverlay);
-        } else {
-            Minecraft.getInstance().setScreen(new ScreenSwitcherScreen(false));
+        }else {
+            super.onClose();
         }
     }
 }

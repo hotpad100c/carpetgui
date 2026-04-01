@@ -20,17 +20,17 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.MinecraftServer;
 //? if < 1.21.11 {
-import net.minecraft.world.level.GameRules;
+/*import net.minecraft.world.level.GameRules;
 import net.minecraft.commands.CommandSourceStack;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import ml.mypals.carpetgui.mixin.accessors.GameRulesAccessor;
 import ml.mypals.carpetgui.mixin.accessors.TypeAccessor;
 import java.util.Objects;
 import static ml.mypals.carpetgui.settings.GamerulesDefaultValueSorter.gamerulesDefaultValues;
-//?} else {
-/*import net.minecraft.world.level.gamerules.GameRule;
+*///?} else {
+import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRules;
-*///?}
+//?}
 import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
     public static final String MOD_ID = "carpetgui";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final String VERSION = /*$ mod_version*/ "1.0.0";
-    public static final String MINECRAFT = /*$ minecraft*/ "1.21.1";
+    public static final String MINECRAFT = /*$ minecraft*/ "1.21.11";
 
     private static PrefabManager prefabManager;
 
@@ -88,10 +88,10 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
             (payload, context) ->
                 CarpetGUIServerPacketHandler.handleRequestRules(payload, context.player(),
                     //? if <1.21.9 {
-                    Objects.requireNonNull(context.player().getServer())
-                    //?} else {
-                    /*context.server()
-                    *///?}
+                    /*Objects.requireNonNull(context.player().getServer())
+                    *///?} else {
+                    context.server()
+                    //?}
                 )
         );
 
@@ -99,10 +99,10 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
             (payload, context) ->
                 CarpetGUIServerPacketHandler.handleRequestRuleStack(payload, context.player(),
                     //? if <1.21.9 {
-                    Objects.requireNonNull(context.player().getServer())
-                     //?} else {
-                    /*context.server()
-                    *///?}
+                    /*Objects.requireNonNull(context.player().getServer())
+                     *///?} else {
+                    context.server()
+                    //?}
                 )
         );
         //?} else {
@@ -146,7 +146,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
             return new ArrayList<>();
         }
         //? if <1.21.11 {
-        GameRulesAccessor rulesAccessor = ((GameRulesAccessor) server.getGameRules());
+        /*GameRulesAccessor rulesAccessor = ((GameRulesAccessor) server.getGameRules());
         for (Map.Entry<GameRules.Key<?>, GameRules.Value<?>> entry : rulesAccessor.carpetGUI$getRules().entrySet()) {
             GameRules.Key<?> rule = entry.getKey();
             GameRules.Value<?> value = entry.getValue();
@@ -166,9 +166,9 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                     List.of(Map.entry("gamerule", "gui.category.gamerules" + " : " + rule.getCategory().getDescriptionId()))
             ));
         }
-        //?} else {
+        *///?} else {
 
-        /*GameRules gameRules = server.getWorldData().getGameRules();
+        GameRules gameRules = server.getWorldData().getGameRules();
         for (GameRule<?> rule : gameRules.availableRules().toList()) {
             fakeCarpetRules.add(new RuleData(
                     "gamerule",
@@ -183,7 +183,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                     List.of(Map.entry("gamerule", "gui.category.gamerules" + " : " + rule.category().getDescriptionId()))
             ));
         }
-        *///?}
+        //?}
         return fakeCarpetRules;
     }
 
@@ -257,7 +257,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                 //? if >1.18.2 {
                 .resolve(CarpetServer.settingsManager.identifier() + ".conf");
                 //?} else {
-                /*.resolve(CarpetServer.settingsManager.getResourceLocation() + ".conf");
+                /*.resolve(CarpetServer.settingsManager.getIdentifier() + ".conf");
                 *///?}
     }
 

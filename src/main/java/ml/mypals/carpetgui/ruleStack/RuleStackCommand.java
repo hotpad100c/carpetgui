@@ -10,8 +10,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 //? if >=1.21.11 {
-/*import net.minecraft.server.permissions.Permissions;
-*///?}
+import net.minecraft.server.permissions.Permissions;
+//?}
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -31,7 +31,7 @@ public final class RuleStackCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
-                literal("rulestack").requires(src -> src/*? if >=1.21.11 {*//*.permissions()*//*?}*/.hasPermission(/*? if >=1.21.11 {*//*Permissions.COMMANDS_ADMIN*//*?} else {*/2/*?}*/))
+                literal("rulestack").requires(src -> src/*? if >=1.21.11 {*/.permissions()/*?}*/.hasPermission(/*? if >=1.21.11 {*/Permissions.COMMANDS_ADMIN/*?} else {*//*2*//*?}*/))
                         .then(literal("push")
                                 .executes(c -> doPush(c, ""))
                                 .then(argument("message", StringArgumentType.greedyString())
