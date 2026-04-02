@@ -42,7 +42,7 @@ public class CarpetGUIClientPacketHandler {
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
             Minecraft client = Minecraft.getInstance();
-            boolean fromRuleGroupScreen = client.screen instanceof RuleGroupScreen;
+            boolean fromRuleGroupScreen = client.screen instanceof RuleGroupScreen ruleGroupScreen && ruleGroupScreen.requestingRulesForNewGroup;
 
             CarpetGUIClient.hasModOnServer = true;
 

@@ -159,7 +159,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
         Component pushTooltip = rebuildPushHint();
         FlowLayout pushButton = btn(
                 Component.translatable("gui.rulestack.btn.push"),
-                Sizing.fill(50), Sizing.fill(100),
+                Sizing.fill(33), Sizing.fill(100),
                 () -> {
                     String msg = pushMessageBox.getValue().trim();
                     sendCmd("rulestack push" + (msg.isEmpty() ? "" : " " + msg));
@@ -173,8 +173,13 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
 
         bottomButtonLayout.child(btn(
                 Component.translatable("gui.rulestack.btn.pop"),
-                Sizing.fill(50), Sizing.fill(100),
+                Sizing.fill(33), Sizing.fill(100),
                 () -> sendCmd("rulestack pop")));
+
+        bottomButtonLayout.child(btn(
+                Component.translatable("gui.rulestack.btn.discard"),
+                Sizing.fill(33), Sizing.fill(100),
+                () -> sendCmd("rulestack discard")));
     }
 
     private void togglePrefabPanel(PrefabPanel target) {

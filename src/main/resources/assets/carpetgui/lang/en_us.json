@@ -24,6 +24,7 @@
   "gui.rulestack.message_hint": "Commit message",
   "gui.rulestack.btn.push": "Push",
   "gui.rulestack.btn.pop": "Revert",
+  "gui.rulestack.btn.discard": "Discard",
   "gui.rulestack.switch_warning": "You have uncommitted changes that will be overwritten.\nHold Shift and click to confirm.",
   "gui.rulestack.btn.switch": "Switch",
   "gui.rulestack.btn.new_prefab": "New",

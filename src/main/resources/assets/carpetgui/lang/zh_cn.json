@@ -37,6 +37,7 @@
   "gui.rulestack.message_hint": "提交说明",
   "gui.rulestack.btn.push": "存档",
   "gui.rulestack.btn.pop": "回退",
+  "gui.rulestack.btn.discard": "丢弃",
   "gui.rulestack.btn.switch": "切换",
   "gui.rulestack.switch_warning": "有未存档的更改，其将被覆盖。按下Shift点击以确认",
   "gui.rulestack.btn.new_prefab": "新建",

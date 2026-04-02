@@ -33,6 +33,7 @@ import static ml.mypals.carpetgui.screen.ScreenUtils.*;
 public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
     private FlowLayout leftContent;
     private FlowLayout rightContent;
+    public boolean requestingRulesForNewGroup = false;
     private List<TextBoxComponent> currentBoxes = new ArrayList<>();
     private RuleGroup currentGroup;
 
@@ -137,7 +138,10 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
         FlowLayout newGroup = btn(
                 Component.translatable("gui.rulegroups.new"),
                 Sizing.content(), Sizing.fill(100),
-                () -> openRuleEditScreen(false)
+                () ->{
+                    requestingRulesForNewGroup = true;
+                    openRuleEditScreen(false);
+                }
         );
         FlowLayout addCmd = btn(
                 Component.translatable("gui.rulegroups.addcommand"),

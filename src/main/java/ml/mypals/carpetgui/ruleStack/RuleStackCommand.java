@@ -48,6 +48,8 @@ public final class RuleStackCommand {
                                                 StringArgumentType.getString(c, "layerId")))))
                         .then(literal("diff")
                                 .executes(RuleStackCommand::doDiff))
+                        .then(literal("discard")
+                                .executes(RuleStackCommand::discard))
                         .then(literal("prefab")
                                 .then(literal("list")
                                         .executes(RuleStackCommand::doPrefabList))
@@ -176,6 +178,31 @@ public final class RuleStackCommand {
         msg.append(Component.literal(" "))
                 .append(Component.translatable("commands.rulestack.pop.redo_hint"));
 
+        for (RuleChange c : layer.getChanges()) {
+            msg.append(Component.literal("\n  ")).append(renderChange(c));
+        }
+        success(ctx, msg, true);
+        return 1;
+    }
+
+    private static int discard(CommandContext<CommandSourceStack> ctx) {
+        if (guard(ctx)) return 0;
+
+        RuleLayer layer = mgr().popAllWithoutSave();
+        if (layer == null) {
+            failure(ctx, Component.translatable("commands.rulestack.pop.empty"));
+            return 0;
+        }
+
+        MutableComponent msg = Component.translatable(
+                "commands.rulestack.pop.success",
+                String.valueOf(layer.getId()),
+                layer.getMessage().isEmpty()
+                        ? Component.literal("")
+                        : Component.translatable("commands.rulestack.push.message_suffix",
+                        layer.getMessage()),
+                String.valueOf(layer.getChanges().size())
+        );
         for (RuleChange c : layer.getChanges()) {
             msg.append(Component.literal("\n  ")).append(renderChange(c));
         }

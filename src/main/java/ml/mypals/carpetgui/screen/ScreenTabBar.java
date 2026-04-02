@@ -67,7 +67,6 @@ public class ScreenTabBar {
     }
 
     private static void onTabClick(Tab tab) {
-        Minecraft.getInstance().setScreen(null);
         switch (tab) {
             case RULES  -> CarpetGUIClient.openRuleEditScreen(true);
             case STACK  -> {

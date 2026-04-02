@@ -92,6 +92,33 @@ public class PrefabManager {
         return layer;
     }
 
+    public RuleLayer popAllWithoutSave() {
+        Prefab active = getActivePrefab();
+        CommandSourceStack src = server.createCommandSourceStack();
+
+        List<RuleChange> pending = getPendingChanges();
+
+        if (!pending.isEmpty()) {
+            for (RuleChange c : pending) {
+                SettingsWatcher.applyRule(c.ruleKey(), c.previousSnapshot(), src);
+            }
+            committedSnapshot = SettingsWatcher.takeSnapshot();
+            save();
+            return new RuleLayer(-1,"",-1,pending);
+        }
+
+        if (active.isEmpty()) return null;
+
+        RuleLayer layer = active.popLayer();
+
+        for (RuleChange c : layer.getChanges()) {
+            SettingsWatcher.applyRule(c.ruleKey(), c.previousSnapshot(), src);
+        }
+        committedSnapshot = SettingsWatcher.takeSnapshot();
+        save();
+        return layer;
+    }
+
     public Prefab createPrefab(String name, boolean newOne) {
         Prefab p = new Prefab(name,
                 newOne ? SettingsWatcher.makeDefaultSnapshot()

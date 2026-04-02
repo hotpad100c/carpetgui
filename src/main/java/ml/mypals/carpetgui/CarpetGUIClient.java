@@ -60,31 +60,6 @@ public class CarpetGUIClient implements ClientModInitializer {
         CarpetGUIConfigManager.initializeConfig();
 
 
-        /*ScreenSwitcherScreen.registerEntry(
-                Component.translatable("gui.screen.rule_groups"),
-                new ItemStack(Items.DRIED_KELP_BLOCK),
-                () -> {
-                    Minecraft.getInstance().setScreen(new RuleGroupScreen());
-                }
-        );
-        ScreenSwitcherScreen.registerEntry(
-                Component.translatable("gui.screen.rules"),
-                new ItemStack(Items.KNOWLEDGE_BOOK),
-                () -> openRuleEditScreen(true)
-        );
-        ScreenSwitcherScreen.registerEntry(
-                Component.translatable("gui.screen.rule_stack"),
-                new ItemStack(Items.NETHERITE_SCRAP),
-                () -> {
-
-                    if(hasModOnServer){
-                        Minecraft.getInstance().setScreen(new RuleStackScreen());
-                        ClientPlayNetworking.send(new RequestRuleStackPayload());
-                    }
-                }
-        );*/
-
-
         carpetRulesKeyBind = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "carpetgui.key.carpetRulesKeyBind",
                 InputConstants.Type.KEYSYM,
@@ -97,7 +72,6 @@ public class CarpetGUIClient implements ClientModInitializer {
         ));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (carpetRulesKeyBind.consumeClick()) {
-                //ScreenSwitcherScreen.setTriggerKey(((KeyMappingAccessor)carpetRulesKeyBind).carpetGUI$getCurrentKey().getValue());
                 ScreenSwitcherScreen.open();
             }
         });
