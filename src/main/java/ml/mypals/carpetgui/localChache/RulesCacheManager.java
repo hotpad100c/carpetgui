@@ -31,6 +31,7 @@ public class RulesCacheManager {
     private static final Path KNOWN_MANAGERS_FILE = CACHE_DIR.resolve("known_managers.json");
     private static final Path RULES_FILE = CACHE_DIR.resolve("base_cache.json");
 
+
     public static void saveCache(List<RuleData> newRules,
                                  String defaults,
                                  String currentLanguage) {
@@ -150,6 +151,145 @@ public class RulesCacheManager {
         } catch (Exception ex) {
             LOGGER.error("Failed to load cache !", ex);
             return Optional.empty();
+        }
+    }
+
+    public static void saveRawCache(RawCacheData rawCache, Collection<CachedRuleEntry> mergedRules, String defaults) {
+        try {
+            Files.createDirectories(CACHE_DIR);
+
+            JsonObject root = new JsonObject();
+            root.addProperty("defaults", defaults == null ? "" : defaults);
+
+            JsonArray rulesArr = new JsonArray();
+            for (CachedRuleEntry entry : mergedRules) {
+                JsonObject obj = new JsonObject();
+                obj.addProperty("name", entry.name);
+                obj.addProperty("type", entry.type);
+                obj.addProperty("description", entry.description);
+                obj.addProperty("defaultValue", entry.defaultValue);
+                obj.addProperty("isGamerule", entry.isGamerule);
+                obj.addProperty("manager", entry.manager);
+
+                JsonObject localNameObj = new JsonObject();
+                entry.localName.forEach(localNameObj::addProperty);
+                obj.add("localName", localNameObj);
+
+                JsonObject localDescObj = new JsonObject();
+                entry.localDescription.forEach(localDescObj::addProperty);
+                obj.add("localDescription", localDescObj);
+
+                JsonArray suggs = new JsonArray();
+                entry.suggestions.forEach(suggs::add);
+                obj.add("suggestions", suggs);
+
+                JsonArray cats = new JsonArray();
+                entry.categories.forEach(cats::add);
+                obj.add("categories", cats);
+
+                rulesArr.add(obj);
+            }
+            root.add("rules", rulesArr);
+
+            JsonArray catsArr = new JsonArray();
+            for (CachedCategoryEntry catEntry : rawCache.categories) {
+                JsonObject obj = new JsonObject();
+                obj.addProperty("key", catEntry.key);
+                JsonObject valObj = new JsonObject();
+                catEntry.value.forEach(valObj::addProperty);
+                obj.add("value", valObj);
+                catsArr.add(obj);
+            }
+            root.add("categories", catsArr);
+
+            try (Writer w = new OutputStreamWriter(
+                    Files.newOutputStream(RULES_FILE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
+                    StandardCharsets.UTF_8)) {
+                GSON.toJson(root, w);
+            }
+
+            Set<String> managers = mergedRules.stream()
+                    .map(e -> e.manager)
+                    .filter(m -> m != null && !m.isBlank())
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            saveKnownManagers(managers);
+
+        } catch (Exception ex) {
+            LOGGER.error("Failed to save raw cache!", ex);
+        }
+    }
+
+    public static RawCacheData loadRawCache() {
+        if (!Files.exists(RULES_FILE)) return null;
+
+        try (Reader r = new InputStreamReader(Files.newInputStream(RULES_FILE), StandardCharsets.UTF_8)) {
+            JsonObject root = GSON.fromJson(r, JsonObject.class);
+
+            RawCacheData data = new RawCacheData();
+            data.defaults = root.has("defaults") ? root.get("defaults").getAsString() : "";
+
+            data.categories = new ArrayList<>();
+            JsonArray catsArr = root.getAsJsonArray("categories");
+            if (catsArr != null) {
+                for (JsonElement el : catsArr) {
+                    JsonObject obj = el.getAsJsonObject();
+                    CachedCategoryEntry entry = new CachedCategoryEntry();
+                    entry.key = obj.get("key").getAsString();
+                    entry.value = new HashMap<>();
+                    JsonObject valObj = obj.getAsJsonObject("value");
+                    if (valObj != null) {
+                        for (Map.Entry<String, JsonElement> e : valObj.entrySet()) {
+                            entry.value.put(e.getKey(), e.getValue().getAsString());
+                        }
+                    }
+                    data.categories.add(entry);
+                }
+            }
+
+            data.rules = new ArrayList<>();
+            JsonArray rulesArr = root.getAsJsonArray("rules");
+            if (rulesArr != null) {
+                for (JsonElement el : rulesArr) {
+                    JsonObject obj = el.getAsJsonObject();
+                    CachedRuleEntry entry = new CachedRuleEntry();
+                    entry.name = obj.get("name").getAsString();
+                    entry.type = obj.get("type").getAsString();
+                    entry.description = obj.get("description").getAsString();
+                    entry.defaultValue = obj.get("defaultValue").getAsString();
+                    entry.isGamerule = obj.get("isGamerule").getAsBoolean();
+                    entry.manager = obj.get("manager").getAsString();
+
+                    entry.suggestions = new ArrayList<>();
+                    obj.getAsJsonArray("suggestions").forEach(s -> entry.suggestions.add(s.getAsString()));
+
+                    entry.categories = new ArrayList<>();
+                    obj.getAsJsonArray("categories").forEach(c -> entry.categories.add(c.getAsString()));
+
+                    entry.localName = new HashMap<>();
+                    JsonElement localNameEl = obj.get("localName");
+                    if (localNameEl != null && localNameEl.isJsonObject()) {
+                        for (Map.Entry<String, JsonElement> e : localNameEl.getAsJsonObject().entrySet()) {
+                            entry.localName.put(e.getKey(), e.getValue().getAsString());
+                        }
+                    }
+
+                    entry.localDescription = new HashMap<>();
+                    JsonElement localDescEl = obj.get("localDescription");
+                    if (localDescEl != null && localDescEl.isJsonObject()) {
+                        for (Map.Entry<String, JsonElement> e : localDescEl.getAsJsonObject().entrySet()) {
+                            entry.localDescription.put(e.getKey(), e.getValue().getAsString());
+                        }
+                    }
+
+                    data.rules.add(entry);
+                }
+            }
+
+            return data;
+
+        } catch (Exception ex) {
+            LOGGER.error("Failed to load raw cache!", ex);
+            return null;
         }
     }
 
@@ -347,5 +487,51 @@ public class RulesCacheManager {
     }
 
     public record CacheResult(List<RuleData> rules, String defaults) {
+    }
+
+    public static class RawCacheData {
+        public List<CachedRuleEntry> rules;
+        public List<CachedCategoryEntry> categories;
+        public String defaults;
+    }
+
+    public static class CachedRuleEntry {
+        public String name;
+        public String type;
+        public String description;
+        public String defaultValue;
+        public boolean isGamerule;
+        public String manager;
+        public List<String> suggestions;
+        public List<String> categories;
+
+        public Map<String, String> localName;
+        public Map<String, String> localDescription;
+
+        public RuleData toRuleData(String lang, List<CachedCategoryEntry> knowCategories) {
+            RuleData rule = new RuleData();
+            rule.name = this.name;
+            rule.manager = this.manager;
+            rule.defaultValue = this.defaultValue;
+            rule.isGamerule = this.isGamerule;
+            rule.suggestions = this.suggestions;
+            rule.type = RuleData.getRuleType(this.type);
+            rule.description = this.description;
+            rule.localName = this.localName.getOrDefault(lang, this.name);
+            rule.localDescription = this.localDescription.getOrDefault(lang, this.description);
+            List<Map.Entry<String, String>> cats = new ArrayList<>();
+            Map<String, String> catValueMap = knowCategories.stream()
+                    .collect(Collectors.toMap(c -> c.key, c -> c.value.getOrDefault(lang, c.key)));
+
+            rule.categories = this.categories.stream()
+                    .map(key -> Map.entry(key, catValueMap.getOrDefault(key, key)))
+                    .collect(Collectors.toList());
+            return rule;
+        }
+    }
+
+    public static class CachedCategoryEntry {
+        public String key;
+        public Map<String, String> value;
     }
 }

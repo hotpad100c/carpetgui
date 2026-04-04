@@ -59,7 +59,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
     public static final String MOD_ID = "carpetgui";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final String VERSION = /*$ mod_version*/ "1.1.0";
+    public static final String VERSION = /*$ mod_version*/ "1.2.0";
     public static final String MINECRAFT = /*$ minecraft*/ "1.21.1";
 
     private static PrefabManager prefabManager;
@@ -119,8 +119,6 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
         ServerPlayConnectionEvents.JOIN.register((impl, sender, server) -> {
             sender.sendPacket(new HelloPacketPayload());
         });
-
-
     }
 
     public static List<RuleData> getRules(String lang) {

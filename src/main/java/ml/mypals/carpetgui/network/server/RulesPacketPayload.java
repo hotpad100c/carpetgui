@@ -11,18 +11,19 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 
-public record RulesPacketPayload(List<RuleData> rules, String defaults) implements CustomPacketPayload {
+public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean isPartial) implements CustomPacketPayload {
 
     public static final Type<RulesPacketPayload> ID = new Type<>(PacketIDs.SYNC_RULES_ID);
     public static final StreamCodec<FriendlyByteBuf, RulesPacketPayload> CODEC = StreamCodec.ofMember(RulesPacketPayload::write, RulesPacketPayload::new);
 
     public RulesPacketPayload(FriendlyByteBuf buf) {
-        this(buf.readList(RuleData::new), buf.readUtf());
+        this(buf.readList(RuleData::new), buf.readUtf(), buf.readBoolean());
     }
 
     public void write(FriendlyByteBuf buf) {
         buf.writeCollection(this.rules(), ((buf1, value) -> value.write(buf1)));
         buf.writeUtf(this.defaults);
+        buf.writeBoolean(this.isPartial);
     }
 
     @Override
@@ -34,16 +35,17 @@ public record RulesPacketPayload(List<RuleData> rules, String defaults) implemen
 /*import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 
-public record RulesPacketPayload(List<RuleData> rules, String defaults) implements FabricPacket {
+public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean isPartial) implements FabricPacket {
 
     public static final PacketType<RulesPacketPayload> ID = PacketType.create(
             PacketIDs.SYNC_RULES_ID,
-            buf -> new RulesPacketPayload(buf.readList(RuleData::new), buf.readUtf())
+            buf -> new RulesPacketPayload(buf.readList(RuleData::new), buf.readUtf(), buf.readBoolean())
     );
 
     public void write(FriendlyByteBuf buf) {
         buf.writeCollection(this.rules, (b, v) -> v.write(b));
         buf.writeUtf(this.defaults);
+        buf.writeBoolean(this.isPartial);
     }
 
     @Override

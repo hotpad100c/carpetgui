@@ -28,9 +28,18 @@ import static ml.mypals.carpetgui.CarpetGUIClient.*;
 public class CarpetGUIServerPacketHandler {
     public static void handleRequestRules(RequestRulesPayload payload, ServerPlayer player, MinecraftServer server) {
         server.execute(() -> {
+
             String lang = payload.lang();
-            RulesPacketPayload response = new RulesPacketPayload(CarpetGUI.getRules(lang), CarpetGUI.getDefaults());
-            ServerPlayNetworking.send(player, response);
+            List<RuleData> allRules = CarpetGUI.getRules(lang);
+            List<String> known = payload.knownRuleNames();
+
+            List<RuleData> toSend = known.isEmpty()
+                    ? allRules
+                    : allRules.stream()
+                    .filter(r -> !known.contains(r.name))
+                    .toList();
+
+            ServerPlayNetworking.send(player, new RulesPacketPayload(toSend, CarpetGUI.getDefaults(), !known.isEmpty()));
         });
     }
 

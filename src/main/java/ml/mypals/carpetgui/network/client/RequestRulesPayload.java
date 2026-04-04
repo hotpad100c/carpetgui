@@ -9,17 +9,21 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 
-public record RequestRulesPayload(String lang) implements CustomPacketPayload {
+import java.util.List;
+
+public record RequestRulesPayload(String lang, List<String> knownRuleNames) implements CustomPacketPayload {
 
     public static final Type<RequestRulesPayload> ID = new Type<>(PacketIDs.REQUEST_RULES_ID);
-    public static final StreamCodec<FriendlyByteBuf, RequestRulesPayload> CODEC = StreamCodec.ofMember(RequestRulesPayload::write, RequestRulesPayload::new);
+    public static final StreamCodec<FriendlyByteBuf, RequestRulesPayload> CODEC
+            = StreamCodec.ofMember(RequestRulesPayload::write, RequestRulesPayload::new);
 
     public RequestRulesPayload(FriendlyByteBuf buf) {
-        this(buf.readUtf());
+        this(buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf));
     }
 
     public void write(FriendlyByteBuf buf) {
         buf.writeUtf(this.lang);
+        buf.writeCollection(this.knownRuleNames, FriendlyByteBuf::writeUtf);
     }
 
     @Override
@@ -31,15 +35,18 @@ public record RequestRulesPayload(String lang) implements CustomPacketPayload {
 /*import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 
-public record RequestRulesPayload(String lang) implements FabricPacket {
+import java.util.List;
+
+public record RequestRulesPayload(String lang, List<String> knownRuleNames) implements FabricPacket {
 
     public static final PacketType<RequestRulesPayload> ID = PacketType.create(
             PacketIDs.REQUEST_RULES_ID,
-            buf -> new RequestRulesPayload(buf.readUtf())
+            buf -> new RequestRulesPayload(buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf))
     );
 
     public void write(FriendlyByteBuf buf) {
         buf.writeUtf(this.lang);
+        buf.writeCollection(this.knownRuleNames, FriendlyByteBuf::writeUtf);
     }
 
     @Override

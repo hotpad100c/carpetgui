@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +25,12 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static ml.mypals.carpetgui.CarpetGUI.MOD_ID;
+
 public class CarpetGUIClient implements ClientModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
-    public static final String VERSION = /*$ mod_version*/ "1.1.0";
+    public static final String VERSION = /*$ mod_version*/ "1.2.0";
     public static final String MINECRAFT = /*$ minecraft*/ "1.21.1";
 
     public static KeyMapping carpetRulesKeyBind;
@@ -51,7 +54,7 @@ public class CarpetGUIClient implements ClientModInitializer {
                 "carpetgui.key.carpetRulesKeyBind",
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_F9,
-                //? if <1.21.9 {
+                //? if < 1.21.9 {
                 "key.category.carpetgui.main"
                 //?} else {
                 /*KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(MOD_ID,"main"))
