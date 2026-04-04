@@ -1,20 +1,13 @@
 package ml.mypals.carpetgui;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import ml.mypals.carpetgui.localChache.RulesCacheManager;
-import ml.mypals.carpetgui.mixin.accessors.KeyMappingAccessor;
 import ml.mypals.carpetgui.network.RuleData;
 import ml.mypals.carpetgui.network.client.CarpetGUIClientPacketHandler;
-import ml.mypals.carpetgui.network.client.RequestRuleStackPayload;
-import ml.mypals.carpetgui.network.client.RequestRulesPayload;
 import ml.mypals.carpetgui.network.server.HelloPacketPayload;
 import ml.mypals.carpetgui.network.server.RuleStackSyncPayload;
 import ml.mypals.carpetgui.network.server.RulesPacketPayload;
 import ml.mypals.carpetgui.screen.ScreenSwitcherScreen;
-import ml.mypals.carpetgui.screen.ruleGroup.RuleGroupScreen;
 import ml.mypals.carpetgui.screen.ruleStack.RuleStackData;
-import ml.mypals.carpetgui.screen.ruleStack.RuleStackScreen;
-import ml.mypals.carpetgui.screen.rulesEditScreen.RulesEditScreen;
 import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -24,18 +17,12 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import static ml.mypals.carpetgui.CarpetGUI.MOD_ID;
 
 public class CarpetGUIClient implements ClientModInitializer {
 
@@ -45,8 +32,8 @@ public class CarpetGUIClient implements ClientModInitializer {
 
     public static KeyMapping carpetRulesKeyBind;
     public static RuleStackData cachedRuleStackData;
-    public static List<RuleData> cachedRules = new ArrayList<>();
-    public static List<RuleData> rulesFromServer = new ArrayList<>();
+    public static List<RuleData> cachedCompleteRules = new ArrayList<>();
+    public static List<RuleData> incompleteRulesFromServer = new ArrayList<>();
     public static List<String> cachedCategories = new ArrayList<>();
     public static List<String> cachedManagers = List.of("carpet");
     public static CopyOnWriteArrayList<String> defaultRules = new CopyOnWriteArrayList<>();
@@ -78,7 +65,7 @@ public class CarpetGUIClient implements ClientModInitializer {
 
         ClientPlayConnectionEvents.DISCONNECT.register((listener, mc) -> {
             hasModOnServer = false;
-            rulesFromServer.clear();
+            incompleteRulesFromServer.clear();
         });
         //? if >=1.20.5 {
         ClientPlayNetworking.registerGlobalReceiver(

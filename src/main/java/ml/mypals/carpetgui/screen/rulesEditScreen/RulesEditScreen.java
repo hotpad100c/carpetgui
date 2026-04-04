@@ -11,7 +11,6 @@ import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
 import ml.mypals.carpetgui.mixin.accessors.ScrollContentAccessor;
 import ml.mypals.carpetgui.network.RuleData;
-import ml.mypals.carpetgui.screen.ScreenSwitcherScreen;
 import ml.mypals.carpetgui.screen.ScreenTabBar;
 import ml.mypals.carpetgui.screen.ScreenUtils;
 import ml.mypals.carpetgui.screen.ruleGroup.RuleCommand;
@@ -191,7 +190,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     private void saveModifiedRulesAsGroup(String groupName) {
-        List<RuleData> modifiedRules = cachedRules.stream()
+        List<RuleData> modifiedRules = cachedCompleteRules.stream()
                 .filter(r -> !Objects.equals(r.defaultValue, r.value) || defaultRules.contains(r.name))
                 .toList();
 
@@ -226,7 +225,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
             setCurrentCategory(DefaultCategory.SEARCHING.getName());
 
             rebuildRulesList(
-                    cachedRules.stream().filter(r -> {
+                    cachedCompleteRules.stream().filter(r -> {
                         List<String> parts = new ArrayList<>();
                         parts.add(r.name);
                         parts.add(r.localName);
@@ -310,24 +309,24 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
     private @NotNull Stream<RuleData> getRuleDataStream() {
         Stream<RuleData> stream;
         if (Objects.equals(currentCategory, DefaultCategory.DEFAULT.getName())) {
-            stream = cachedRules.stream().filter(r -> {
+            stream = cachedCompleteRules.stream().filter(r -> {
                 String org = r.name;
                 return defaultRules.contains(org);
             });
         } else if (Objects.equals(currentCategory, DefaultCategory.FAVORITE.getName())) {
-            stream = cachedRules.stream().filter(r -> {
+            stream = cachedCompleteRules.stream().filter(r -> {
                 String org = r.name;
 
                 return favoriteRules.contains(org);
             });
         } else if (Objects.equals(currentCategory, DefaultCategory.MODIFIED.getName())) {
-            stream = cachedRules.stream().filter(r -> !r.defaultValue.equals(r.value));
+            stream = cachedCompleteRules.stream().filter(r -> !r.defaultValue.equals(r.value));
         } else if (Objects.equals(currentCategory, DefaultCategory.GAMERULES.getName())) {
-            stream = cachedRules.stream().filter(r -> r.categories.getFirst().getKey().equals("gamerule"));
+            stream = cachedCompleteRules.stream().filter(r -> r.categories.getFirst().getKey().equals("gamerule"));
         } else if (Objects.equals(currentCategory, DefaultCategory.ALL.getName())) {
-            stream = cachedRules.stream().filter(r -> !r.categories.getFirst().getKey().equals("gamerule"));
+            stream = cachedCompleteRules.stream().filter(r -> !r.categories.getFirst().getKey().equals("gamerule"));
         } else {
-            stream = cachedRules.stream().filter(r -> r.categories.stream().anyMatch(e -> Objects.equals(e.getValue(), currentCategory)));
+            stream = cachedCompleteRules.stream().filter(r -> r.categories.stream().anyMatch(e -> Objects.equals(e.getValue(), currentCategory)));
         }
         return stream;
     }

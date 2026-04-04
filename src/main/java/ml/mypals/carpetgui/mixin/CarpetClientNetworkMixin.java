@@ -9,7 +9,7 @@ import net.minecraft.nbt.Tag;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import static ml.mypals.carpetgui.CarpetGUIClient.rulesFromServer;
+import static ml.mypals.carpetgui.CarpetGUIClient.incompleteRulesFromServer;
 
 @Mixin(value = ClientNetworkHandler.class, remap = false)
 public class CarpetClientNetworkMixin {
@@ -35,7 +35,7 @@ public class CarpetClientNetworkMixin {
             ruleData.value = value;
             ruleData.name = ruleName;
 
-            rulesFromServer.add(ruleData);
+            incompleteRulesFromServer.add(ruleData);
         }
         return ruleNBT;
     }

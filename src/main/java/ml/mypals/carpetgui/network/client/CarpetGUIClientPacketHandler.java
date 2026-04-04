@@ -48,8 +48,8 @@ public class CarpetGUIClientPacketHandler {
 
             CarpetGUIClient.hasModOnServer = true;
 
-            CarpetGUIClient.cachedRules.clear();
-            CarpetGUIClient.cachedRules.addAll(payload.rules());
+            CarpetGUIClient.cachedCompleteRules.clear();
+            CarpetGUIClient.cachedCompleteRules.addAll(payload.rules());
 
             cachedCategories.clear();
             for (var entry : RulesEditScreen.DefaultCategory.values()) {
@@ -60,7 +60,7 @@ public class CarpetGUIClientPacketHandler {
 
             Set<String> categories = new LinkedHashSet<>();
 
-            ListIterator<RuleData> it = cachedRules.listIterator();
+            ListIterator<RuleData> it = cachedCompleteRules.listIterator();
             while (it.hasNext()) {
                 RuleData data = it.next();
 
@@ -87,7 +87,7 @@ public class CarpetGUIClientPacketHandler {
             String lang = client.getLanguageManager().getSelected();
 
             new Thread(() -> {
-                RulesCacheManager.saveCache(cachedRules, payload.defaults(), lang);
+                RulesCacheManager.saveCache(cachedCompleteRules, payload.defaults(), lang);
                 cachedManagers = RulesCacheManager.loadKnownManagers();
             }, "carpetgui-cache-save").start();
 
@@ -115,8 +115,8 @@ public class CarpetGUIClientPacketHandler {
 
         cacheOpt.ifPresent(cache -> {
             client.execute(() -> {
-                cachedRules.clear();
-                cachedRules.addAll(cache.rules());
+                cachedCompleteRules.clear();
+                cachedCompleteRules.addAll(cache.rules());
 
                 cachedCategories.clear();
                 for (var entry : RulesEditScreen.DefaultCategory.values()) {
@@ -138,15 +138,15 @@ public class CarpetGUIClientPacketHandler {
                 favoriteRules.clear();
                 favoriteRules.addAll(CarpetGUIConfigManager.readFavoriteRules());
 
-                if (rulesFromServer != null && !rulesFromServer.isEmpty()) {
+                if (incompleteRulesFromServer != null && !incompleteRulesFromServer.isEmpty()) {
                     Map<String, RuleData> cachedMap = new HashMap<>();
-                    for (RuleData rule : cachedRules) {
+                    for (RuleData rule : cachedCompleteRules) {
                         if (rule.name != null) {
                             cachedMap.put(rule.name, rule);
                         }
                     }
 
-                    for (RuleData serverRule : rulesFromServer) {
+                    for (RuleData serverRule : incompleteRulesFromServer) {
                         if (serverRule.name == null || serverRule.name.isEmpty()) {
                             continue;
                         }
@@ -173,17 +173,17 @@ public class CarpetGUIClientPacketHandler {
                             newRule.categories = List.of(Map.entry("unkown", Component.translatable("gui.category.unknown").getString()));
                             newRule.isGamerule = false;
 
-                            cachedRules.add(newRule);
+                            cachedCompleteRules.add(newRule);
                             cachedMap.put(newRule.name, newRule);
                         }
                     }
 
-                    Iterator<RuleData> iterator = cachedRules.iterator();
+                    Iterator<RuleData> iterator = cachedCompleteRules.iterator();
                     while (iterator.hasNext()) {
                         RuleData cachedRule = iterator.next();
                         if (cachedRule.name == null) continue;
 
-                        boolean existsOnServer = rulesFromServer.stream()
+                        boolean existsOnServer = incompleteRulesFromServer.stream()
                                 .anyMatch(sr -> sr.name != null && sr.name.equals(cachedRule.name));
 
                         if (!existsOnServer && !cachedRule.isGamerule) {
