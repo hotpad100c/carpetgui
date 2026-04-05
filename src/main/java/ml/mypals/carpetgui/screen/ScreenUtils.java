@@ -15,7 +15,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+//?if>1.20.1{
 import net.minecraft.network.chat.contents.PlainTextContents;
+//?}else{
+/*import net.minecraft.network.chat.ComponentContents;
+*///?}
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
