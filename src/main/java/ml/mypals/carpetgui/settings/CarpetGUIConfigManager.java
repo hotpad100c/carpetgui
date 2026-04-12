@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class CarpetGUIConfigManager {
     private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir();
-    private static final Path CarpetGUI_DIR = CONFIG_DIR.resolve("CarpetGUI");
+    public static final Path CarpetGUI_DIR = CONFIG_DIR.resolve("carpetgui");
     private static final Path FAVORITE_RULES_FILE = CarpetGUI_DIR.resolve("favoriteRules.conf");
 
     public static void initializeConfig() {

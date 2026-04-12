@@ -5,7 +5,7 @@ plugins {
     // id("me.modmuss50.mod-publish-plugin") version "1.0.+" apply false
 }
 
-stonecutter active "1.21.1"
+stonecutter active "1.21.11"
 
 /*
 // Make newer versions be published last
@@ -71,6 +71,12 @@ stonecutter parameters {
 
         string(eval(current.version, "<1.21.11")) {
             replace("import net.minecraft.util.Util", "import net.minecraft.Util")
+        }
+        string(eval(current.version, "<26.1")) {
+            replace("PayloadTypeRegistry.serverboundPlay()", "PayloadTypeRegistry.playC2S()")
+        }
+        string(eval(current.version, "<26.1")) {
+            replace("PayloadTypeRegistry.clientboundPlay()", "PayloadTypeRegistry.playS2C()")
         }
     }
 }

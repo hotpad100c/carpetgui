@@ -10,18 +10,18 @@ import ml.mypals.carpetgui.mixin.accessors.SettngsManagerAccessor;
 import ml.mypals.carpetgui.settings.GamerulesDefaultValueSorter;
 import net.minecraft.commands.CommandSourceStack;
 //? if <1.21.11 {
-import net.minecraft.world.level.GameRules;
-//?} else {
-/*import net.minecraft.world.level.gamerules.GameRule;
+/*import net.minecraft.world.level.GameRules;
+*///?} else {
+import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRuleType;
 import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;import net.minecraft.world.level.gamerules.GameRules;
-*///?}
+//?}
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static ml.mypals.carpetgui.CarpetGUI.*;
 import static ml.mypals.carpetgui.CarpetGUI.getCarpetDefaultsConfigFile;
-import static ml.mypals.carpetgui.CarpetGUI.readDefaultSettingsFromConf;
 
 
 public final class SettingsWatcher {
@@ -46,23 +46,23 @@ public final class SettingsWatcher {
         });
 
         //? if <1.21.11 {
-        ((GameRulesAccessor) CarpetServer.minecraft_server.getGameRules()).carpetGUI$getRules().forEach(
+        /*((GameRulesAccessor) getGamerules()).carpetGUI$getRules().forEach(
                 (k, v) -> {
                     String key = "gamerule$" + k.getCategory().getDescriptionId() + ":" + k.getId();
                     String val = v.toString();
                     snap.put(key, new RuleValueSnapshot(val, false));
                 }
         );
-        //?} else {
-        /*GameRules gameRules = CarpetServer.minecraft_server.getWorldData().getGameRules();
+        *///?} else {
+        GameRules gameRules = getGamerules();
         gameRules.availableRules().toList().forEach(
                 (rule) -> {
                     String key = "gamerule$" + rule.category() + ":" + rule.id();
-                    String val = gameRules.get(rule).toString();
+                    String val = gameRules.get(rule).toString().toLowerCase();
                     snap.put(key, new RuleValueSnapshot(val, false));
                 }
         );
-        *///?}
+        //?}
 
         return snap;
     }
@@ -70,11 +70,16 @@ public final class SettingsWatcher {
     private static Map<String, Set<String>> readAllDefaults() {
         Map<String, Set<String>> result = new HashMap<>();
         CarpetGUI.forEachCarpetManager(mgr -> {
-            Set<String> names = new HashSet<>(readDefaultSettingsFromConf(getCarpetDefaultsConfigFile()));
+            Set<String> names = new HashSet<>();
+
+            forEachCarpetManager(settingsManager -> names.addAll(readDefaultSettingsFromConf(getCarpetDefaultsConfigFile(settingsManager))));
+            names.addAll(readDefaultSettingsFromOrgConf());
+
             result.put(mgr.identifier(), names);
         });
         return result;
     }
+
 
     public static Map<String, RuleValueSnapshot> makeDefaultSnapshot() {
         Map<String, RuleValueSnapshot> snap = new LinkedHashMap<>();
@@ -82,40 +87,51 @@ public final class SettingsWatcher {
             String id = mgr.identifier();
             for (CarpetRule<?> rule : mgr.getCarpetRules()) {
                 snap.put(id + ":" + rule.name(),
-                        new RuleValueSnapshot(String.valueOf(rule.defaultValue()), false));
+                        new RuleValueSnapshot(rule.defaultValue().toString().toLowerCase(), false));
             }
         });
 
         //? if <1.21.11 {
-        GamerulesDefaultValueSorter.gamerulesDefaultValues.forEach(
+        /*GamerulesDefaultValueSorter.gamerulesDefaultValues.forEach(
                 (k, v) -> {
                     String key = "gamerule$" + k.getCategory().getDescriptionId() + ":" + k.getId();
                     snap.put(key, new RuleValueSnapshot(v, false));
                 }
         );
-        //?} else {
-        /*GameRules gameRules = CarpetServer.minecraft_server.getWorldData().getGameRules();
+        *///?} else {
+        GameRules gameRules = getGamerules();
         gameRules.availableRules().toList().forEach(
                 (rule) -> {
                     String key = "gamerule$" + rule.category() + ":" + rule.id();
                     snap.put(key, new RuleValueSnapshot(rule.defaultValue().toString(), false));
                 }
         );
-        *///?}
+        //?}
         return snap;
     }
 
     public static void applyRule(String ruleKey, RuleValueSnapshot snapshot, CommandSourceStack source) {
         boolean silentOrg = ((CommandSourceStackAccessor) source).carpetGUI$getSilent();
         ((CommandSourceStackAccessor) source).carpetGUI$setSilent(true);
-        int sep = ruleKey.indexOf(':');
+        //? if <1.21.11 {
+        /*int sep = ruleKey.indexOf(':');
+        *///?} else {
+        int sep = ruleKey.indexOf("]:")+1;//identify gamerules
+        //?}
         if (sep < 0) return;
-        String managerId = ruleKey.substring(0, sep);
+        String managerId;
+        String gameruleId = ruleKey.substring(0, sep);
+        if(gameruleId.isEmpty()){
+            sep = ruleKey.indexOf(":");
+            managerId = ruleKey.substring(0, sep);
+        }else {
+            managerId = gameruleId;
+        }
         String ruleName = ruleKey.substring(sep + 1);
 
         if (managerId.startsWith("gamerule")) {
             //? if <1.21.11 {
-            GameRules gameRules = source.getServer().getGameRules();
+            /*GameRules gameRules = source.getServer().getGameRules();
             GameRules.Key<?> key = findRuleKey(ruleName, gameRules);
 
             if (key == null) return;
@@ -136,8 +152,8 @@ public final class SettingsWatcher {
                 }
             } catch (Exception ignored) {
             }
-            //?} else {
-            /*GameRules gameRules = CarpetServer.minecraft_server.getWorldData().getGameRules();
+            *///?} else {
+            GameRules gameRules = getGamerules();
             GameRule<?> rule = findRule(ruleName, gameRules);
             try{
                 if(rule.gameRuleType() == GameRuleType.BOOL){
@@ -146,7 +162,7 @@ public final class SettingsWatcher {
                     gameRules.set((GameRule<Integer>)rule, Integer.parseInt(snapshot.value()), CarpetServer.minecraft_server);
                 }
             }catch (Exception ignored){}
-            *///?}
+            //?}
         } else {
             CarpetGUI.forEachCarpetManager(mgr -> {
                 if (!mgr.identifier().equals(managerId)) return;
@@ -167,7 +183,7 @@ public final class SettingsWatcher {
     }
 
     //? if <1.21.11 {
-    private static GameRules.Key<?> findRuleKey(String name, GameRules gameRules) {
+    /*private static GameRules.Key<?> findRuleKey(String name, GameRules gameRules) {
         final GameRules.Key<?>[] result = new GameRules.Key<?>[1];
 
         gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
@@ -181,14 +197,15 @@ public final class SettingsWatcher {
 
         return result[0];
     }
-    //?} else {
-    /*private static GameRule<?> findRule(String name, GameRules gameRules) {
+    *///?} else {
+    private static GameRule<?> findRule(String name, GameRules gameRules) {
         final GameRule<?>[] result = new GameRule[1];
 
         gameRules.visitGameRuleTypes(new  GameRuleTypeVisitor() {
             @Override
             public <T> void visit(@NotNull GameRule<T> gameRule) {
-                if (gameRule.id().equals(name)) {
+                String path = gameRule.getIdentifier().getPath();
+                if (path.equals(name)) {
                     result[0] = gameRule;
                 }
             }
@@ -197,5 +214,5 @@ public final class SettingsWatcher {
         return result[0];
     }
 
-    *///?}
+    //?}
 }

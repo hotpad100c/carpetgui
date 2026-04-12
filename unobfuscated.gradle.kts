@@ -1,19 +1,13 @@
 plugins {
-    id("net.fabricmc.fabric-loom-remap")
-
-    // `maven-publish`
+    id("net.fabricmc.fabric-loom")
     id("me.modmuss50.mod-publish-plugin") version "0.3.5"
 }
+
 
 version = "${property("mod.version")}+${stonecutter.current.version}"
 base.archivesName = property("mod.id") as String
 
-val requiredJava = when {
-    stonecutter.eval(stonecutter.current.version, ">=1.20.6") -> JavaVersion.VERSION_21
-    stonecutter.eval(stonecutter.current.version, ">=1.18") -> JavaVersion.VERSION_17
-    stonecutter.eval(stonecutter.current.version, ">=1.17") -> JavaVersion.VERSION_16
-    else -> JavaVersion.VERSION_1_8
-}
+val requiredJava = JavaVersion.VERSION_25
 
 repositories {
     /**
@@ -34,16 +28,13 @@ repositories {
 dependencies {
 
     minecraft("com.mojang:minecraft:${stonecutter.current.version}")
-    mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
+    implementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
-    if(stonecutter.eval(stonecutter.current.version, "<=1.17.1") ){
-        modImplementation("com.github.glisco03:owo-lib:${property("deps.owo_version")}")
-    }else{
-        modImplementation("io.wispforest:owo-lib:${property("deps.owo_version")}")
-    }
-    modImplementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
+    implementation("io.wispforest:owo-lib:${property("deps.owo_version")}")
+    //include("io.wispforest:owo-sentinel:${property("deps.owo_version")}")
+
+    implementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
 }
 
 loom {
@@ -90,16 +81,14 @@ tasks {
     // Builds the version into a shared folder in `build/libs/${mod version}/`
     register<Copy>("buildAndCollect") {
         group = "build"
-        from(remapJar.map { it.archiveFile }, remapSourcesJar.map { it.archiveFile })
+        from(jar.map { it.archiveFile })
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
         dependsOn("build")
     }
 }
 
-// Publishes builds to Modrinth and Curseforge with changelog from the CHANGELOG.md file
 publishMods {
-    file = tasks.remapJar.map { it.archiveFile.get() }
-    additionalFiles.from(tasks.remapSourcesJar.map { it.archiveFile.get() })
+    file = tasks.jar.map { it.archiveFile.get() }
     displayName = "${property("mod.name")} ${property("mod.version")} for ${property("mod.mc_title")}"
     version = property("mod.version") as String
     changelog = rootProject.file("CHANGELOG.md").readText()
@@ -120,12 +109,13 @@ publishMods {
     }
 
 }
-/*
+
 // Publishes builds to a maven repository under `com.example:template:0.1.0+mc`
+/*
 publishing {
     repositories {
-        maven("https://maven.example.com/releases") {
-            name = "myMaven"
+        maven("https://mvnrepository.com/artifact/io.github.hotpad100c/ryansrenderingkit/releases") {
+            name = "RyansRenderingKit"
             // To authenticate, create `myMavenUsername` and `myMavenPassword` properties in your Gradle home properties.
             // See https://stonecutter.kikugie.dev/wiki/tips/properties#defining-properties
             credentials(PasswordCredentials::class.java)
@@ -139,10 +129,77 @@ publishing {
         create<MavenPublication>("mavenJava") {
             groupId = "${property("mod.group")}.${property("mod.id")}"
             artifactId = property("mod.id") as String
-            version = project.version
+            version = project.version.toString()
 
             from(components["java"])
+
+            pom {
+                name = "Ryan's Rendering Kit"
+                description = "A powerful rendering utility library for Fabric"
+                url = "https://github.com/hotpad100c/ryansrenderingkit"
+                licenses {
+                    license {
+                        name = "MIT"
+                        url = "https://opensource.org/licenses/MIT"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "hotpad100c"
+                        name = "Ryan100C"
+                    }
+                }
+                scm {
+                    connection = "scm:git:github.com:hotpad100c/ryansrenderingkit.git"
+                    developerConnection = "scm:git:github.com:hotpad100c/ryansrenderingkit.git"
+                    url = "https://github.com/hotpad100c/ryansrenderingkit"
+                }
+            }
+        }
+    }
+}*//*
+mavenPublishing {
+    publishToMavenCentral()
+
+    signAllPublications()
+    coordinates(
+        "io.github.hotpad100c",
+        "ryansrenderingkit",
+        project.version.toString()
+    )
+    pom {
+        name.set("Ryans Rendering Kit")
+        description.set("A Fabric rendering utility library for Minecraft mods.")
+        url.set("https://github.com/hotpad100c/ryansrenderingkit")
+
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
+            }
+        }
+
+        scm {
+            url.set("https://github.com/hotpad100c/ryansrenderingkit")
+            connection.set("scm:git:https://github.com/hotpad100c/ryansrenderingkit.git")
+            developerConnection.set("scm:git:ssh://git@github.com:hotpad100c/ryansrenderingkit.git")
+        }
+
+        developers {
+            developer {
+                id.set("hotpad100c")
+                name.set("Ryan100C")
+                email.set("hotpad100c@gmail.com")
+            }
         }
     }
 }
- */
+
+signing {
+    useInMemoryPgpKeys(
+        findProperty("signing.keyId") as String,
+        file("C:\\Users\\Ryan\\.gnupg\\private.key").readText(),
+        findProperty("signing.password") as String
+    )
+    sign(publishing.publications)
+}*/

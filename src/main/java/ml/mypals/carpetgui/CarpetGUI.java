@@ -3,8 +3,14 @@ package ml.mypals.carpetgui;
 import carpet.CarpetExtension;
 import carpet.CarpetServer;
 
+import carpet.CarpetSettings;
+import carpet.api.settings.CarpetRule;
 import carpet.api.settings.RuleHelper;
 import carpet.api.settings.SettingsManager;
+import carpet.utils.Translations;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import com.google.gson.Gson;
 import ml.mypals.carpetgui.network.RuleData;
@@ -18,19 +24,21 @@ import ml.mypals.carpetgui.translate.TranslationHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 //? if < 1.21.11 {
-import net.minecraft.world.level.GameRules;
+/*import net.minecraft.world.level.GameRules;
 import net.minecraft.commands.CommandSourceStack;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import ml.mypals.carpetgui.mixin.accessors.GameRulesAccessor;
 import ml.mypals.carpetgui.mixin.accessors.TypeAccessor;
 import java.util.Objects;
 import static ml.mypals.carpetgui.settings.GamerulesDefaultValueSorter.gamerulesDefaultValues;
-//?} else {
-/*import net.minecraft.world.level.gamerules.GameRule;
+*///?} else {
+import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRules;
-*///?}
+//?}
 import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +48,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -59,8 +68,8 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
     public static final String MOD_ID = "carpetgui";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final String VERSION = /*$ mod_version*/ "1.2.0";
-    public static final String MINECRAFT = /*$ minecraft*/ "1.21.1";
+    public static final String VERSION = /*$ mod_version*/ "1.3.2";
+    public static final String MINECRAFT = /*$ minecraft*/ "1.21.11";
 
     private static PrefabManager prefabManager;
 
@@ -81,6 +90,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
         
         PayloadTypeRegistry.playC2S().register(RequestRulesPayload.ID, RequestRulesPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(RequestRuleStackPayload.ID, RequestRuleStackPayload.CODEC);
+
         PayloadTypeRegistry.playS2C().register(RulesPacketPayload.ID, RulesPacketPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(HelloPacketPayload.ID, HelloPacketPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(RuleStackSyncPayload.ID, RuleStackSyncPayload.CODEC);
@@ -88,10 +98,10 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
             (payload, context) ->
                 CarpetGUIServerPacketHandler.handleRequestRules(payload, context.player(),
                     //? if <1.21.9 {
-                    Objects.requireNonNull(context.player().getServer())
-                    //?} else {
-                    /*context.server()
-                    *///?}
+                    /*Objects.requireNonNull(context.player().getServer())
+                    *///?} else {
+                    context.server()
+                    //?}
                 )
         );
 
@@ -99,10 +109,10 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
             (payload, context) ->
                 CarpetGUIServerPacketHandler.handleRequestRuleStack(payload, context.player(),
                     //? if <1.21.9 {
-                    Objects.requireNonNull(context.player().getServer())
-                     //?} else {
-                    /*context.server()
-                    *///?}
+                    /*Objects.requireNonNull(context.player().getServer())
+                     *///?} else {
+                    context.server()
+                    //?}
                 )
         );
         //?} else {
@@ -144,7 +154,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
             return new ArrayList<>();
         }
         //? if <1.21.11 {
-        GameRulesAccessor rulesAccessor = ((GameRulesAccessor) server.getGameRules());
+        /*GameRulesAccessor rulesAccessor = ((GameRulesAccessor) getGamerules());
         for (Map.Entry<GameRules.Key<?>, GameRules.Value<?>> entry : rulesAccessor.carpetGUI$getRules().entrySet()) {
             GameRules.Key<?> rule = entry.getKey();
             GameRules.Value<?> value = entry.getValue();
@@ -164,9 +174,9 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                     List.of(Map.entry("gamerule", "gui.category.gamerules" + " : " + rule.getCategory().getDescriptionId()))
             ));
         }
-        //?} else {
+        *///?} else {
 
-        /*GameRules gameRules = server.getWorldData().getGameRules();
+        GameRules gameRules = getGamerules();
         for (GameRule<?> rule : gameRules.availableRules().toList()) {
             fakeCarpetRules.add(new RuleData(
                     "gamerule",
@@ -181,57 +191,88 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                     List.of(Map.entry("gamerule", "gui.category.gamerules" + " : " + rule.category().getDescriptionId()))
             ));
         }
-        *///?}
+        //?}
         return fakeCarpetRules;
     }
-
+    public static GameRules getGamerules(){
+        MinecraftServer server = CarpetServer.minecraft_server;
+        //? if <1.21.11 {
+        /*return server.getGameRules();
+        *///?} else if <26.1 {
+        return server.getWorldData().getGameRules();
+        //?} else {
+        /*return server.getGameRules();
+        *///?}
+    }
     public static List<RuleData> getRules(SettingsManager settingsManager, String lang) {
         List<RuleData> rules = new ArrayList<>();
         String managerID = settingsManager.identifier();
+
+        String originalLang = CarpetSettings.language;
+
+        CarpetSettings.language = "en_us";
+        Translations.updateLanguage();
+
+        Map<CarpetRule<?>, String> enNames = new HashMap<>();
+        Map<CarpetRule<?>, String> enDescs = new HashMap<>();
+
         settingsManager.getCarpetRules().forEach(rule -> {
-            String orName = rule.name();
-            String localName = lang.equals("en_us") ? orName :
-                    getNameTranslation(lang, managerID, rule.name());
-            String orgDesc = RuleHelper.translatedDescription(rule);
-            String localDescription =
-                    lang.equals("en_us") ? orgDesc :
-                            getDescTranslation(lang, managerID, rule.name());
-
-            List<Map.Entry<String, String>> translatedCategories = rule.categories().stream().map(
-                    cat -> {
-                        String translated = TranslationHelper.getCategoryTranslation(lang, managerID, cat);
-                        return Map.entry(cat, translated);
-                    }
-            ).toList();
-
-            rules.add(
-                    new RuleData(
-                            managerID,
-                            orName,
-                            localName,
-                            rule.type(),
-                            rule.defaultValue().toString(),
-                            rule.value().toString(),
-                            orgDesc,
-                            localDescription,
-                            rule.suggestions().stream().toList(),
-                            translatedCategories.stream().toList())
-            );
+            enNames.put(rule, RuleHelper.translatedName(rule));
+            enDescs.put(rule, RuleHelper.translatedDescription(rule));
         });
+
+        CarpetSettings.language = lang;
+        Translations.updateLanguage();
+
+        for (var rule : settingsManager.getCarpetRules()) {
+
+            String localName = RuleHelper.translatedName(rule);
+            String localDescription = RuleHelper.translatedDescription(rule);
+
+            List<Map.Entry<String, String>> translatedCategories =
+                    rule.categories().stream()
+                            .map(cat -> Map.entry(cat, RuleHelper.translatedCategory(managerID, cat)))
+                            .toList();
+
+            CarpetSettings.language = originalLang;
+            Translations.updateLanguage();
+
+            rules.add(new RuleData(
+                    managerID,
+                    enNames.get(rule),
+                    localName,
+                    rule.type(),
+                    rule.defaultValue().toString().toLowerCase(),
+                    rule.value().toString().toLowerCase(),
+                    enDescs.get(rule),
+                    localDescription,
+                    rule.suggestions().stream().toList(),
+                    translatedCategories
+            ));
+        }
+
 
         return rules;
     }
 
     public static String getDefaults() {
         StringBuilder defaults = new StringBuilder();
-        readDefaultSettingsFromConf(getCarpetDefaultsConfigFile()).forEach(c -> {
-            defaults.append(c).append(";");
-        });
+
+        forEachCarpetManager(settingsManager ->
+                readDefaultSettingsFromConf(getCarpetDefaultsConfigFile(settingsManager))
+                        .forEach(c -> defaults.append(c).append(";"))
+        );
+
+        readDefaultSettingsFromOrgConf().forEach(c -> defaults.append(c).append(";"));
+
+
+
         return defaults.toString();
     }
 
     public static List<String> readDefaultSettingsFromConf(Path path) {
-        try (BufferedReader reader = Files.newBufferedReader(path)) {
+        try {
+            BufferedReader reader = Files.newBufferedReader(path);
             String line = "";
             List<String> result = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
@@ -249,14 +290,36 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
             return new ArrayList<>();
         }
     }
+    public static List<String> readDefaultSettingsFromOrgConf() {
+        if (!FabricLoader.getInstance().isModLoaded("carpet-org-addition")) {
+            return new ArrayList<>();
+        }
+        try (BufferedReader reader = Files.newBufferedReader(getOrgDefaultsConfigFile())) {
+            JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+            JsonObject rules = root.getAsJsonObject("rules");
+            List<String> result = new ArrayList<>();
+            if (rules != null) {
+                for (Map.Entry<String, JsonElement> entry : rules.entrySet()) {
+                    result.add(entry.getKey());
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
 
-    public static Path getCarpetDefaultsConfigFile() {
+    public static Path getCarpetDefaultsConfigFile(SettingsManager settingsManager) {
         return CarpetServer.minecraft_server.getWorldPath(LevelResource.ROOT)
                 //? if >1.18.2 {
-                .resolve(CarpetServer.settingsManager.identifier() + ".conf");
+                .resolve(settingsManager.identifier() + ".conf");
                 //?} else {
-                /*.resolve(CarpetServer.settingsManager.getResourceLocation() + ".conf");
+                /*.resolve(settingsManager.getIdentifier() + ".conf");
                 *///?}
+    }
+    public static Path getOrgDefaultsConfigFile() {
+        return CarpetServer.minecraft_server.getWorldPath(LevelResource.ROOT)
+                .resolve("carpetorgaddition/config.json");
     }
 
     @Override

@@ -9,6 +9,8 @@ import net.minecraft.nbt.Tag;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.Optional;
+
 import static ml.mypals.carpetgui.CarpetGUIClient.incompleteRulesFromServer;
 
 @Mixin(value = ClientNetworkHandler.class, remap = false)
@@ -21,21 +23,29 @@ public class CarpetClientNetworkMixin {
         CompoundTag ruleNBT = (CompoundTag) original.call(instance, string);
         if (ruleNBT.contains("Manager")) {
             //? if >=1.21.5 {
-            /*String ruleName = ruleNBT.getString("Rule").get();
+            String ruleName = ruleNBT.getString("Rule").get();
             String managerName = ruleNBT.getString("Manager").get();
             String value = ruleNBT.getString("Value").get();
-            *///?} else {
-            String ruleName = ruleNBT.getString("Rule");
+            //?} else {
+            /*String ruleName = ruleNBT.getString("Rule");
             String managerName = ruleNBT.getString("Manager");
             String value = ruleNBT.getString("Value");
-            //?}
+            *///?}
 
             RuleData ruleData = new RuleData();
             ruleData.manager = managerName;
             ruleData.value = value;
             ruleData.name = ruleName;
 
-            incompleteRulesFromServer.add(ruleData);
+            Optional<RuleData> existing = incompleteRulesFromServer.stream()
+                    .filter(r -> r.name.equals(ruleData.name))
+                    .findFirst();
+
+            if (existing.isPresent()) {
+                existing.get().value = ruleData.value;
+            } else {
+                incompleteRulesFromServer.add(ruleData);
+            }
         }
         return ruleNBT;
     }

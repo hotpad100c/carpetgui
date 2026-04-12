@@ -2,6 +2,7 @@ package ml.mypals.carpetgui.localChache;
 
 import com.google.gson.*;
 import ml.mypals.carpetgui.network.RuleData;
+import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class RulesCacheManager {
 
     private static final Path CACHE_DIR = FabricLoader.getInstance()
             .getConfigDir()
-            .resolve("carpetgui")
+            .resolve(CarpetGUIConfigManager.CarpetGUI_DIR)
             .resolve("cache");
     private static final Path KNOWN_MANAGERS_FILE = CACHE_DIR.resolve("known_managers.json");
     private static final Path RULES_FILE = CACHE_DIR.resolve("base_cache.json");
@@ -156,6 +157,7 @@ public class RulesCacheManager {
 
     public static void saveRawCache(RawCacheData rawCache, Collection<CachedRuleEntry> mergedRules, String defaults) {
         try {
+
             Files.createDirectories(CACHE_DIR);
 
             JsonObject root = new JsonObject();
@@ -220,9 +222,16 @@ public class RulesCacheManager {
     }
 
     public static RawCacheData loadRawCache() {
-        if (!Files.exists(RULES_FILE)) return null;
 
-        try (Reader r = new InputStreamReader(Files.newInputStream(RULES_FILE), StandardCharsets.UTF_8)) {
+
+        try {
+
+            if (!Files.exists(RULES_FILE)){
+                Files.createDirectories(CACHE_DIR);
+                Files.createFile(RULES_FILE);
+            }
+
+            Reader r = new InputStreamReader(Files.newInputStream(RULES_FILE), StandardCharsets.UTF_8);
             JsonObject root = GSON.fromJson(r, JsonObject.class);
 
             RawCacheData data = new RawCacheData();
@@ -295,7 +304,10 @@ public class RulesCacheManager {
 
     public static void saveKnownManagers(Set<String> newManagers) {
         try {
-            Files.createDirectories(CACHE_DIR);
+            if (!Files.exists(KNOWN_MANAGERS_FILE)){
+                Files.createDirectories(CACHE_DIR);
+                Files.createFile(KNOWN_MANAGERS_FILE);
+            }
 
             Set<String> merged = new LinkedHashSet<>(loadKnownManagers());
             merged.addAll(newManagers);
@@ -319,11 +331,15 @@ public class RulesCacheManager {
     }
 
     public static List<String> loadKnownManagers() {
-        if (!Files.exists(KNOWN_MANAGERS_FILE)) return List.of("carpet");
 
-        try (Reader r = new InputStreamReader(
-                Files.newInputStream(KNOWN_MANAGERS_FILE), StandardCharsets.UTF_8)) {
+        try {
 
+            if (!Files.exists(KNOWN_MANAGERS_FILE)){
+                Files.createDirectories(CACHE_DIR);
+                Files.createFile(KNOWN_MANAGERS_FILE);
+            }
+
+            Reader r = new InputStreamReader(Files.newInputStream(KNOWN_MANAGERS_FILE), StandardCharsets.UTF_8);
             JsonObject root = GSON.fromJson(r, JsonObject.class);
             if (root == null || !root.has("managers")) return List.of("carpet");
 

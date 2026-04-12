@@ -12,4 +12,6 @@ public interface ScrollContentAccessor {
     void carpetGUI$setScrollOffset(double scrollOffset);
     @Accessor("maxScroll")
     int carpetGUI$getMaxScroll();
+    @Accessor("maxScroll")
+    void carpetGUI$setMaxScroll(int maxScroll);
 }

@@ -1,6 +1,6 @@
 package ml.mypals.carpetgui.screen;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.component.UIComponents;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import ml.mypals.carpetgui.CarpetGUIClient;
@@ -28,7 +28,7 @@ public class ScreenTabBar {
     }
 
     public static void build(FlowLayout root, Tab activeTab) {
-        FlowLayout tabBar = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.horizontalFlow(
+        FlowLayout tabBar = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.horizontalFlow(
                 Sizing.fill(100), Sizing.fill(7));
         tabBar.surface(Surface.flat(0x661A1A1A));
         tabBar.verticalAlignment(VerticalAlignment.CENTER);
@@ -38,10 +38,10 @@ public class ScreenTabBar {
         for (Tab tab : Tab.values()) {
             boolean isActive = tab == activeTab;
 
-            var label = /*? if <1.21.11 {*/Components/*?} else {*//*UIComponents*//*?}*/.label(Component.translatable(tab.key));
+            var label = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.label(Component.translatable(tab.key));
             label.color(Color.ofArgb(isActive ? 0xFFFFFFFF : 0x66AAAAAA));
 
-            FlowLayout btn = /*? if <1.21.11 {*/Containers/*?} else {*//*UIContainers*//*?}*/.horizontalFlow(
+            FlowLayout btn = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.horizontalFlow(
                     Sizing.content(), Sizing.fill(100));
             btn.verticalAlignment(VerticalAlignment.CENTER);
             btn.padding(Insets.horizontal(8));
@@ -51,10 +51,10 @@ public class ScreenTabBar {
 
             if (!isActive) {
                 //? if <1.21.9 {
-                btn.mouseDown().subscribe((x, y, b) -> {
-                 //?} else {
-                /*btn.mouseDown().subscribe((mouseButtonEvent, b) -> {
-                *///?}
+                /*btn.mouseDown().subscribe((x, y, b) -> {
+                 *///?} else {
+                btn.mouseDown().subscribe((mouseButtonEvent, b) -> {
+                //?}
                     onTabClick(tab);
                     Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
                     return true;
