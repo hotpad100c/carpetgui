@@ -217,7 +217,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
         Map<CarpetRule<?>, String> enDescs = new HashMap<>();
 
         settingsManager.getCarpetRules().forEach(rule -> {
-            enNames.put(rule, RuleHelper.translatedName(rule));
+            enNames.put(rule, rule.name());
             enDescs.put(rule, RuleHelper.translatedDescription(rule));
         });
 
