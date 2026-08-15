@@ -41,6 +41,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
     public boolean instantAffect;
     private FlowLayout saveDialog;
     private OverlayContainer<FlowLayout> dialogOverlay;
+    private final List<RuleWidget> currentRuleWidgets = new ArrayList<>();
     public double lastCategoryScroll = 0;
     public double lastRuleListScroll = 0;
     public String currentCategory = "unknown";
@@ -176,14 +177,45 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
                 ScreenUtils.showSaveGroupDialog(this.uiAdapter.rootComponent, dialogOverlay);
             }
         });
+        ScreenKeyboardEvents.afterKeyPress(this).register((screen, key, scancode, modifiers) -> {
+            if ((key == GLFW.GLFW_KEY_LEFT_SHIFT || key == GLFW.GLFW_KEY_RIGHT_SHIFT) && !ScreenUtils.pressShift) {
+                ScreenUtils.pressShift = true;
+                this.updateRuleTooltips();
+            }
+        });
+        ScreenKeyboardEvents.afterKeyRelease(this).register((screen, key, scancode, modifiers) -> {
+            if ((key == GLFW.GLFW_KEY_LEFT_SHIFT || key == GLFW.GLFW_KEY_RIGHT_SHIFT) && ScreenUtils.pressShift) {
+                ScreenUtils.pressShift = false;
+                this.updateRuleTooltips();
+            }
+        });
         *///?} else {
         ScreenKeyboardEvents.afterKeyPress(this).register((screen, key) -> {
             if ((key.modifiers() & GLFW.GLFW_MOD_CONTROL) != 0 && key.key() == GLFW.GLFW_KEY_S) {
                 ScreenUtils.showSaveGroupDialog(this.uiAdapter.rootComponent, dialogOverlay);
             }
         });
+        ScreenKeyboardEvents.afterKeyPress(this).register((screen, key) -> {
+            if ((key.key() == GLFW.GLFW_KEY_LEFT_SHIFT || key.key() == GLFW.GLFW_KEY_RIGHT_SHIFT) && !ScreenUtils.pressShift) {
+                ScreenUtils.pressShift = true;
+                this.updateRuleTooltips();
+            }
+        });
+        ScreenKeyboardEvents.afterKeyRelease(this).register((screen, key) -> {
+            if ((key.key() == GLFW.GLFW_KEY_LEFT_SHIFT || key.key() == GLFW.GLFW_KEY_RIGHT_SHIFT) && ScreenUtils.pressShift) {
+                ScreenUtils.pressShift = false;
+                this.updateRuleTooltips();
+            }
+        });
         //?}
         return master.getKey();
+    }
+
+    private void updateRuleTooltips() {
+        String query = searching ? searchBox.getValue() : "";
+        for (RuleWidget widget : currentRuleWidgets) {
+            widget.updateTooltip(query);
+        }
     }
 
     private void saveModifiedRulesAsGroup(String groupName) {
@@ -341,10 +373,15 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
 
     private void rebuildRulesList(Stream<RuleData> stream, String query) {
         rulesListLayout.clearChildren();
+        this.currentRuleWidgets.clear();
         stream.sorted(Comparator.comparing(rule -> {
             String en = rule.name;
             return en.isEmpty() ? "" : en.toLowerCase().substring(0, 1);
-        })).forEach(r -> rulesListLayout.child(new RuleWidget(r, this, query).buildComponent()));
+        })).forEach(r -> {
+            RuleWidget widget = new RuleWidget(r, this, query);
+            rulesListLayout.child(widget.buildComponent());
+            this.currentRuleWidgets.add(widget);
+        });
     }
 
     private FlowLayout buildCategoryRow(String name) {

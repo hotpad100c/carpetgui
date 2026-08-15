@@ -14,11 +14,9 @@ import ml.mypals.carpetgui.network.RuleData;
 import ml.mypals.carpetgui.network.client.RequestRuleStackPayload;
 import ml.mypals.carpetgui.network.server.RuleStackSyncPayload;
 import ml.mypals.carpetgui.screen.ScreenTabBar;
-import ml.mypals.carpetgui.screen.ScreenUtils;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -33,7 +31,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static ml.mypals.carpetgui.CarpetGUIClient.cachedCompleteRules;
-import static ml.mypals.carpetgui.CarpetGUIClient.cachedRuleStackData;
 import static ml.mypals.carpetgui.screen.ScreenUtils.*;
 
 public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {

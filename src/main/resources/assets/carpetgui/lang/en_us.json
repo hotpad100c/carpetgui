@@ -4,6 +4,7 @@
   "gui.screen.tooltip.suggestions": "ValueSuggestions",
   "gui.screen.tooltip.currentValue": "CurrentValue",
   "carpetgui.key.carpetRulesKeyBind": "Open menu",
+  "gui.screen.tooltip.extra": "Press Shift to show more",
   "key.category.carpetgui.main": "Carpet GUI",
   "gui.tip.unknown_rule": "This rule is unknown. It usually indicates that CarpetGUI is not installed on the server. \nThe information displayed here is based on guesses from previously cached rules",
   "gui.tip.default": "(Set as default) ",

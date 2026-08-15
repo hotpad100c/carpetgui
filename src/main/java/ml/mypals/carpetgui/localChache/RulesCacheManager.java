@@ -41,6 +41,7 @@ public class RulesCacheManager {
 
             Map<String, JsonObject> oldLocalNames = new HashMap<>();
             Map<String, JsonObject> oldLocalDescs = new HashMap<>();
+            Map<String, JsonObject> oldLocalExtra = new HashMap<>();
             Map<String, JsonObject> oldCategoryValues = new LinkedHashMap<>();
             List<RuleData> oldRules = List.of();
             String mergedDefaults = defaults;
@@ -75,6 +76,7 @@ public class RulesCacheManager {
                             String name = obj.get("name").getAsString();
                             extractLocaleMap(obj, "localName", name, oldLocalNames);
                             extractLocaleMap(obj, "localDescription", name, oldLocalDescs);
+                            extractLocaleMap(obj, "localExtra", name, oldLocalExtra);
                         }
                         oldRules = deserializeRules(oldRulesArr, oldCategoryValues, currentLanguage);
                     }
@@ -104,7 +106,7 @@ public class RulesCacheManager {
 
             JsonObject root = new JsonObject();
             root.addProperty("defaults", mergedDefaults);
-            root.add("rules", serializeRules(mergedRules, oldLocalNames, oldLocalDescs, currentLanguage));
+            root.add("rules", serializeRules(mergedRules, oldLocalNames, oldLocalDescs, oldLocalExtra, currentLanguage));
             root.add("categories", serializeTopLevelCategories(oldCategoryValues));
 
             try (Writer w = new OutputStreamWriter(
@@ -169,6 +171,7 @@ public class RulesCacheManager {
                 obj.addProperty("name", entry.name);
                 obj.addProperty("type", entry.type);
                 obj.addProperty("description", entry.description);
+                obj.addProperty("extraDescription", entry.extraDescription);
                 obj.addProperty("defaultValue", entry.defaultValue);
                 obj.addProperty("isGamerule", entry.isGamerule);
                 obj.addProperty("manager", entry.manager);
@@ -180,6 +183,10 @@ public class RulesCacheManager {
                 JsonObject localDescObj = new JsonObject();
                 entry.localDescription.forEach(localDescObj::addProperty);
                 obj.add("localDescription", localDescObj);
+
+                JsonObject localExtraObj = new JsonObject();
+                entry.localExtra.forEach(localExtraObj::addProperty);
+                obj.add("localExtra", localExtraObj);
 
                 JsonArray suggs = new JsonArray();
                 entry.suggestions.forEach(suggs::add);
@@ -264,6 +271,7 @@ public class RulesCacheManager {
                     entry.name = obj.get("name").getAsString();
                     entry.type = obj.get("type").getAsString();
                     entry.description = obj.get("description").getAsString();
+                    entry.extraDescription = obj.get("extraDescription").getAsString();
                     entry.defaultValue = obj.get("defaultValue").getAsString();
                     entry.isGamerule = obj.get("isGamerule").getAsBoolean();
                     entry.manager = obj.get("manager").getAsString();
@@ -287,6 +295,14 @@ public class RulesCacheManager {
                     if (localDescEl != null && localDescEl.isJsonObject()) {
                         for (Map.Entry<String, JsonElement> e : localDescEl.getAsJsonObject().entrySet()) {
                             entry.localDescription.put(e.getKey(), e.getValue().getAsString());
+                        }
+                    }
+
+                    entry.localExtra = new HashMap<>();
+                    JsonElement localExtraEl = obj.get("localExtra");
+                    if (localExtraEl != null && localExtraEl.isJsonObject()) {
+                        for (Map.Entry<String, JsonElement> e : localExtraEl.getAsJsonObject().entrySet()) {
+                            entry.localExtra.put(e.getKey(), e.getValue().getAsString());
                         }
                     }
 
@@ -359,6 +375,7 @@ public class RulesCacheManager {
     private static JsonArray serializeRules(List<RuleData> rules,
                                             Map<String, JsonObject> oldLocalNames,
                                             Map<String, JsonObject> oldLocalDescs,
+                                            Map<String, JsonObject> oldLocalExtra,
                                             String currentLanguage) {
         JsonArray arr = new JsonArray();
         for (RuleData r : rules) {
@@ -366,6 +383,7 @@ public class RulesCacheManager {
             obj.addProperty("name", r.name);
             obj.addProperty("type", r.type.getName());
             obj.addProperty("description", r.description);
+            obj.addProperty("extraDescription", r.extraDescription);
             obj.addProperty("defaultValue", r.defaultValue);
             obj.addProperty("isGamerule", r.isGamerule);
             obj.addProperty("manager", r.manager);
@@ -374,6 +392,8 @@ public class RulesCacheManager {
                     mergeLocaleMap(oldLocalNames.get(r.name), currentLanguage, r.localName));
             obj.add("localDescription",
                     mergeLocaleMap(oldLocalDescs.get(r.name), currentLanguage, r.localDescription));
+            obj.add("localExtra",
+                    mergeLocaleMap(oldLocalExtra.get(r.name), currentLanguage, r.localExtra));
 
 
             JsonArray suggs = new JsonArray();
@@ -413,9 +433,11 @@ public class RulesCacheManager {
 
             String name = obj.get("name").getAsString();
             String description = obj.get("description").getAsString();
+            String extraDescription = obj.get("extraDescription").getAsString();
 
             String localName = resolveLocale(obj.get("localName"), currentLanguage, name);
             String localDescription = resolveLocale(obj.get("localDescription"), currentLanguage, description);
+            String localExtra = resolveLocale(obj.get("localExtra"), currentLanguage, extraDescription);
 
             RuleData rd = new RuleData(
                     obj.get("manager").getAsString(),
@@ -426,6 +448,8 @@ public class RulesCacheManager {
                     obj.get("defaultValue").getAsString(),
                     description,
                     localDescription,
+                    extraDescription,
+                    localExtra,
                     List.of(),
                     List.of()
             );
@@ -515,6 +539,7 @@ public class RulesCacheManager {
         public String name;
         public String type;
         public String description;
+        public String extraDescription;
         public String defaultValue;
         public boolean isGamerule;
         public String manager;
@@ -523,6 +548,7 @@ public class RulesCacheManager {
 
         public Map<String, String> localName;
         public Map<String, String> localDescription;
+        public Map<String, String> localExtra;
 
         public RuleData toRuleData(String lang, List<CachedCategoryEntry> knowCategories) {
             RuleData rule = new RuleData();
@@ -533,8 +559,10 @@ public class RulesCacheManager {
             rule.suggestions = this.suggestions;
             rule.type = RuleData.getRuleType(this.type);
             rule.description = this.description;
+            rule.extraDescription = this.extraDescription;
             rule.localName = this.localName.getOrDefault(lang, this.name);
             rule.localDescription = this.localDescription.getOrDefault(lang, this.description);
+            rule.localExtra = this.localExtra.getOrDefault(lang, this.extraDescription);
             List<Map.Entry<String, String>> cats = new ArrayList<>();
             Map<String, String> catValueMap = knowCategories.stream()
                     .collect(Collectors.toMap(c -> c.key, c -> c.value.getOrDefault(lang, c.key)));

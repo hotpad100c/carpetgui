@@ -1,10 +1,12 @@
 package ml.mypals.carpetgui.screen.rulesEditScreen;
 
+import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import ml.mypals.carpetgui.network.RuleData;
+import ml.mypals.carpetgui.screen.ScreenUtils;
 import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -37,6 +39,7 @@ public class RuleWidget {
     private boolean isLocked;
     private boolean isFavorited;
     private boolean currentBoolValue;
+    private LabelComponent nameLabel;
 
     public RuleWidget(RuleData ruleData, RulesEditScreen screen, String query) {
         this(ruleData, screen);
@@ -73,6 +76,7 @@ public class RuleWidget {
         nameLabel.color(Color.WHITE);
         nameLabel.tooltip(buildTooltip(ruleData, query));
         leftCol.child(nameLabel);
+        this.nameLabel = nameLabel;
 
         StringBuilder cats = new StringBuilder();
         for (String c : ruleData.categories.stream().map(Map.Entry::getValue).toList()) cats.append(c).append(" | ");
@@ -245,5 +249,11 @@ public class RuleWidget {
     private void sendCommand(String cmd) {
         var conn = Minecraft.getInstance().getConnection();
         if (this.screen.instantAffect && conn != null) conn.sendCommand(cmd);
+    }
+
+    public void updateTooltip(String newQuery) {
+        if (this.nameLabel == null) return;
+        Component tooltip = ScreenUtils.buildTooltip(ruleData, newQuery);
+        this.nameLabel.tooltip(tooltip);
     }
 }

@@ -37,6 +37,7 @@ public class ScreenUtils {
     public static final Identifier LOVE_OFF = rl("ui/love.png");
     public static final Identifier TRUE_TEX = rl("ui/true_t.png");
     public static final Identifier FALSE_TEX = rl("ui/false_t.png");
+    public static boolean pressShift = false;
 
     public static FlowLayout buildSpriteToggle(Identifier initTex, int w, int h,
                                                java.util.function.Consumer<FlowLayout> onClick) {
@@ -240,6 +241,13 @@ public class ScreenUtils {
             ).withStyle(ChatFormatting.GRAY));
         }
         tip.append("]");
+
+        if (pressShift && (!ruleData.extraDescription.isEmpty() || !ruleData.localExtra.isEmpty())) {
+            tip.append(Component.literal(ruleData.localExtra.isEmpty() ? ruleData.extraDescription : ruleData.localExtra).withStyle(ChatFormatting.DARK_GRAY));
+        } else if (!ruleData.extraDescription.isEmpty() || !ruleData.localExtra.isEmpty()) {
+            tip.append("\n").append(Component.translatable("gui.screen.tooltip.extra").withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC));
+        }
+
         return tip;
     }
     public static Component highlight(String text, String query) {

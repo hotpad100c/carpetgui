@@ -20,12 +20,10 @@ import ml.mypals.carpetgui.network.server.CarpetGUIServerPacketHandler;
 import ml.mypals.carpetgui.network.server.HelloPacketPayload;
 import ml.mypals.carpetgui.ruleStack.PrefabManager;
 import ml.mypals.carpetgui.ruleStack.RuleStackCommand;
-import ml.mypals.carpetgui.translate.TranslationHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 //? if < 1.21.11 {
 /*import net.minecraft.world.level.GameRules;
@@ -53,13 +51,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static ml.mypals.carpetgui.translate.TranslationHelper.getDescTranslation;
-import static ml.mypals.carpetgui.translate.TranslationHelper.getNameTranslation;
-
 //? if >=1.20.5 {
 import ml.mypals.carpetgui.network.server.RuleStackSyncPayload;
 import ml.mypals.carpetgui.network.server.RulesPacketPayload;
-import ml.mypals.carpetgui.ruleStack.Prefab;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 //?}
 
@@ -170,6 +164,8 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                     String.valueOf(server.getGameRules().getRule(rule)),
                     rule.getDescriptionId(),
                     rule.getDescriptionId(),
+                    "",
+                    "",
                     argumentBuilder.getType().getExamples().stream().toList(),
                     List.of(Map.entry("gamerule", "gui.category.gamerules" + " : " + rule.getCategory().getDescriptionId()))
             ));
@@ -187,6 +183,8 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                     String.valueOf(gameRules.get(rule)),
                     rule.getDescriptionId(),
                     rule.getDescriptionId(),
+                    "",
+                    "",
                     rule.argument().getExamples().stream().toList(),
                     List.of(Map.entry("gamerule", "gui.category.gamerules" + " : " + rule.category().getDescriptionId()))
             ));
@@ -215,10 +213,12 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
         Map<CarpetRule<?>, String> enNames = new HashMap<>();
         Map<CarpetRule<?>, String> enDescs = new HashMap<>();
+        Map<CarpetRule<?>, String> enExtras = new HashMap<>();
 
         settingsManager.getCarpetRules().forEach(rule -> {
             enNames.put(rule, rule.name());
             enDescs.put(rule, RuleHelper.translatedDescription(rule));
+            enExtras.put(rule, RuleData.getExtraDesc(rule.name(), rule.settingsManager()));
         });
 
         CarpetSettings.language = lang;
@@ -228,6 +228,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
             String localName = RuleHelper.translatedName(rule);
             String localDescription = RuleHelper.translatedDescription(rule);
+            String localExtra = RuleData.getExtraDesc(rule.name(), rule.settingsManager());
 
             List<Map.Entry<String, String>> translatedCategories =
                     rule.categories().stream()
@@ -246,6 +247,8 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                     rule.value().toString().toLowerCase(),
                     enDescs.get(rule),
                     localDescription,
+                    enExtras.get(rule),
+                    localExtra,
                     rule.suggestions().stream().toList(),
                     translatedCategories
             ));

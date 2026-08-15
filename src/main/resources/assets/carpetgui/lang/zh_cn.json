@@ -3,6 +3,7 @@
   "gui.screen.tooltip.defaultValue": "默认值",
   "gui.screen.tooltip.suggestions": "预设值",
   "gui.screen.tooltip.currentValue": "当前值",
+  "gui.screen.tooltip.extra": "按下shift显示更多",
   "carpetgui.key.carpetRulesKeyBind": "打开GUI",
   "key.category.carpetgui.main": "地毯 GUI",
   "gui.tip.unknown_rule": "这是一个未知的规则。通常意味着服务器并未安装CarpetGUI \n当前界面显示的所有信息，均来自历史缓存记录的推断",
