@@ -15,9 +15,12 @@ import static ml.mypals.carpetgui.CarpetGUIClient.incompleteRulesFromServer;
 
 @Mixin(value = ClientNetworkHandler.class, remap = false)
 public class CarpetClientNetworkMixin {
+    //?if>1.20.1{
     @WrapOperation(method = "lambda$static$1",
-            at = @At(target = "Lnet/minecraft/nbt/CompoundTag;get(Ljava/lang/String;)Lnet/minecraft/nbt/Tag;"
-                    , value = "INVOKE"))
+    //?}else{
+    @WrapOperation(method = "lambda$static$0",
+    //?}
+    at = @At(target = "Lnet/minecraft/nbt/CompoundTag;get(Ljava/lang/String;)Lnet/minecraft/nbt/Tag;", value = "INVOKE"))
     private static Tag onRuleSet(CompoundTag instance, String string, Operation<Tag> original) {
 
         CompoundTag ruleNBT = (CompoundTag) original.call(instance, string);
