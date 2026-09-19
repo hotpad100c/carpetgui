@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import ml.mypals.carpetgui.mixin.ui.ClickableStyleFinderAccessor;
 import ml.mypals.carpetgui.ui.base.BaseUIComponent;
-import ml.mypals.carpetgui.ui.core.AnimatableProperty;
 import ml.mypals.carpetgui.ui.core.Color;
 import ml.mypals.carpetgui.ui.core.HorizontalAlignment;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
@@ -29,7 +28,7 @@ public class LabelComponent extends BaseUIComponent {
    protected List<FormattedCharSequence> wrappedText;
    protected VerticalAlignment verticalTextAlignment;
    protected HorizontalAlignment horizontalTextAlignment;
-   protected final AnimatableProperty<Color> color;
+   protected final Observable<Color> color;
    protected final Observable<Integer> lineHeight;
    protected final Observable<Integer> lineSpacing;
    protected boolean shadow;
@@ -40,7 +39,7 @@ public class LabelComponent extends BaseUIComponent {
       this.textRenderer = Minecraft.getInstance().font;
       this.verticalTextAlignment = VerticalAlignment.TOP;
       this.horizontalTextAlignment = HorizontalAlignment.LEFT;
-      this.color = AnimatableProperty.<Color>of(Color.WHITE);
+      this.color = Observable.<Color>of(Color.WHITE);
       Objects.requireNonNull(this.textRenderer);
       this.lineHeight = Observable.<Integer>of(9);
       this.lineSpacing = Observable.<Integer>of(2);
@@ -86,7 +85,7 @@ public class LabelComponent extends BaseUIComponent {
       return this;
    }
 
-   public AnimatableProperty<Color> color() {
+   public Observable<Color> color() {
       return this.color;
    }
 
@@ -158,9 +157,9 @@ public class LabelComponent extends BaseUIComponent {
       return this.textHeight();
    }
 
-   public void inflate(Size space) {
+   public void carpetGUI$inflate(Size space) {
       this.wrapLines();
-      super.inflate(space);
+      super.carpetGUI$inflate(space);
    }
 
    private void wrapLines() {
@@ -171,12 +170,8 @@ public class LabelComponent extends BaseUIComponent {
       return this.wrappedText.size() * (this.lineHeight() + this.lineSpacing()) - this.lineSpacing();
    }
 
-   public void update(float delta, int mouseX, int mouseY) {
-      super.update(delta, mouseX, mouseY);
-      this.color.update(delta);
-   }
 
-   public void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+   public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
       graphics.push().translate(0.0F, 1.0F / (float)Minecraft.getInstance().getWindow().getGuiScale());
       this.drawText((renderX, renderY, text, shadow, color) -> graphics.text(Minecraft.getInstance().font, text, renderX, renderY, color.argb(), shadow));
       graphics.pop();
@@ -226,13 +221,13 @@ public class LabelComponent extends BaseUIComponent {
       }
    }
 
-   public boolean shouldDrawTooltip(double mouseX, double mouseY) {
+   public boolean carpetGUI$shouldDrawTooltip(double mouseX, double mouseY) {
       Style hoveredStyle = this.styleAt((int)(mouseX - (double)this.x), (int)(mouseY - (double)this.y));
-      return super.shouldDrawTooltip(mouseX, mouseY) || hoveredStyle != null && hoveredStyle.getHoverEvent() != null && this.isInBoundingBox(mouseX, mouseY);
+      return super.carpetGUI$shouldDrawTooltip(mouseX, mouseY) || hoveredStyle != null && hoveredStyle.getHoverEvent() != null && this.isInBoundingBox(mouseX, mouseY);
    }
 
-   public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
-      return (Boolean)this.textClickHandler.apply(this.styleAt((int)click.x(), (int)click.y())) | super.onMouseDown(click, doubled);
+   public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
+      return (Boolean)this.textClickHandler.apply(this.styleAt((int)click.x(), (int)click.y())) | super.carpetGUI$onMouseDown(click, doubled);
    }
 
    protected @Nullable Style styleAt(int mouseX, int mouseY) {

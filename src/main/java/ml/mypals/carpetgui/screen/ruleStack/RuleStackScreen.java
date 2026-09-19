@@ -106,11 +106,11 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       panel.surface(Surface.outline(1711276032));
       panel.padding(Insets.of(2));
       FlowLayout prefabSection = UIContainers.verticalFlow(Sizing.fill(100), Sizing.content());
-      prefabSection.margins(Insets.bottom(5));
+      prefabSection.carpetGUI$margins(Insets.bottom(5));
       panel.child(prefabSection);
       this.prefabNameLabel = UIComponents.label(Component.translatable("gui.rulestack.prefab", new Object[]{"…"}).withStyle(ChatFormatting.YELLOW));
       this.prefabNameLabel.color(Color.WHITE);
-      this.prefabNameLabel.margins(Insets.bottom(3));
+      this.prefabNameLabel.carpetGUI$margins(Insets.bottom(3));
       prefabSection.child(this.prefabNameLabel);
       FlowLayout prefabBtns = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(5));
       prefabBtns.gap(3);
@@ -118,7 +118,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       prefabBtns.child(ScreenUtils.btn(Component.translatable("gui.rulestack.btn.new_prefab"), Sizing.fill(20), Sizing.fill(100), () -> this.togglePrefabPanel(RuleStackScreen.PrefabPanel.NEW_INPUT)));
       prefabSection.child(prefabBtns);
       this.prefabDynamic = UIContainers.verticalFlow(Sizing.fill(100), Sizing.content());
-      this.prefabDynamic.margins(Insets.top(3));
+      this.prefabDynamic.carpetGUI$margins(Insets.top(3));
       this.prefabDynamic.horizontalAlignment(HorizontalAlignment.CENTER);
       this.prefabDynamic.verticalAlignment(VerticalAlignment.CENTER);
       prefabSection.child(this.prefabDynamic);
@@ -130,18 +130,18 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       this.pushMessageBox = UIComponents.textBox(Sizing.fill(100));
       this.pushMessageBox.setMaxLength(100);
       this.pushMessageBox.setSuggestion(hint);
-      this.pushMessageBox.focusGained().subscribe((FocusGained)(s) -> this.pushMessageBox.setSuggestion(""));
-      this.pushMessageBox.focusLost().subscribe((FocusLost)() -> {
+      this.pushMessageBox.carpetGUI$focusGained().subscribe((FocusGained)(s) -> this.pushMessageBox.setSuggestion(""));
+      this.pushMessageBox.carpetGUI$focusLost().subscribe((FocusLost)() -> {
          if (this.pushMessageBox.getValue().isEmpty()) {
             this.pushMessageBox.setSuggestion(hint);
          }
 
       });
-      this.pushMessageBox.margins(Insets.top(4));
+      this.pushMessageBox.carpetGUI$margins(Insets.top(4));
       panel.child(this.pushMessageBox);
       this.bottomButtonLayout = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fixed(16));
       this.bottomButtonLayout.gap(4);
-      this.bottomButtonLayout.margins(Insets.top(2));
+      this.bottomButtonLayout.carpetGUI$margins(Insets.top(2));
       this.bottomButtonLayout.horizontalAlignment(HorizontalAlignment.CENTER);
       this.buildBottomButtons();
       panel.child(this.bottomButtonLayout);
@@ -202,16 +202,16 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
             }
 
             row.child(lbl);
-            row.mouseEnter().subscribe((MouseEnter)() -> {
+            row.carpetGUI$mouseEnter().subscribe((MouseEnter)() -> {
                if (data.pendingChanges().isEmpty() || InputConstants.isKeyDown(this.minecraft.getWindow(), 340)) {
                   row.surface(row.surface().and(Surface.outline(Color.WHITE.argb())));
                }
 
             });
-            row.mouseLeave().subscribe((MouseLeave)() -> row.surface(Surface.flat(active ? 1084948394 : 285212671)));
+            row.carpetGUI$mouseLeave().subscribe((MouseLeave)() -> row.surface(Surface.flat(active ? 1084948394 : 285212671)));
             if (!active) {
-               row.cursorStyle(CursorStyle.HAND);
-               row.mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
+               row.carpetGUI$cursorStyle(CursorStyle.HAND);
+               row.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
                   if (!data.pendingChanges().isEmpty() && !InputConstants.isKeyDown(this.minecraft.getWindow(), 340)) {
                      return false;
                   } else {
@@ -234,7 +234,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       TextBoxComponent nameBox = UIComponents.textBox(Sizing.fill(80));
       nameBox.setMaxLength(256);
       nameBox.setSuggestion("…");
-      nameBox.focusGained().subscribe((FocusGained)(s) -> nameBox.setSuggestion(""));
+      nameBox.carpetGUI$focusGained().subscribe((FocusGained)(s) -> nameBox.setSuggestion(""));
       row.child(nameBox);
       FlowLayout newButton = ScreenUtils.btn(Component.translatable("gui.rulegroups.save"), Sizing.fill(18), Sizing.fill(98), () -> {
          String n = nameBox.getValue().trim();
@@ -341,7 +341,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       }
 
       if (onClick != null) {
-         entry.cursorStyle(CursorStyle.HAND);
+         entry.carpetGUI$cursorStyle(CursorStyle.HAND);
       }
 
       FlowLayout gutter = UIContainers.verticalFlow(Sizing.fixed(16), Sizing.fill(100));
@@ -400,7 +400,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
 
       entry.child(content);
       if (onClick != null) {
-         entry.mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
+         entry.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             onClick.run();
             return true;
@@ -457,7 +457,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       FlowLayout card = UIContainers.verticalFlow(Sizing.fill(100), Sizing.content());
       card.surface(Surface.flat(-1727855869).and(Surface.outline(301989887)));
       card.padding(Insets.of(4, 4, 7, 7));
-      card.margins(Insets.bottom(1));
+      card.carpetGUI$margins(Insets.bottom(1));
       String managerId = c.managerId();
       if (managerId.startsWith("gamerule")) {
          managerId = managerId.split("\\$")[0];

@@ -6,6 +6,7 @@ import java.util.ListIterator;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -37,7 +38,7 @@ public interface ParentUIComponent extends UIComponent {
 
    ParentUIComponent padding(Insets var1);
 
-   AnimatableProperty<Insets> padding();
+   Observable<Insets> padding();
 
    ParentUIComponent allowOverflow(boolean var1);
 
@@ -55,7 +56,7 @@ public interface ParentUIComponent extends UIComponent {
       if (this.hasParent()) {
          UIComponent.super.drawTooltip(context, mouseX, mouseY, partialTicks, delta);
       } else {
-         ArrayList<UIComponent> hoveredDescendants = new ArrayList();
+         ArrayList<UIComponent> hoveredDescendants = new ArrayList<>();
          Objects.requireNonNull(hoveredDescendants);
          this.forEachDescendantWhere(hoveredDescendants::add, (component) -> component.isInBoundingBox((double)mouseX, (double)mouseY));
          hoveredDescendants.remove(this);
@@ -66,21 +67,20 @@ public interface ParentUIComponent extends UIComponent {
             for(int parentIdx = i - 1; parentIdx >= 0; --parentIdx) {
                Object var11 = hoveredDescendants.get(parentIdx);
                if (var11 instanceof ParentUIComponent) {
-                  ParentUIComponent parent = (ParentUIComponent)var11;
-                  nextParent = parent;
+                   nextParent = (ParentUIComponent)var11;
                   break;
                }
             }
 
             UIComponent current = (UIComponent)hoveredDescendants.get(i);
-            if (nextParent != null && current.parent() != nextParent) {
+            if (nextParent != null && current.carpetGUI$parent() != nextParent) {
                break;
             }
 
-            if (current.shouldDrawTooltip((double)mouseX, (double)mouseY)) {
+            if (current.carpetGUI$shouldDrawTooltip((double)mouseX, (double)mouseY)) {
                context.push();
 
-               while(i >= 0 && (i <= 0 || ((UIComponent)hoveredDescendants.get(i)).parent() == hoveredDescendants.get(i - 1))) {
+               while(i >= 0 && (i <= 0 || ((UIComponent)hoveredDescendants.get(i)).carpetGUI$parent() == hoveredDescendants.get(i - 1))) {
                   context.translate(0.0F, 0.0F);
                   --i;
                }
@@ -94,12 +94,12 @@ public interface ParentUIComponent extends UIComponent {
       }
    }
 
-   default boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
+   default boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
       ListIterator<UIComponent> iter = this.children().listIterator(this.children().size());
 
       while(iter.hasPrevious()) {
          UIComponent child = (UIComponent)iter.previous();
-         if (child.isInBoundingBox((double)this.x() + click.x(), (double)this.y() + click.y()) && child.onMouseDown(new MouseButtonEvent((double)this.x() + click.x() - (double)child.x(), (double)this.y() + click.y() - (double)child.y(), click.buttonInfo()), doubled)) {
+         if (child.isInBoundingBox((double)this.carpetGUI$x() + click.x(), (double)this.carpetGUI$y() + click.y()) && child.carpetGUI$onMouseDown(new MouseButtonEvent((double)this.carpetGUI$x() + click.x() - (double)child.carpetGUI$x(), (double)this.carpetGUI$y() + click.y() - (double)child.carpetGUI$y(), click.buttonInfo()), doubled)) {
             return true;
          }
       }
@@ -107,12 +107,12 @@ public interface ParentUIComponent extends UIComponent {
       return false;
    }
 
-   default boolean onMouseScroll(double mouseX, double mouseY, double amount) {
+   default boolean carpetGUI$onMouseScroll(double mouseX, double mouseY, double amount) {
       ListIterator<UIComponent> iter = this.children().listIterator(this.children().size());
 
       while(iter.hasPrevious()) {
          UIComponent child = (UIComponent)iter.previous();
-         if (child.isInBoundingBox((double)this.x() + mouseX, (double)this.y() + mouseY) && child.onMouseScroll((double)this.x() + mouseX - (double)child.x(), (double)this.y() + mouseY - (double)child.y(), amount)) {
+         if (child.isInBoundingBox((double)this.carpetGUI$x() + mouseX, (double)this.carpetGUI$y() + mouseY) && child.carpetGUI$onMouseScroll((double)this.carpetGUI$x() + mouseX - (double)child.carpetGUI$x(), (double)this.carpetGUI$y() + mouseY - (double)child.carpetGUI$y(), amount)) {
             return true;
          }
       }
@@ -120,11 +120,9 @@ public interface ParentUIComponent extends UIComponent {
       return false;
    }
 
-   default void update(float delta, int mouseX, int mouseY) {
-      this.padding().update(delta);
-
+   default void carpetGUI$update(float delta, int mouseX, int mouseY) {
       for(int i = 0; i < this.children().size(); ++i) {
-         ((UIComponent)this.children().get(i)).update(delta, mouseX, mouseY);
+         ((UIComponent)this.children().get(i)).carpetGUI$update(delta, mouseX, mouseY);
       }
 
    }
@@ -141,7 +139,7 @@ public interface ParentUIComponent extends UIComponent {
 
       while(iter.hasPrevious()) {
          UIComponent child = (UIComponent)iter.previous();
-         if (Objects.equals(child.id(), id)) {
+         if (Objects.equals(child.carpetGUI$id(), id)) {
             if (!expectedClass.isAssignableFrom(child.getClass())) {
                throw new IllegalStateException("Expected child with id '" + id + "' to be a " + expectedClass.getSimpleName() + " but it is a " + child.getClass().getSimpleName());
             }
@@ -166,9 +164,8 @@ public interface ParentUIComponent extends UIComponent {
       while(iter.hasPrevious()) {
          UIComponent child = (UIComponent)iter.previous();
          if (child.isInBoundingBox((double)x, (double)y)) {
-            if (child instanceof ParentUIComponent) {
-               ParentUIComponent parent = (ParentUIComponent)child;
-               return parent.childAt(x, y);
+            if (child instanceof ParentUIComponent parent) {
+                return parent.childAt(x, y);
             }
 
             return child;
@@ -201,9 +198,8 @@ public interface ParentUIComponent extends UIComponent {
 
       for(UIComponent child : this.children()) {
          if (condition.test(child)) {
-            if (child instanceof ParentUIComponent) {
-               ParentUIComponent parent = (ParentUIComponent)child;
-               parent.forEachDescendantWhere(action, condition);
+            if (child instanceof ParentUIComponent parent) {
+                parent.forEachDescendantWhere(action, condition);
             } else {
                action.accept(child);
             }

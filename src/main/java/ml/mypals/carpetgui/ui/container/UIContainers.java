@@ -15,17 +15,9 @@ public final class UIContainers {
       return new FlowLayout(horizontalSizing, verticalSizing, FlowLayout.Algorithm.HORIZONTAL);
    }
 
-   public static FlowLayout ltrTextFlow(Sizing horizontalSizing, Sizing verticalSizing) {
-      return new FlowLayout(horizontalSizing, verticalSizing, FlowLayout.Algorithm.LTR_TEXT);
-   }
-
 
    public static <C extends UIComponent> ScrollContainer<C> verticalScroll(Sizing horizontalSizing, Sizing verticalSizing, C child) {
       return new ScrollContainer<C>(ScrollContainer.ScrollDirection.VERTICAL, horizontalSizing, verticalSizing, child);
-   }
-
-   public static <C extends UIComponent> ScrollContainer<C> horizontalScroll(Sizing horizontalSizing, Sizing verticalSizing, C child) {
-      return new ScrollContainer<C>(ScrollContainer.ScrollDirection.HORIZONTAL, horizontalSizing, verticalSizing, child);
    }
 
    public static <C extends UIComponent> OverlayContainer<C> overlay(C child) {

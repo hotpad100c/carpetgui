@@ -100,7 +100,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       this.searchBox.setMaxLength(100);
       this.searchBox.setFocused(true);
       this.searchBox.onChanged().subscribe(this::onSearch);
-      this.searchBox.focusGained().subscribe((FocusGained)(source) -> this.onSearch(this.searchBox.getValue()));
+      this.searchBox.carpetGUI$focusGained().subscribe((FocusGained)(source) -> this.onSearch(this.searchBox.getValue()));
       searchRow.child(this.searchBox);
       leftPanel.child(searchRow);
       this.rulesListLayout = UIContainers.verticalFlow(Sizing.fill(99), Sizing.content());
@@ -111,7 +111,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       rightPanel.padding(Insets.of(5));
       this.currentCategoryLabel = UIComponents.label(Component.nullToEmpty(this.currentCategory));
       this.currentCategoryLabel.color(Color.WHITE);
-      this.currentCategoryLabel.margins(Insets.of(2, 6, 4, 0));
+      this.currentCategoryLabel.carpetGUI$margins(Insets.of(2, 6, 4, 0));
       rightPanel.child(this.currentCategoryLabel);
       this.categoriesListLayout = UIContainers.verticalFlow(Sizing.fill(98), Sizing.content());
       this.categoriesScroll = UIContainers.<FlowLayout>verticalScroll(Sizing.fill(100), Sizing.fill(100), this.categoriesListLayout);
@@ -264,11 +264,11 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       row.surface(Surface.flat(selected ? 1342572038 : 537265670));
       row.padding(Insets.of(4, 4, 6, 0));
       row.verticalAlignment(VerticalAlignment.CENTER);
-      row.cursorStyle(CursorStyle.HAND);
+      row.carpetGUI$cursorStyle(CursorStyle.HAND);
       LabelComponent label = UIComponents.label(RulesEditScreen.DefaultCategory.getDisplayName(name));
       label.color(Color.WHITE);
       row.child(label);
-      row.mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
+      row.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
          this.setCurrentCategory(name);
          Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
          return true;

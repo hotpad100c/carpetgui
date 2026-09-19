@@ -58,11 +58,6 @@ public abstract class BaseOwoScreen<R extends ParentUIComponent> extends Screen 
       if (this.uiAdapter != null) {
          this.uiAdapter.drawTooltip(drawContext, mouseX, mouseY, tickDelta);
       }
-
-   }
-
-   protected <C extends UIComponent> C component(Class<C> expectedClass, String id) {
-      return (C)this.uiAdapter.rootComponent.childById(expectedClass, id);
    }
 
    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
@@ -82,10 +77,10 @@ public abstract class BaseOwoScreen<R extends ParentUIComponent> extends Screen 
          return false;
       } else {
          if (!input.hasControlDown()) {
-            UIComponent var3 = this.uiAdapter.rootComponent.focusHandler().focused();
+            UIComponent var3 = this.uiAdapter.rootComponent.carpetGUI$focusHandler().focused();
             if (var3 instanceof GreedyInputUIComponent) {
                GreedyInputUIComponent inputComponent = (GreedyInputUIComponent)var3;
-               if (inputComponent.onKeyPress(input)) {
+               if (inputComponent.carpetGUI$onKeyPress(input)) {
                   return true;
                }
             }

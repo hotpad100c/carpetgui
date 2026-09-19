@@ -2,7 +2,6 @@ package ml.mypals.carpetgui.ui.component;
 
 import java.util.function.Consumer;
 import ml.mypals.carpetgui.mixin.ui.AbstractWidgetAccessor;
-import ml.mypals.carpetgui.mixin.ui.ButtonAccessor;
 import ml.mypals.carpetgui.ui.UI;
 import ml.mypals.carpetgui.ui.core.CursorStyle;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
@@ -14,7 +13,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -22,18 +20,18 @@ public class ButtonComponent extends Button {
    public static final Identifier ACTIVE_TEXTURE = UI.id("button/active");
    public static final Identifier HOVERED_TEXTURE = UI.id("button/hovered");
    public static final Identifier DISABLED_TEXTURE = UI.id("button/disabled");
-   protected Renderer renderer;
    protected boolean textShadow;
 
    protected ButtonComponent(Component message, Consumer<ButtonComponent> onPress) {
       super(0, 0, 0, 0, message, (button) -> onPress.accept((ButtonComponent)button), Button.DEFAULT_NARRATION);
-      this.renderer = ButtonComponent.Renderer.VANILLA;
       this.textShadow = true;
       this.sizing(Sizing.content());
    }
 
    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-      this.renderer.draw((OwoUIGraphics)graphics, this, a);
+      Identifier texture = this.active ? (this.isHovered ? HOVERED_TEXTURE : ACTIVE_TEXTURE) : DISABLED_TEXTURE;
+      NinePatchTexture.draw(texture, (OwoUIGraphics)graphics, this.getX(), this.getY(), this.width, this.height);
+
       Font textRenderer = Minecraft.getInstance().font;
       int color = this.active ? -1 : -6250336;
       if (this.textShadow) {
@@ -46,21 +44,6 @@ public class ButtonComponent extends Button {
       if (this.isHovered && tooltip.get() != null) {
          graphics.setTooltipForNextFrame(textRenderer, tooltip.get().toCharSequence(Minecraft.getInstance()), DefaultTooltipPositioner.INSTANCE, mouseX, mouseY, false);
       }
-
-   }
-
-   public ButtonComponent onPress(Consumer<ButtonComponent> onPress) {
-      ((ButtonAccessor)this).carpetGUI$setOnPress((button) -> onPress.accept((ButtonComponent)button));
-      return this;
-   }
-
-   public ButtonComponent renderer(Renderer renderer) {
-      this.renderer = renderer;
-      return this;
-   }
-
-   public Renderer renderer() {
-      return this.renderer;
    }
 
    public ButtonComponent textShadow(boolean textShadow) {
@@ -83,43 +66,5 @@ public class ButtonComponent extends Button {
 
    protected CursorStyle carpetGUI$preferredCursorStyle() {
       return CursorStyle.HAND;
-   }
-
-   @FunctionalInterface
-   public interface Renderer {
-      Renderer VANILLA = (matrices, button, delta) -> {
-         Identifier texture = button.active ? (button.isHovered ? ButtonComponent.HOVERED_TEXTURE : ButtonComponent.ACTIVE_TEXTURE) : ButtonComponent.DISABLED_TEXTURE;
-         NinePatchTexture.draw(texture, matrices, button.getX(), button.getY(), button.width, button.height);
-      };
-
-      static Renderer flat(int color, int hoveredColor, int disabledColor) {
-         return (context, button, delta) -> {
-            if (button.active) {
-               if (button.isHovered) {
-                  context.fill(button.getX(), button.getY(), button.getX() + button.width, button.getY() + button.height, hoveredColor);
-               } else {
-                  context.fill(button.getX(), button.getY(), button.getX() + button.width, button.getY() + button.height, color);
-               }
-            } else {
-               context.fill(button.getX(), button.getY(), button.getX() + button.width, button.getY() + button.height, disabledColor);
-            }
-
-         };
-      }
-
-      static Renderer texture(Identifier texture, int u, int v, int textureWidth, int textureHeight) {
-         return (context, button, delta) -> {
-            int renderV = v;
-            if (!button.active) {
-               renderV = v + button.height * 2;
-            } else if (button.isHovered()) {
-               renderV = v + button.height;
-            }
-
-            context.blit(RenderPipelines.GUI_TEXTURED, texture, button.getX(), button.getY(), (float)u, (float)renderV, button.width, button.height, textureWidth, textureHeight);
-         };
-      }
-
-      void draw(OwoUIGraphics var1, ButtonComponent var2, float var3);
    }
 }

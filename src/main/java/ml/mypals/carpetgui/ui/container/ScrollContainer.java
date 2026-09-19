@@ -1,29 +1,27 @@
 package ml.mypals.carpetgui.ui.container;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import ml.mypals.carpetgui.ui.UI;
+
+import ml.mypals.carpetgui.ui.base.BaseParentUIComponent;
 import ml.mypals.carpetgui.ui.core.Color;
 import ml.mypals.carpetgui.ui.core.Insets;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
+import ml.mypals.carpetgui.ui.core.ParentUIComponent;
 import ml.mypals.carpetgui.ui.core.Size;
 import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.UIComponent;
-import ml.mypals.carpetgui.ui.util.NinePatchTexture;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
-public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComponent<C> {
-   public static final Identifier VERTICAL_VANILLA_SCROLLBAR_TEXTURE = UI.id("scrollbar/vanilla_vertical");
-   public static final Identifier DISABLED_VERTICAL_VANILLA_SCROLLBAR_TEXTURE = UI.id("scrollbar/vanilla_vertical_disabled");
-   public static final Identifier HORIZONTAL_VANILLA_SCROLLBAR_TEXTURE = UI.id("scrollbar/vanilla_horizontal_disabled");
-   public static final Identifier DISABLED_HORIZONTAL_VANILLA_SCROLLBAR_TEXTURE = UI.id("scrollbar/vanilla_horizontal_disabled");
-   public static final Identifier VANILLA_SCROLLBAR_TRACK_TEXTURE = UI.id("scrollbar/track");
-   public static final Identifier FLAT_VANILLA_SCROLLBAR_TEXTURE = UI.id("scrollbar/vanilla_flat");
+public class ScrollContainer<C extends UIComponent> extends BaseParentUIComponent {
+   protected C child;
+   protected List<UIComponent> childView;
    protected double scrollOffset = (double)0.0F;
    protected double currentScrollPosition = (double)0.0F;
    protected int lastScrollPosition = -1;
@@ -48,13 +46,37 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
    }
 
    protected ScrollContainer(ScrollDirection direction, Sizing horizontalSizing, Sizing verticalSizing, C child) {
-      super(horizontalSizing, verticalSizing, child);
+      super(horizontalSizing, verticalSizing);
+      this.child = child;
+      this.childView = Collections.singletonList(this.child);
       this.direction = direction;
+   }
+
+   public C child() {
+      return this.child;
+   }
+
+   public List<UIComponent> children() {
+      return this.childView;
+   }
+
+   public ParentUIComponent removeChild(UIComponent child) {
+      throw new UnsupportedOperationException("Cannot remove the child of a scroll container");
+   }
+
+   public ScrollContainer<C> child(C newChild) {
+      if (this.child != null) {
+         this.child.carpetGUI$dismount(UIComponent.DismountReason.REMOVED);
+      }
+      this.child = newChild;
+      this.childView = Collections.singletonList(this.child);
+      this.updateLayout();
+      return this;
    }
 
    protected int determineHorizontalContentSize(Sizing sizing) {
       if (this.direction == ScrollContainer.ScrollDirection.VERTICAL) {
-         return super.determineHorizontalContentSize(sizing);
+         return this.child.fullSize().width() + ((Insets)this.padding.get()).horizontal();
       } else {
          throw new UnsupportedOperationException("Horizontal ScrollContainer cannot be horizontally content-sized");
       }
@@ -62,14 +84,15 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
 
    protected int determineVerticalContentSize(Sizing sizing) {
       if (this.direction == ScrollContainer.ScrollDirection.HORIZONTAL) {
-         return super.determineVerticalContentSize(sizing);
+         return this.child.fullSize().height() + ((Insets)this.padding.get()).vertical();
       } else {
          throw new UnsupportedOperationException("Vertical ScrollContainer cannot be vertically content-sized");
       }
    }
 
    public void layout(Size space) {
-      super.layout(space);
+      this.child.carpetGUI$inflate(this.calculateChildSpace(space));
+      this.child.carpetGUI$mount(this, this.childMountX(), this.childMountY());
       this.maxScroll = Math.max(0, (Integer)this.direction.sizeGetter.apply(this.child) - ((Integer)this.direction.sizeGetter.apply(this) - (Integer)this.direction.insetGetter.apply((Insets)this.padding.get())));
       this.scrollOffset = Mth.clamp(this.scrollOffset, (double)0.0F, (double)this.maxScroll + (double)0.5F);
       this.childSize = (Integer)this.direction.sizeGetter.apply(this.child);
@@ -77,11 +100,13 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
    }
 
    protected int childMountX() {
-      return (int)((double)super.childMountX() - this.direction.choose(this.currentScrollPosition, (double)0.0F));
+      int baseX = this.x + ((Insets)this.child.carpetGUI$margins().get()).left() + ((Insets)this.padding.get()).left();
+      return (int)((double)baseX - this.direction.choose(this.currentScrollPosition, (double)0.0F));
    }
 
    protected int childMountY() {
-      return (int)((double)super.childMountY() - this.direction.choose((double)0.0F, this.currentScrollPosition));
+      int baseY = this.y + ((Insets)this.child.carpetGUI$margins().get()).top() + ((Insets)this.padding.get()).top();
+      return (int)((double)baseY - this.direction.choose((double)0.0F, this.currentScrollPosition));
    }
 
    protected void parentUpdate(float delta, int mouseX, int mouseY) {
@@ -95,8 +120,8 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
       return Math.abs(delta) > Math.abs(diff) ? diff : delta;
    }
 
-   public void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
-      super.draw(graphics, mouseX, mouseY, partialTicks, delta);
+   public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+      super.carpetGUI$draw(graphics, mouseX, mouseY, partialTicks, delta);
       int effectiveScrollOffset = this.scrollStep > 0 ? (int)this.scrollOffset / this.scrollStep * this.scrollStep : (int)this.currentScrollPosition;
       if (this.scrollStep > 0 && (double)this.maxScroll - this.scrollOffset == (double)-1.0F) {
          effectiveScrollOffset = (int)((double)effectiveScrollOffset + this.scrollOffset % (double)this.scrollStep);
@@ -104,7 +129,7 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
 
       int newScrollPosition = (Integer)this.direction.coordinateGetter.apply(this) - effectiveScrollOffset;
       if (newScrollPosition != this.lastScrollPosition) {
-         this.direction.coordinateSetter.accept(this.child, newScrollPosition + (this.direction == ScrollContainer.ScrollDirection.VERTICAL ? ((Insets)this.padding.get()).top() + ((Insets)this.child.margins().get()).top() : ((Insets)this.padding.get()).left() + ((Insets)this.child.margins().get()).left()));
+         this.direction.coordinateSetter.accept(this.child, newScrollPosition + (this.direction == ScrollContainer.ScrollDirection.VERTICAL ? ((Insets)this.padding.get()).top() + ((Insets)this.child.carpetGUI$margins().get()).top() : ((Insets)this.padding.get()).left() + ((Insets)this.child.carpetGUI$margins().get()).left()));
          this.lastScrollPosition = newScrollPosition;
       }
 
@@ -135,12 +160,12 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
 
    }
 
-   public boolean canFocus(UIComponent.FocusSource source) {
+   public boolean carpetGUI$canFocus(UIComponent.FocusSource source) {
       return true;
    }
 
-   public boolean onMouseScroll(double mouseX, double mouseY, double amount) {
-      if (this.child.onMouseScroll((double)this.x + mouseX - (double)this.child.x(), (double)this.y + mouseY - (double)this.child.y(), amount)) {
+   public boolean carpetGUI$onMouseScroll(double mouseX, double mouseY, double amount) {
+      if (this.child.carpetGUI$onMouseScroll((double)this.x + mouseX - (double)this.child.carpetGUI$x(), (double)this.y + mouseY - (double)this.child.carpetGUI$y(), amount)) {
          return true;
       } else {
          if (this.scrollStep < 1) {
@@ -153,18 +178,18 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
       }
    }
 
-   public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
+   public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
       if (this.isInScrollbar((double)this.x + click.x(), (double)this.y + click.y())) {
-         super.onMouseDown(click, doubled);
+         super.carpetGUI$onMouseDown(click, doubled);
          return true;
       } else {
-         return super.onMouseDown(click, doubled);
+         return super.carpetGUI$onMouseDown(click, doubled);
       }
    }
 
-   public boolean onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
+   public boolean carpetGUI$onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
       if (!this.scrollbaring && !this.isInScrollbar((double)this.x + click.x(), (double)this.y + click.y())) {
-         return super.onMouseDrag(click, deltaX, deltaY);
+         return super.carpetGUI$onMouseDrag(click, deltaX, deltaY);
       } else {
          double delta = this.direction.choose(deltaX, deltaY);
          double selfSize = (double)((Integer)this.direction.sizeGetter.apply(this) - (Integer)this.direction.insetGetter.apply((Insets)this.padding.get()));
@@ -179,7 +204,7 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
       }
    }
 
-   public boolean onKeyPress(KeyEvent input) {
+   public boolean carpetGUI$onKeyPress(KeyEvent input) {
       if (input.key() == this.direction.lessKeycode) {
          this.scrollBy((double)-10.0F, false, true);
       } else if (input.key() == this.direction.moreKeycode) {
@@ -194,7 +219,7 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
       return false;
    }
 
-   public boolean onMouseUp(MouseButtonEvent click) {
+   public boolean carpetGUI$onMouseUp(MouseButtonEvent click) {
       this.scrollbaring = false;
       return true;
    }
@@ -221,9 +246,9 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
 
    public ScrollContainer<C> scrollTo(UIComponent component) {
       if (this.direction == ScrollContainer.ScrollDirection.VERTICAL) {
-         this.scrollOffset = Mth.clamp(this.scrollOffset - (double)(this.y - component.y() + ((Insets)component.margins().get()).top()), (double)0.0F, (double)this.maxScroll);
+         this.scrollOffset = Mth.clamp(this.scrollOffset - (double)(this.y - component.carpetGUI$y() + ((Insets)component.carpetGUI$margins().get()).top()), (double)0.0F, (double)this.maxScroll);
       } else {
-         this.scrollOffset = Mth.clamp(this.scrollOffset - (double)(this.x - component.x() + ((Insets)component.margins().get()).right()), (double)0.0F, (double)this.maxScroll);
+         this.scrollOffset = Mth.clamp(this.scrollOffset - (double)(this.x - component.carpetGUI$x() + ((Insets)component.carpetGUI$margins().get()).right()), (double)0.0F, (double)this.maxScroll);
       }
 
       return this;
@@ -287,27 +312,12 @@ public class ScrollContainer<C extends UIComponent> extends WrappingParentUIComp
          };
       }
 
-      static Scrollbar vanilla() {
-         return (context, x, y, width, height, trackX, trackY, trackWidth, trackHeight, lastInteractTime, direction, active) -> {
-            NinePatchTexture.draw(ScrollContainer.VANILLA_SCROLLBAR_TRACK_TEXTURE, context, trackX, trackY, trackWidth, trackHeight);
-            Identifier texture = direction == ScrollContainer.ScrollDirection.VERTICAL ? (active ? ScrollContainer.VERTICAL_VANILLA_SCROLLBAR_TEXTURE : ScrollContainer.DISABLED_VERTICAL_VANILLA_SCROLLBAR_TEXTURE) : (active ? ScrollContainer.HORIZONTAL_VANILLA_SCROLLBAR_TEXTURE : ScrollContainer.DISABLED_HORIZONTAL_VANILLA_SCROLLBAR_TEXTURE);
-            NinePatchTexture.draw(texture, context, x + 1, y + 1, width - 2, height - 2);
-         };
-      }
-
-      static Scrollbar vanillaFlat() {
-         return (context, x, y, width, height, trackX, trackY, trackWidth, trackHeight, lastInteractTime, direction, active) -> {
-            context.fill(trackX, trackY, trackX + trackWidth, trackY + trackHeight, Color.BLACK.argb());
-            NinePatchTexture.draw(ScrollContainer.FLAT_VANILLA_SCROLLBAR_TEXTURE, context, x, y, width, height);
-         };
-      }
-
       void draw(OwoUIGraphics var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, int var9, long var10, ScrollDirection var12, boolean var13);
    }
 
    public static enum ScrollDirection {
-      VERTICAL(UIComponent::height, UIComponent::updateY, UIComponent::y, Insets::vertical, 265, 264),
-      HORIZONTAL(UIComponent::width, UIComponent::updateX, UIComponent::x, Insets::horizontal, 263, 262);
+      VERTICAL(UIComponent::carpetGUI$height, UIComponent::carpetGUI$updateY, UIComponent::carpetGUI$y, Insets::vertical, 265, 264),
+      HORIZONTAL(UIComponent::carpetGUI$width, UIComponent::carpetGUI$updateX, UIComponent::carpetGUI$x, Insets::horizontal, 263, 262);
 
       public final Function<UIComponent, Integer> sizeGetter;
       public final BiConsumer<UIComponent, Integer> coordinateSetter;

@@ -2,14 +2,13 @@ package ml.mypals.carpetgui.ui.core;
 
 import com.mojang.blaze3d.platform.Window;
 import java.util.function.BiFunction;
-import ml.mypals.carpetgui.ui.UI;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.narration.NarratableEntry.NarrationPriority;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -24,9 +23,6 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    protected int y;
    protected int width;
    protected int height;
-   public boolean enableInspector = false;
-   public boolean globalInspector = false;
-   public int inspectorZOffset = 1000;
 
    protected OwoUIAdapter(int x, int y, int width, int height, R rootComponent) {
       this.x = x;
@@ -45,14 +41,9 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
       return adapter;
    }
 
-   public static <R extends ParentUIComponent> OwoUIAdapter<R> createWithoutScreen(int x, int y, int width, int height, BiFunction<Sizing, Sizing, R> rootComponentMaker) {
-      R rootComponent = (R)(rootComponentMaker.apply(Sizing.fill(100), Sizing.fill(100)));
-      return new OwoUIAdapter<R>(x, y, width, height, rootComponent);
-   }
-
    public void inflateAndMount() {
-      this.rootComponent.inflate(Size.of(this.width, this.height));
-      this.rootComponent.mount((ParentUIComponent)null, this.x, this.y);
+      this.rootComponent.carpetGUI$inflate(Size.of(this.width, this.height));
+      this.rootComponent.carpetGUI$mount((ParentUIComponent)null, this.x, this.y);
    }
 
    public void moveAndResize(int x, int y, int width, int height) {
@@ -66,14 +57,6 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    public void dispose() {
       this.cursorAdapter.dispose();
       this.disposed = true;
-   }
-
-   public boolean toggleInspector() {
-      return this.enableInspector = !this.enableInspector;
-   }
-
-   public boolean toggleGlobalInspector() {
-      return this.globalInspector = !this.globalInspector;
    }
 
    public int x() {
@@ -103,17 +86,13 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
          isRendering = true;
          float delta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
          Window window = Minecraft.getInstance().getWindow();
-         this.rootComponent.update(delta, mouseX, mouseY);
+         this.rootComponent.carpetGUI$update(delta, mouseX, mouseY);
          graphics.enableScissor(0, 0, window.getWidth(), window.getHeight());
-         this.rootComponent.draw(owoGraphics, mouseX, mouseY, a, delta);
+         this.rootComponent.carpetGUI$draw(owoGraphics, mouseX, mouseY, a, delta);
          graphics.disableScissor();
          UIComponent hovered = this.rootComponent.childAt(mouseX, mouseY);
          if (!this.disposed && hovered != null) {
-            this.cursorAdapter.applyStyle(hovered.cursorStyle());
-         }
-
-         if (this.enableInspector) {
-            OwoUIGraphics.drawInspector(owoGraphics, this.rootComponent, (double)mouseX, (double)mouseY, !this.globalInspector);
+            this.cursorAdapter.applyStyle(hovered.carpetGUI$cursorStyle());
          }
       } finally {
          isRendering = false;
@@ -144,35 +123,27 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    }
 
    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
-      return this.rootComponent.onMouseDown(click, doubled);
+      return this.rootComponent.carpetGUI$onMouseDown(click, doubled);
    }
 
    public boolean mouseReleased(MouseButtonEvent click) {
-      return this.rootComponent.onMouseUp(click);
+      return this.rootComponent.carpetGUI$onMouseUp(click);
    }
 
    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-      return this.rootComponent.onMouseScroll(mouseX, mouseY, verticalAmount);
+      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, verticalAmount);
    }
 
    public boolean mouseDragged(MouseButtonEvent click, double deltaX, double deltaY) {
-      return this.rootComponent.onMouseDrag(click, deltaX, deltaY);
+      return this.rootComponent.carpetGUI$onMouseDrag(click, deltaX, deltaY);
    }
 
    public boolean keyPressed(KeyEvent input) {
-      if (UI.DEBUG && input.key() == 340) {
-         if (input.hasControlDown()) {
-            this.toggleInspector();
-         } else if (input.hasAltDown()) {
-            this.toggleGlobalInspector();
-         }
-      }
-
-      return this.rootComponent.onKeyPress(input);
+      return this.rootComponent.carpetGUI$onKeyPress(input);
    }
 
    public boolean charTyped(CharacterEvent input) {
-      return this.rootComponent.onCharTyped(input);
+      return this.rootComponent.carpetGUI$onCharTyped(input);
    }
 
    public NarratableEntry.NarrationPriority narrationPriority() {

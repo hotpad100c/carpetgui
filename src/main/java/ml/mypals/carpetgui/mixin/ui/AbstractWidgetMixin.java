@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import ml.mypals.carpetgui.ui.component.UIComponents;
 import ml.mypals.carpetgui.ui.component.VanillaWidgetComponent;
-import ml.mypals.carpetgui.ui.core.AnimatableProperty;
 import ml.mypals.carpetgui.ui.core.CursorStyle;
 import ml.mypals.carpetgui.ui.core.Insets;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
@@ -15,8 +14,9 @@ import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.UIComponent;
 import ml.mypals.carpetgui.ui.event.UIEvents.*;
 import ml.mypals.carpetgui.ui.inject.UIComponentStub;
-import ml.mypals.carpetgui.ui.util.EventSource;
+import ml.mypals.carpetgui.ui.util.EventStream;
 import ml.mypals.carpetgui.ui.util.FocusHandler;
+import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -41,196 +41,196 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
    @Unique
    protected VanillaWidgetComponent wrapper = null;
 
-   public void inflate(Size space) {
-      this.carpetGUI$getWrapper().inflate(space);
+   public void carpetGUI$inflate(Size space) {
+      this.carpetGUI$getWrapper().carpetGUI$inflate(space);
    }
 
-   public void mount(ParentUIComponent parent, int x, int y) {
-      this.carpetGUI$getWrapper().mount(parent, x, y);
+   public void carpetGUI$mount(ParentUIComponent parent, int x, int y) {
+      this.carpetGUI$getWrapper().carpetGUI$mount(parent, x, y);
    }
 
-   public void dismount(UIComponent.DismountReason reason) {
-      this.carpetGUI$getWrapper().dismount(reason);
+   public void carpetGUI$dismount(UIComponent.DismountReason reason) {
+      this.carpetGUI$getWrapper().carpetGUI$dismount(reason);
    }
 
-   public @Nullable ParentUIComponent parent() {
-      return this.carpetGUI$getWrapper().parent();
+   public @Nullable ParentUIComponent carpetGUI$parent() {
+      return this.carpetGUI$getWrapper().carpetGUI$parent();
    }
 
-   public @Nullable FocusHandler focusHandler() {
-      return this.carpetGUI$getWrapper().focusHandler();
+   public @Nullable FocusHandler carpetGUI$focusHandler() {
+      return this.carpetGUI$getWrapper().carpetGUI$focusHandler();
    }
 
-   public UIComponent positioning(Positioning positioning) {
-      this.carpetGUI$getWrapper().positioning(positioning);
+   public UIComponent carpetGUI$positioning(Positioning positioning) {
+      this.carpetGUI$getWrapper().carpetGUI$positioning(positioning);
       return this;
    }
 
-   public AnimatableProperty<Positioning> positioning() {
-      return this.carpetGUI$getWrapper().positioning();
+   public Observable<Positioning> carpetGUI$positioning() {
+      return this.carpetGUI$getWrapper().carpetGUI$positioning();
    }
 
-   public UIComponent margins(Insets margins) {
-      this.carpetGUI$getWrapper().margins(margins);
+   public UIComponent carpetGUI$margins(Insets margins) {
+      this.carpetGUI$getWrapper().carpetGUI$margins(margins);
       return this;
    }
 
-   public AnimatableProperty<Insets> margins() {
-      return this.carpetGUI$getWrapper().margins();
+   public Observable<Insets> carpetGUI$margins() {
+      return this.carpetGUI$getWrapper().carpetGUI$margins();
    }
 
-   public UIComponent horizontalSizing(Sizing horizontalSizing) {
-      this.carpetGUI$getWrapper().horizontalSizing(horizontalSizing);
+   public UIComponent carpetGUI$horizontalSizing(Sizing horizontalSizing) {
+      this.carpetGUI$getWrapper().carpetGUI$horizontalSizing(horizontalSizing);
       return this;
    }
 
-   public UIComponent verticalSizing(Sizing verticalSizing) {
-      this.carpetGUI$getWrapper().verticalSizing(verticalSizing);
+   public UIComponent carpetGUI$verticalSizing(Sizing verticalSizing) {
+      this.carpetGUI$getWrapper().carpetGUI$verticalSizing(verticalSizing);
       return this;
    }
 
-   public AnimatableProperty<Sizing> horizontalSizing() {
-      return this.carpetGUI$getWrapper().horizontalSizing();
+   public Observable<Sizing> carpetGUI$horizontalSizing() {
+      return this.carpetGUI$getWrapper().carpetGUI$horizontalSizing();
    }
 
-   public AnimatableProperty<Sizing> verticalSizing() {
-      return this.carpetGUI$getWrapper().verticalSizing();
+   public Observable<Sizing> carpetGUI$verticalSizing() {
+      return this.carpetGUI$getWrapper().carpetGUI$verticalSizing();
    }
 
-   public EventSource<MouseDown> mouseDown() {
-      return this.carpetGUI$getWrapper().mouseDown();
+   public EventStream<MouseDown> carpetGUI$mouseDown() {
+      return this.carpetGUI$getWrapper().carpetGUI$mouseDown();
    }
 
-   public int x() {
-      return this.carpetGUI$getWrapper().x();
+   public int carpetGUI$x() {
+      return this.carpetGUI$getWrapper().carpetGUI$x();
    }
 
-   public int y() {
-      return this.carpetGUI$getWrapper().y();
+   public int carpetGUI$y() {
+      return this.carpetGUI$getWrapper().carpetGUI$y();
    }
 
-   public int width() {
-      return this.carpetGUI$getWrapper().width();
+   public int carpetGUI$width() {
+      return this.carpetGUI$getWrapper().carpetGUI$width();
    }
 
-   public int height() {
-      return this.carpetGUI$getWrapper().height();
+   public int carpetGUI$height() {
+      return this.carpetGUI$getWrapper().carpetGUI$height();
    }
 
-   public void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
-      this.carpetGUI$getWrapper().draw(graphics, mouseX, mouseY, partialTicks, delta);
+   public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+      this.carpetGUI$getWrapper().carpetGUI$draw(graphics, mouseX, mouseY, partialTicks, delta);
    }
 
-   public boolean shouldDrawTooltip(double mouseX, double mouseY) {
-      return this.carpetGUI$getWrapper().shouldDrawTooltip(mouseX, mouseY);
+   public boolean carpetGUI$shouldDrawTooltip(double mouseX, double mouseY) {
+      return this.carpetGUI$getWrapper().carpetGUI$shouldDrawTooltip(mouseX, mouseY);
    }
 
-   public void update(float delta, int mouseX, int mouseY) {
-      this.carpetGUI$getWrapper().update(delta, mouseX, mouseY);
-      this.cursorStyle(this.active ? this.carpetGUI$preferredCursorStyle() : CursorStyle.POINTER);
+   public void carpetGUI$update(float delta, int mouseX, int mouseY) {
+      this.carpetGUI$getWrapper().carpetGUI$update(delta, mouseX, mouseY);
+      this.carpetGUI$cursorStyle(this.active ? this.carpetGUI$preferredCursorStyle() : CursorStyle.POINTER);
    }
 
-   public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
-      return this.carpetGUI$getWrapper().onMouseDown(click, doubled);
+   public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
+      return this.carpetGUI$getWrapper().carpetGUI$onMouseDown(click, doubled);
    }
 
-   public boolean onMouseUp(MouseButtonEvent click) {
-      return this.carpetGUI$getWrapper().onMouseUp(click);
+   public boolean carpetGUI$onMouseUp(MouseButtonEvent click) {
+      return this.carpetGUI$getWrapper().carpetGUI$onMouseUp(click);
    }
 
-   public EventSource<MouseUp> mouseUp() {
-      return this.carpetGUI$getWrapper().mouseUp();
+   public EventStream<MouseUp> carpetGUI$mouseUp() {
+      return this.carpetGUI$getWrapper().carpetGUI$mouseUp();
    }
 
-   public EventSource<MouseScroll> mouseScroll() {
-      return this.carpetGUI$getWrapper().mouseScroll();
+   public EventStream<MouseScroll> carpetGUI$mouseScroll() {
+      return this.carpetGUI$getWrapper().carpetGUI$mouseScroll();
    }
 
-   public EventSource<MouseDrag> mouseDrag() {
-      return this.carpetGUI$getWrapper().mouseDrag();
+   public EventStream<MouseDrag> carpetGUI$mouseDrag() {
+      return this.carpetGUI$getWrapper().carpetGUI$mouseDrag();
    }
 
-   public EventSource<KeyPress> keyPress() {
-      return this.carpetGUI$getWrapper().keyPress();
+   public EventStream<KeyPress> carpetGUI$keyPress() {
+      return this.carpetGUI$getWrapper().carpetGUI$keyPress();
    }
 
-   public EventSource<CharTyped> charTyped() {
-      return this.carpetGUI$getWrapper().charTyped();
+   public EventStream<CharTyped> carpetGUI$charTyped() {
+      return this.carpetGUI$getWrapper().carpetGUI$charTyped();
    }
 
-   public EventSource<FocusGained> focusGained() {
-      return this.carpetGUI$getWrapper().focusGained();
+   public EventStream<FocusGained> carpetGUI$focusGained() {
+      return this.carpetGUI$getWrapper().carpetGUI$focusGained();
    }
 
-   public EventSource<FocusLost> focusLost() {
-      return this.carpetGUI$getWrapper().focusLost();
+   public EventStream<FocusLost> carpetGUI$focusLost() {
+      return this.carpetGUI$getWrapper().carpetGUI$focusLost();
    }
 
-   public EventSource<MouseEnter> mouseEnter() {
-      return this.carpetGUI$getWrapper().mouseEnter();
+   public EventStream<MouseEnter> carpetGUI$mouseEnter() {
+      return this.carpetGUI$getWrapper().carpetGUI$mouseEnter();
    }
 
-   public EventSource<MouseLeave> mouseLeave() {
-      return this.carpetGUI$getWrapper().mouseLeave();
+   public EventStream<MouseLeave> carpetGUI$mouseLeave() {
+      return this.carpetGUI$getWrapper().carpetGUI$mouseLeave();
    }
 
-   public boolean onMouseScroll(double mouseX, double mouseY, double amount) {
-      return this.carpetGUI$getWrapper().onMouseScroll(mouseX, mouseY, amount);
+   public boolean carpetGUI$onMouseScroll(double mouseX, double mouseY, double amount) {
+      return this.carpetGUI$getWrapper().carpetGUI$onMouseScroll(mouseX, mouseY, amount);
    }
 
-   public boolean onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
-      return this.carpetGUI$getWrapper().onMouseDrag(click, deltaX, deltaY);
+   public boolean carpetGUI$onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
+      return this.carpetGUI$getWrapper().carpetGUI$onMouseDrag(click, deltaX, deltaY);
    }
 
-   public boolean onKeyPress(KeyEvent input) {
-      return this.carpetGUI$getWrapper().onKeyPress(input);
+   public boolean carpetGUI$onKeyPress(KeyEvent input) {
+      return this.carpetGUI$getWrapper().carpetGUI$onKeyPress(input);
    }
 
-   public boolean onCharTyped(CharacterEvent input) {
-      return this.carpetGUI$getWrapper().onCharTyped(input);
+   public boolean carpetGUI$onCharTyped(CharacterEvent input) {
+      return this.carpetGUI$getWrapper().carpetGUI$onCharTyped(input);
    }
 
-   public boolean canFocus(UIComponent.FocusSource source) {
+   public boolean carpetGUI$canFocus(UIComponent.FocusSource source) {
       return true;
    }
 
-   public void onFocusGained(UIComponent.FocusSource source) {
+   public void carpetGUI$onFocusGained(UIComponent.FocusSource source) {
       this.setFocused(source == UIComponent.FocusSource.KEYBOARD_CYCLE);
-      this.carpetGUI$getWrapper().onFocusGained(source);
+      this.carpetGUI$getWrapper().carpetGUI$onFocusGained(source);
    }
 
-   public void onFocusLost() {
+   public void carpetGUI$onFocusLost() {
       this.setFocused(false);
-      this.carpetGUI$getWrapper().onFocusLost();
+      this.carpetGUI$getWrapper().carpetGUI$onFocusLost();
    }
 
-   public <C extends UIComponent> C configure(Consumer<C> closure) {
-      return (C)this.carpetGUI$getWrapper().configure(closure);
+   public <C extends UIComponent> C carpetGUI$configure(Consumer<C> closure) {
+      return (C)this.carpetGUI$getWrapper().carpetGUI$configure(closure);
    }
 
-   public CursorStyle cursorStyle() {
-      return this.carpetGUI$getWrapper().cursorStyle();
+   public CursorStyle carpetGUI$cursorStyle() {
+      return this.carpetGUI$getWrapper().carpetGUI$cursorStyle();
    }
 
-   public UIComponent cursorStyle(CursorStyle style) {
-      return this.carpetGUI$getWrapper().cursorStyle(style);
+   public UIComponent carpetGUI$cursorStyle(CursorStyle style) {
+      return this.carpetGUI$getWrapper().carpetGUI$cursorStyle(style);
    }
 
-   public UIComponent tooltip(List<ClientTooltipComponent> tooltip) {
-      return this.carpetGUI$getWrapper().tooltip(tooltip);
+   public UIComponent carpetGUI$tooltip(List<ClientTooltipComponent> tooltip) {
+      return this.carpetGUI$getWrapper().carpetGUI$tooltip(tooltip);
    }
 
-   public List<ClientTooltipComponent> tooltip() {
-      return this.carpetGUI$getWrapper().tooltip();
+   public List<ClientTooltipComponent> carpetGUI$tooltip() {
+      return this.carpetGUI$getWrapper().carpetGUI$tooltip();
    }
 
-   public UIComponent id(@Nullable String id) {
-      this.carpetGUI$getWrapper().id(id);
+   public UIComponent carpetGUI$id(@Nullable String id) {
+      this.carpetGUI$getWrapper().carpetGUI$id(id);
       return this;
    }
 
-   public @Nullable String id() {
-      return this.carpetGUI$getWrapper().id();
+   public @Nullable String carpetGUI$id() {
+      return this.carpetGUI$getWrapper().carpetGUI$id();
    }
 
    @Unique
@@ -242,23 +242,23 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
       return this.wrapper;
    }
 
-   public @Nullable VanillaWidgetComponent widgetWrapper() {
+   public @Nullable VanillaWidgetComponent carpetGUI$widgetWrapper() {
       return this.wrapper;
    }
 
-   public int xOffset() {
+   public int carpetGUI$xOffset() {
       return 0;
    }
 
-   public int yOffset() {
+   public int carpetGUI$yOffset() {
       return 0;
    }
 
-   public int widthOffset() {
+   public int carpetGUI$widthOffset() {
       return 0;
    }
 
-   public int heightOffset() {
+   public int carpetGUI$heightOffset() {
       return 0;
    }
 
@@ -270,20 +270,21 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
    private void applyWidthToWrapper(int width, CallbackInfo ci) {
       VanillaWidgetComponent wrapper = this.wrapper;
       if (wrapper != null) {
-         wrapper.horizontalSizing(Sizing.fixed(width));
+         wrapper.carpetGUI$horizontalSizing(Sizing.fixed(width));
          ci.cancel();
       }
 
    }
 
-   public void updateX(int x) {
-      this.carpetGUI$getWrapper().updateX(x);
+   public void carpetGUI$updateX(int x) {
+      this.carpetGUI$getWrapper().carpetGUI$updateX(x);
    }
 
-   public void updateY(int y) {
-      this.carpetGUI$getWrapper().updateY(y);
+   public void carpetGUI$updateY(int y) {
+      this.carpetGUI$getWrapper().carpetGUI$updateY(y);
    }
 
+   @Unique
    protected CursorStyle carpetGUI$preferredCursorStyle() {
       return CursorStyle.POINTER;
    }

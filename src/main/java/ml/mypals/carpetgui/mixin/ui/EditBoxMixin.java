@@ -33,8 +33,8 @@ public abstract class EditBoxMixin extends AbstractWidget implements GreedyInput
       }
    }
 
-   public void onFocusGained(UIComponent.FocusSource source) {
-      super.onFocusGained(source);
+   public void carpetGUI$onFocusGained(UIComponent.FocusSource source) {
+      super.carpetGUI$onFocusGained(source);
       this.setFocused(true);
    }
 

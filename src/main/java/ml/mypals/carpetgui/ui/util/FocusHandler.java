@@ -17,7 +17,7 @@ public class FocusHandler {
 
    public void updateClickFocus(double mouseX, double mouseY) {
       UIComponent clicked = this.root.childAt((int)mouseX, (int)mouseY);
-      this.focus(clicked != null && clicked.canFocus(UIComponent.FocusSource.MOUSE_CLICK) ? clicked : null, UIComponent.FocusSource.MOUSE_CLICK);
+      this.focus(clicked != null && clicked.carpetGUI$canFocus(UIComponent.FocusSource.MOUSE_CLICK) ? clicked : null, UIComponent.FocusSource.MOUSE_CLICK);
    }
 
    @Contract(
@@ -34,7 +34,7 @@ public class FocusHandler {
    public void cycle(boolean forwards) {
       ArrayList<UIComponent> allChildren = new ArrayList();
       this.root.collectDescendants(allChildren);
-      allChildren.removeIf((component) -> !component.canFocus(UIComponent.FocusSource.KEYBOARD_CYCLE));
+      allChildren.removeIf((component) -> !component.carpetGUI$canFocus(UIComponent.FocusSource.KEYBOARD_CYCLE));
       if (!allChildren.isEmpty()) {
          int newIndex = this.focused == null ? (forwards ? 0 : allChildren.size() - 1) : allChildren.indexOf(this.focused) + (forwards ? 1 : -1);
          if (newIndex >= allChildren.size()) {
@@ -53,7 +53,7 @@ public class FocusHandler {
       if (this.focused != null) {
          ArrayList<UIComponent> allChildren = new ArrayList();
          this.root.collectDescendants(allChildren);
-         allChildren.removeIf((component) -> !component.canFocus(UIComponent.FocusSource.KEYBOARD_CYCLE));
+         allChildren.removeIf((component) -> !component.carpetGUI$canFocus(UIComponent.FocusSource.KEYBOARD_CYCLE));
          if (!allChildren.isEmpty()) {
             UIComponent closest = this.focused;
             switch (keyCode) {
@@ -62,10 +62,10 @@ public class FocusHandler {
                   int closestY = Integer.MAX_VALUE;
 
                   for(UIComponent child : allChildren) {
-                     if (child != this.focused && child.x() >= this.focused.x() + this.focused.width() && child.x() <= closestX && Math.abs(child.y() - this.focused.y()) <= closestY) {
+                     if (child != this.focused && child.carpetGUI$x() >= this.focused.carpetGUI$x() + this.focused.carpetGUI$width() && child.carpetGUI$x() <= closestX && Math.abs(child.carpetGUI$y() - this.focused.carpetGUI$y()) <= closestY) {
                         closest = child;
-                        closestX = child.x();
-                        closestY = Math.abs(child.y() - this.focused.y());
+                        closestX = child.carpetGUI$x();
+                        closestY = Math.abs(child.carpetGUI$y() - this.focused.carpetGUI$y());
                      }
                   }
                   break;
@@ -75,10 +75,10 @@ public class FocusHandler {
                   int closestY = Integer.MAX_VALUE;
 
                   for(UIComponent child : allChildren) {
-                     if (child != this.focused && child.x() + child.width() <= this.focused.x() && child.x() + child.width() >= closestX && Math.abs(child.y() - this.focused.y()) <= closestY) {
+                     if (child != this.focused && child.carpetGUI$x() + child.carpetGUI$width() <= this.focused.carpetGUI$x() && child.carpetGUI$x() + child.carpetGUI$width() >= closestX && Math.abs(child.carpetGUI$y() - this.focused.carpetGUI$y()) <= closestY) {
                         closest = child;
-                        closestX = child.x() + child.width();
-                        closestY = Math.abs(child.y() - this.focused.y());
+                        closestX = child.carpetGUI$x() + child.carpetGUI$width();
+                        closestY = Math.abs(child.carpetGUI$y() - this.focused.carpetGUI$y());
                      }
                   }
                   break;
@@ -88,10 +88,10 @@ public class FocusHandler {
                   int closestY = Integer.MAX_VALUE;
 
                   for(UIComponent child : allChildren) {
-                     if (child != this.focused && child.y() >= this.focused.y() + this.focused.height() && child.y() + child.height() <= closestY && Math.abs(child.x() - this.focused.x()) <= closestX) {
+                     if (child != this.focused && child.carpetGUI$y() >= this.focused.carpetGUI$y() + this.focused.carpetGUI$height() && child.carpetGUI$y() + child.carpetGUI$height() <= closestY && Math.abs(child.carpetGUI$x() - this.focused.carpetGUI$x()) <= closestX) {
                         closest = child;
-                        closestX = Math.abs(child.x() - this.focused.x());
-                        closestY = child.y() + child.height();
+                        closestX = Math.abs(child.carpetGUI$x() - this.focused.carpetGUI$x());
+                        closestY = child.carpetGUI$y() + child.carpetGUI$height();
                      }
                   }
                   break;
@@ -101,10 +101,10 @@ public class FocusHandler {
                   int closestY = 0;
 
                   for(UIComponent child : allChildren) {
-                     if (child != this.focused && child.y() + child.height() <= this.focused.y() && child.y() + child.height() >= closestY && Math.abs(child.x() - this.focused.x()) <= closestX) {
+                     if (child != this.focused && child.carpetGUI$y() + child.carpetGUI$height() <= this.focused.carpetGUI$y() && child.carpetGUI$y() + child.carpetGUI$height() >= closestY && Math.abs(child.carpetGUI$x() - this.focused.carpetGUI$x()) <= closestX) {
                         closest = child;
-                        closestX = Math.abs(child.x() - this.focused.x());
-                        closestY = child.y() + child.height();
+                        closestX = Math.abs(child.carpetGUI$x() - this.focused.carpetGUI$x());
+                        closestY = child.carpetGUI$y() + child.carpetGUI$height();
                      }
                   }
                   break;
@@ -119,11 +119,11 @@ public class FocusHandler {
    public void focus(@Nullable UIComponent component, UIComponent.FocusSource source) {
       if (this.focused != component) {
          if (this.focused != null) {
-            this.focused.onFocusLost();
+            this.focused.carpetGUI$onFocusLost();
          }
 
          if ((this.focused = component) != null) {
-            this.focused.onFocusGained(source);
+            this.focused.carpetGUI$onFocusGained(source);
             this.lastFocusSource = source;
          } else {
             this.lastFocusSource = null;

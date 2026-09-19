@@ -1,22 +1,7 @@
 package ml.mypals.carpetgui.ui.core;
 
-import net.minecraft.util.Mth;
-import org.jetbrains.annotations.ApiStatus.Internal;
-
 public record Insets(int top, int bottom, int left, int right) {
    private static final Insets NONE = new Insets(0, 0, 0, 0);
-
-   /** @deprecated */
-   @Deprecated(
-      forRemoval = true
-   )
-   @Internal
-   public Insets(int top, int bottom, int left, int right) {
-      this.top = top;
-      this.bottom = bottom;
-      this.left = left;
-      this.right = right;
-   }
 
    public Insets inverted() {
       return new Insets(-this.top, -this.bottom, -this.left, -this.right);
@@ -26,36 +11,12 @@ public record Insets(int top, int bottom, int left, int right) {
       return new Insets(this.top + top, this.bottom + bottom, this.left + left, this.right + right);
    }
 
-   public Insets withTop(int top) {
-      return new Insets(top, this.bottom, this.left, this.right);
-   }
-
-   public Insets withBottom(int bottom) {
-      return new Insets(this.top, bottom, this.left, this.right);
-   }
-
-   public Insets withLeft(int left) {
-      return new Insets(this.top, this.bottom, left, this.right);
-   }
-
-   public Insets withRight(int right) {
-      return new Insets(this.top, this.bottom, this.left, right);
-   }
-
    public int horizontal() {
       return this.left + this.right;
    }
 
    public int vertical() {
       return this.top + this.bottom;
-   }
-
-   public Insets interpolate(Insets next, float delta) {
-      return new Insets(Mth.lerpInt(delta, this.top, next.top), Mth.lerpInt(delta, this.bottom, next.bottom), Mth.lerpInt(delta, this.left, next.left), Mth.lerpInt(delta, this.right, next.right));
-   }
-
-   public static Insets both(int horizontal, int vertical) {
-      return new Insets(vertical, vertical, horizontal, horizontal);
    }
 
    public static Insets top(int top) {

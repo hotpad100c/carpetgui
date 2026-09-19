@@ -149,9 +149,9 @@ public class RuleWidget {
 
    private FlowLayout buildBoolToggle() {
       FlowLayout wrapper = UIContainers.horizontalFlow(Sizing.fixed(30), Sizing.fixed(13));
-      wrapper.cursorStyle(CursorStyle.HAND);
+      wrapper.carpetGUI$cursorStyle(CursorStyle.HAND);
       wrapper.child(ScreenUtils.makeTexture(this.currentBoolValue ? ScreenUtils.TRUE_TEX : ScreenUtils.FALSE_TEX, 30, 13));
-      wrapper.mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
+      wrapper.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
          Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
          this.currentBoolValue = !this.currentBoolValue;
          String var10001 = this.ruleData.manager;
@@ -182,11 +182,11 @@ public class RuleWidget {
          });
       }
 
-      box.focusGained().subscribe((FocusGained)(focusSource) -> {
+      box.carpetGUI$focusGained().subscribe((FocusGained)(focusSource) -> {
          Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
          box.setSuggestion("");
       });
-      box.focusLost().subscribe((FocusLost)() -> {
+      box.carpetGUI$focusLost().subscribe((FocusLost)() -> {
          String val = box.getValue();
          if (!val.isEmpty()) {
             this.sendCommand(this.ruleData.manager + " " + this.orgName + " " + val);

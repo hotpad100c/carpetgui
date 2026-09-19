@@ -78,7 +78,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
       FlowLayout leftPanel = UIContainers.verticalFlow(Sizing.fill(80), Sizing.fill(99));
       leftPanel.padding(Insets.of(2));
       leftPanel.child(rulesScroll.sizing(Sizing.fill(100), Sizing.fill(90)));
-      leftPanel.child(bottomBar.positioning(Positioning.relative(0, 99)).sizing(Sizing.fill(99), Sizing.fill(8)));
+      leftPanel.child(bottomBar.carpetGUI$positioning(Positioning.relative(0, 99)).sizing(Sizing.fill(99), Sizing.fill(8)));
       this.rightContent = UIContainers.verticalFlow(Sizing.fill(90), Sizing.content());
       this.rightContent.gap(2);
 
@@ -175,12 +175,12 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
       row.surface(Surface.flat(selected ? 1342572038 : 537265670));
       row.verticalAlignment(VerticalAlignment.CENTER);
       row.horizontalAlignment(HorizontalAlignment.CENTER);
-      row.cursorStyle(CursorStyle.HAND);
+      row.carpetGUI$cursorStyle(CursorStyle.HAND);
       String displayName = ScreenUtils.truncateWithEllipsis(group.name(), Minecraft.getInstance().font, 150);
-      UIComponent nameLabel = UIComponents.label(Component.literal(displayName)).color(Color.WHITE).horizontalSizing(Sizing.fill(80));
+      UIComponent nameLabel = UIComponents.label(Component.literal(displayName)).color(Color.WHITE).carpetGUI$horizontalSizing(Sizing.fill(80));
       nameLabel.tooltip(Component.literal(group.name()));
       row.child(nameLabel);
-      row.mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
+      row.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
          Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
          this.setGroup(group);
          this.rebuildRightPanel();
@@ -219,12 +219,12 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
       row.surface(Surface.flat(537265670));
       row.verticalAlignment(VerticalAlignment.CENTER);
       row.horizontalAlignment(HorizontalAlignment.LEFT);
-      row.mouseEnter().subscribe((MouseEnter)() -> row.surface(Surface.flat(1074136582)));
-      row.mouseLeave().subscribe((MouseLeave)() -> row.surface(Surface.flat(537265670)));
+      row.carpetGUI$mouseEnter().subscribe((MouseEnter)() -> row.surface(Surface.flat(1074136582)));
+      row.carpetGUI$mouseLeave().subscribe((MouseLeave)() -> row.surface(Surface.flat(537265670)));
       String text = cmd.value() != null ? cmd.value() : "";
       TextBoxComponent box;
       if (cmd.prefix() != null) {
-         row.child(UIComponents.label(Component.literal(cmd.prefix()).withStyle(ChatFormatting.BLUE)).horizontalSizing(Sizing.fill(12)));
+         row.child(UIComponents.label(Component.literal(cmd.prefix()).withStyle(ChatFormatting.BLUE)).carpetGUI$horizontalSizing(Sizing.fill(12)));
          String translatedName = cmd.ruleName();
          RuleData ruleData = (RuleData)CarpetGUIClient.cachedCompleteRules.get(cmd.ruleName());
          if (ruleData != null) {
@@ -232,7 +232,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
          }
 
          String displayName = ScreenUtils.truncateWithEllipsis(translatedName, Minecraft.getInstance().font, 150);
-         UIComponent nameLabel = UIComponents.label(Component.literal(displayName)).color(cmd.locked() ? Color.ofArgb(-10496) : Color.WHITE).horizontalSizing(Sizing.fill(50));
+         UIComponent nameLabel = UIComponents.label(Component.literal(displayName)).color(cmd.locked() ? Color.ofArgb(-10496) : Color.WHITE).carpetGUI$horizontalSizing(Sizing.fill(50));
          String defaultHint = cmd.locked() ? Component.translatable("gui.tip.default").getString() : "";
          nameLabel.tooltip(Component.literal(defaultHint + translatedName));
          row.child(nameLabel);
@@ -241,8 +241,8 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
          box = UIComponents.textBox(Sizing.fill(92));
       }
 
-      box.focusGained().subscribe((FocusGained)(focusSource) -> Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F)));
-      box.focusLost().subscribe(this::saveCurrent);
+      box.carpetGUI$focusGained().subscribe((FocusGained)(focusSource) -> Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F)));
+      box.carpetGUI$focusLost().subscribe(this::saveCurrent);
       box.setMaxLength(114514);
       box.text(text);
       valueBoxes.add(box);
@@ -251,7 +251,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
          this.currentGroup.commands().remove(cmd);
          this.leftContent.removeChild(row);
       });
-      delRow.sizing(Sizing.fixed(12), Sizing.fixed(10)).positioning(Positioning.relative(100, 0));
+      delRow.sizing(Sizing.fixed(12), Sizing.fixed(10)).carpetGUI$positioning(Positioning.relative(100, 0));
       row.child(delRow);
       return row;
    }

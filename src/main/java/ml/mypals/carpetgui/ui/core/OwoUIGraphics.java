@@ -1,15 +1,11 @@
 package ml.mypals.carpetgui.ui.core;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 import ml.mypals.carpetgui.mixin.ui.GuiGraphicsExtractorAccessor;
-import ml.mypals.carpetgui.ui.UI;
 import ml.mypals.carpetgui.ui.event.WindowResizeCallback;
-import ml.mypals.carpetgui.ui.util.NinePatchTexture;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 import net.minecraft.client.Minecraft;
@@ -24,16 +20,11 @@ import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPosition
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 
 public class OwoUIGraphics extends GuiGraphicsExtractor {
-   public static final Identifier PANEL_NINE_PATCH_TEXTURE = UI.id("panel/default");
-   public static final Identifier DARK_PANEL_NINE_PATCH_TEXTURE = UI.id("panel/dark");
-   public static final Identifier PANEL_INSET_NINE_PATCH_TEXTURE = UI.id("panel/inset");
    private final Consumer<Runnable> setTooltipDrawer;
 
    protected OwoUIGraphics(Minecraft client, GuiRenderState renderState, int mouseX, int mouseY, Consumer<Runnable> setTooltipDrawer) {
@@ -99,7 +90,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
          return true;
       } else {
          ScreenPosition pos = rect.position();
-         return other.x() < pos.x() + rect.width() && other.x() + other.width() >= pos.x() && other.y() < pos.y() + rect.height() && other.y() + other.height() >= pos.y();
+         return other.carpetGUI$x() < pos.x() + rect.width() && other.carpetGUI$x() + other.carpetGUI$width() >= pos.x() && other.carpetGUI$y() < pos.y() + rect.height() && other.carpetGUI$y() + other.carpetGUI$height() >= pos.y();
       }
    }
 
@@ -133,38 +124,6 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
       }
    }
 
-   public void drawPanel(int x, int y, int width, int height, boolean dark) {
-      NinePatchTexture.draw(dark ? DARK_PANEL_NINE_PATCH_TEXTURE : PANEL_NINE_PATCH_TEXTURE, this, x, y, width, height);
-   }
-
-   public void drawText(Component text, float x, float y, float scale, int color) {
-      this.drawText(text, x, y, scale, color, OwoUIGraphics.TextAnchor.TOP_LEFT);
-   }
-
-   public void drawText(Component text, float x, float y, float scale, int color, TextAnchor anchorPoint) {
-      Font textRenderer = Minecraft.getInstance().font;
-      this.pose().pushMatrix();
-      this.pose().scale(scale, scale);
-      switch (anchorPoint.ordinal()) {
-         case 0:
-            x -= (float)textRenderer.width(text) * scale;
-            break;
-         case 1:
-            x -= (float)textRenderer.width(text) * scale;
-            Objects.requireNonNull(textRenderer);
-            y -= 9.0F * scale;
-         case 2:
-         default:
-            break;
-         case 3:
-            Objects.requireNonNull(textRenderer);
-            y -= 9.0F * scale;
-      }
-
-      this.text(textRenderer, text, (int)(x * (1.0F / scale)), (int)(y * (1.0F / scale)), color, false);
-      this.pose().popMatrix();
-   }
-
    public void drawTooltip(Font textRenderer, int x, int y, List<ClientTooltipComponent> components) {
       this.drawTooltip(textRenderer, x, y, components, (Identifier)null);
    }
@@ -176,85 +135,6 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
    protected void setTooltipForNextFrameInternal(Font textRenderer, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner, @Nullable Identifier texture, boolean replaceExisting) {
       super.setTooltipForNextFrameInternal(textRenderer, components, x, y, positioner, texture, replaceExisting);
       this.setTooltipDrawer.accept(((GuiGraphicsExtractorAccessor)this).carpetGUI$getDeferredTooltip());
-   }
-
-   public static void drawInsets(OwoUIGraphics self, int x, int y, int width, int height, Insets insets, int color) {
-      drawInsets(self, RenderPipelines.GUI, x, y, width, height, insets, color);
-   }
-
-   public static void drawInsets(OwoUIGraphics self, RenderPipeline pipeline, int x, int y, int width, int height, Insets insets, int color) {
-      self.fill(pipeline, x - insets.left(), y - insets.top(), x + width + insets.right(), y, color);
-      self.fill(pipeline, x - insets.left(), y + height, x + width + insets.right(), y + height + insets.bottom(), color);
-      self.fill(pipeline, x - insets.left(), y, x, y + height, color);
-      self.fill(pipeline, x + width, y, x + width + insets.right(), y + height, color);
-   }
-
-   public static void drawInspector(OwoUIGraphics self, ParentUIComponent root, double mouseX, double mouseY, boolean onlyHovered) {
-      Minecraft client = Minecraft.getInstance();
-      Font textRenderer = client.font;
-      ArrayList<UIComponent> children = new ArrayList();
-      if (!onlyHovered) {
-         root.collectDescendants(children);
-      } else if (root.childAt((int)mouseX, (int)mouseY) != null) {
-         children.add(root.childAt((int)mouseX, (int)mouseY));
-      }
-
-      RenderPipeline pipeline = RenderPipelines.GUI;
-
-      for(UIComponent child : children) {
-         if (child instanceof ParentUIComponent parentComponent) {
-            drawInsets(self, pipeline, parentComponent.x(), parentComponent.y(), parentComponent.width(), parentComponent.height(), ((Insets)parentComponent.padding().get()).inverted(), -1492325155);
-         }
-
-         Insets margins = (Insets)child.margins().get();
-         drawInsets(self, pipeline, child.x(), child.y(), child.width(), child.height(), margins, -1476398280);
-         self.drawRectOutline(pipeline, child.x(), child.y(), child.width(), child.height(), -12930817);
-         if (onlyHovered) {
-            int inspectorX = child.x() + 1;
-            int inspectorY = child.y() + child.height() + ((Insets)child.margins().get()).bottom() + 1;
-            MutableComponent message = Component.literal(child.getClass().getSimpleName()).append(child.id() == null ? "\n" : " '" + child.id() + "'\n").append(child.inspectorDescriptor());
-            List<FormattedCharSequence> wrappedMessage = textRenderer.split(message, client.getWindow().getGuiScaledWidth() + 4);
-            int inspectorWidth = wrappedMessage.stream().mapToInt(textRenderer::width).max().orElse(30);
-            Objects.requireNonNull(textRenderer);
-            int inspectorHeight = 9 * wrappedMessage.size() + 4;
-            if (inspectorY > client.getWindow().getGuiScaledHeight() - inspectorHeight) {
-               inspectorY -= child.fullSize().height() + inspectorHeight + 1;
-               if (child instanceof ParentUIComponent) {
-                  ParentUIComponent parentComponent = (ParentUIComponent)child;
-                  inspectorX += ((Insets)parentComponent.padding().get()).left();
-                  inspectorY += ((Insets)parentComponent.padding().get()).top();
-               }
-            }
-
-            if (inspectorY < 0) {
-               inspectorY = 1;
-            }
-
-            if (inspectorX > client.getWindow().getGuiScaledWidth() - inspectorWidth) {
-               inspectorX = client.getWindow().getGuiScaledWidth() - inspectorWidth - 2;
-            }
-
-            if (inspectorX < 0) {
-               inspectorX = 1;
-            }
-
-            self.fill(pipeline, inspectorX, inspectorY, inspectorX + inspectorWidth + 3, inspectorY + inspectorHeight, -1493172224);
-            self.drawRectOutline(pipeline, inspectorX, inspectorY, inspectorWidth + 3, inspectorHeight, -1493172224);
-            self.textWithWordWrap(textRenderer, message, inspectorX + 2, inspectorY + 2, inspectorWidth, -1, false);
-         }
-      }
-
-   }
-
-   public static enum TextAnchor {
-      TOP_RIGHT,
-      BOTTOM_RIGHT,
-      TOP_LEFT,
-      BOTTOM_LEFT;
-
-      private static TextAnchor[] $values() {
-         return new TextAnchor[]{TOP_RIGHT, BOTTOM_RIGHT, TOP_LEFT, BOTTOM_LEFT};
-      }
    }
 
    public static class UtilityScreen extends Screen {

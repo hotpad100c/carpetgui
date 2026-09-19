@@ -53,7 +53,7 @@ public class NinePatchTexture {
    }
 
    public void draw(OwoUIGraphics context, PositionedRectangle rectangle, Color color) {
-      this.draw(context, rectangle.x(), rectangle.y(), rectangle.width(), rectangle.height(), color);
+      this.draw(context, rectangle.carpetGUI$x(), rectangle.carpetGUI$y(), rectangle.carpetGUI$width(), rectangle.carpetGUI$height(), color);
    }
 
    public void draw(OwoUIGraphics context, int x, int y, int width, int height) {
@@ -173,27 +173,11 @@ public class NinePatchTexture {
       REGISTRY.put(UI.id(id), new NinePatchTexture(UI.id("textures/gui/" + texture), u, v, cornerPatchSize, centerPatchSize, textureSize, repeat));
    }
 
-   private static void registerUniform(String id, String texture, int u, int v, Size patchSize, Size textureSize, boolean repeat) {
-      REGISTRY.put(UI.id(id), new NinePatchTexture(UI.id("textures/gui/" + texture), u, v, patchSize, textureSize, repeat));
-   }
-
    static {
       Size buttons = Size.of(64, 192);
       register("button/active", "buttons.png", 0, 0, Size.of(3, 3), Size.of(58, 58), buttons, true);
       register("button/hovered", "buttons.png", 0, 64, Size.of(3, 3), Size.of(58, 58), buttons, true);
       register("button/disabled", "buttons.png", 0, 128, Size.of(3, 3), Size.of(58, 58), buttons, true);
-      Size panel = Size.of(16, 16);
-      registerUniform("panel/default", "panel.png", 0, 0, Size.of(5, 5), panel, false);
-      registerUniform("panel/dark", "dark_panel.png", 0, 0, Size.of(5, 5), panel, false);
-      registerUniform("panel/inset", "panel_inset.png", 0, 0, Size.of(5, 5), panel, false);
-      Size scrollbar = Size.of(64, 32);
-      register("scrollbar/track", "scrollbar.png", 26, 0, Size.of(1, 1), Size.of(4, 30), scrollbar, false);
-      register("scrollbar/vanilla_flat", "scrollbar.png", 33, 0, Size.of(1, 1), Size.of(14, 30), scrollbar, false);
-      register("scrollbar/vanilla_vertical", "scrollbar.png", 0, 0, Size.of(2, 2), Size.of(8, 12), scrollbar, true);
-      register("scrollbar/vanilla_vertical_disabled", "scrollbar.png", 13, 0, Size.of(2, 2), Size.of(8, 12), scrollbar, true);
-      register("scrollbar/vanilla_horizontal", "scrollbar.png", 0, 16, Size.of(2, 2), Size.of(8, 12), scrollbar, true);
-      register("scrollbar/vanilla_horizontal_disabled", "scrollbar.png", 13, 16, Size.of(2, 2), Size.of(8, 12), scrollbar, true);
-      register("slim_slider_track", "slim_slider.png", 0, 0, Size.of(1, 1), Size.of(14, 1), Size.of(16, 16), false);
    }
 
    public static record PatchSizing(@Nullable Size patchSize, @Nullable Size cornerPatchSize, @Nullable Size centerPatchSize) {

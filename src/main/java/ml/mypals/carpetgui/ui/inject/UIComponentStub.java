@@ -3,7 +3,6 @@ package ml.mypals.carpetgui.ui.inject;
 import java.util.List;
 import java.util.function.Consumer;
 import ml.mypals.carpetgui.ui.component.VanillaWidgetComponent;
-import ml.mypals.carpetgui.ui.core.AnimatableProperty;
 import ml.mypals.carpetgui.ui.core.CursorStyle;
 import ml.mypals.carpetgui.ui.core.Insets;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
@@ -13,8 +12,9 @@ import ml.mypals.carpetgui.ui.core.Size;
 import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.UIComponent;
 import ml.mypals.carpetgui.ui.event.UIEvents.*;
-import ml.mypals.carpetgui.ui.util.EventSource;
+import ml.mypals.carpetgui.ui.util.EventStream;
 import ml.mypals.carpetgui.ui.util.FocusHandler;
+import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -22,203 +22,203 @@ import net.minecraft.client.input.MouseButtonEvent;
 import org.jetbrains.annotations.Nullable;
 
 public interface UIComponentStub extends UIComponent {
-   default void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+   default void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default @Nullable ParentUIComponent parent() {
+   default @Nullable ParentUIComponent carpetGUI$parent() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default @Nullable FocusHandler focusHandler() {
+   default @Nullable FocusHandler carpetGUI$focusHandler() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default UIComponent positioning(Positioning positioning) {
+   default UIComponent carpetGUI$positioning(Positioning positioning) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default AnimatableProperty<Positioning> positioning() {
+   default Observable<Positioning> carpetGUI$positioning() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default UIComponent margins(Insets margins) {
+   default UIComponent carpetGUI$margins(Insets margins) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default AnimatableProperty<Insets> margins() {
+   default Observable<Insets> carpetGUI$margins() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default UIComponent horizontalSizing(Sizing horizontalSizing) {
+   default UIComponent carpetGUI$horizontalSizing(Sizing horizontalSizing) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default UIComponent verticalSizing(Sizing verticalSizing) {
+   default UIComponent carpetGUI$verticalSizing(Sizing verticalSizing) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default AnimatableProperty<Sizing> horizontalSizing() {
+   default Observable<Sizing> carpetGUI$horizontalSizing() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default AnimatableProperty<Sizing> verticalSizing() {
+   default Observable<Sizing> carpetGUI$verticalSizing() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<MouseEnter> mouseEnter() {
+   default EventStream<MouseEnter> carpetGUI$mouseEnter() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<MouseLeave> mouseLeave() {
+   default EventStream<MouseLeave> carpetGUI$mouseLeave() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default CursorStyle cursorStyle() {
+   default CursorStyle carpetGUI$cursorStyle() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default UIComponent cursorStyle(CursorStyle style) {
+   default UIComponent carpetGUI$cursorStyle(CursorStyle style) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default UIComponent tooltip(List<ClientTooltipComponent> tooltip) {
+   default UIComponent carpetGUI$tooltip(List<ClientTooltipComponent> tooltip) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default List<ClientTooltipComponent> tooltip() {
+   default List<ClientTooltipComponent> carpetGUI$tooltip() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default void inflate(Size space) {
+   default void carpetGUI$inflate(Size space) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default void mount(ParentUIComponent parent, int x, int y) {
+   default void carpetGUI$mount(ParentUIComponent parent, int x, int y) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default void dismount(UIComponent.DismountReason reason) {
+   default void carpetGUI$dismount(UIComponent.DismountReason reason) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default <C extends UIComponent> C configure(Consumer<C> closure) {
+   default <C extends UIComponent> C carpetGUI$configure(Consumer<C> closure) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default int width() {
+   default int carpetGUI$width() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default int height() {
+   default int carpetGUI$height() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
+   default boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<MouseDown> mouseDown() {
+   default EventStream<MouseDown> carpetGUI$mouseDown() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default boolean onMouseUp(MouseButtonEvent click) {
+   default boolean carpetGUI$onMouseUp(MouseButtonEvent click) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<MouseUp> mouseUp() {
+   default EventStream<MouseUp> carpetGUI$mouseUp() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default boolean onMouseScroll(double mouseX, double mouseY, double amount) {
+   default boolean carpetGUI$onMouseScroll(double mouseX, double mouseY, double amount) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<MouseScroll> mouseScroll() {
+   default EventStream<MouseScroll> carpetGUI$mouseScroll() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default boolean onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
+   default boolean carpetGUI$onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<MouseDrag> mouseDrag() {
+   default EventStream<MouseDrag> carpetGUI$mouseDrag() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default boolean onKeyPress(KeyEvent input) {
+   default boolean carpetGUI$onKeyPress(KeyEvent input) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<KeyPress> keyPress() {
+   default EventStream<KeyPress> carpetGUI$keyPress() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default boolean onCharTyped(CharacterEvent input) {
+   default boolean carpetGUI$onCharTyped(CharacterEvent input) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<CharTyped> charTyped() {
+   default EventStream<CharTyped> carpetGUI$charTyped() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default void onFocusGained(UIComponent.FocusSource source) {
+   default void carpetGUI$onFocusGained(UIComponent.FocusSource source) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<FocusGained> focusGained() {
+   default EventStream<FocusGained> carpetGUI$focusGained() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default void onFocusLost() {
+   default void carpetGUI$onFocusLost() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default EventSource<FocusLost> focusLost() {
+   default EventStream<FocusLost> carpetGUI$focusLost() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default int x() {
+   default int carpetGUI$x() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default void updateX(int x) {
+   default void carpetGUI$updateX(int x) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default int y() {
+   default int carpetGUI$y() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default void updateY(int y) {
+   default void carpetGUI$updateY(int y) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default UIComponent id(@Nullable String id) {
+   default UIComponent carpetGUI$id(@Nullable String id) {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default @Nullable String id() {
+   default @Nullable String carpetGUI$id() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default VanillaWidgetComponent widgetWrapper() {
+   default VanillaWidgetComponent carpetGUI$widgetWrapper() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default int xOffset() {
+   default int carpetGUI$xOffset() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default int yOffset() {
+   default int carpetGUI$yOffset() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default int widthOffset() {
+   default int carpetGUI$widthOffset() {
       throw new IllegalStateException("Interface stub method called");
    }
 
-   default int heightOffset() {
+   default int carpetGUI$heightOffset() {
       throw new IllegalStateException("Interface stub method called");
    }
 }

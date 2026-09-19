@@ -36,11 +36,11 @@ public class ScreenTabBar {
          FlowLayout btn = UIContainers.horizontalFlow(Sizing.content(), Sizing.fill(100));
          btn.verticalAlignment(VerticalAlignment.CENTER);
          btn.padding(Insets.horizontal(8));
-         btn.cursorStyle(CursorStyle.HAND);
+         btn.carpetGUI$cursorStyle(CursorStyle.HAND);
          btn.surface(Surface.flat(isActive ? 1724895183 : 0).and(Surface.outline(1722789807)));
          btn.child(label);
          if (!isActive) {
-            btn.mouseDown().subscribe((MouseDown)(mouseButtonEvent, b) -> {
+            btn.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, b) -> {
                onTabClick(tab);
                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                return true;

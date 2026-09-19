@@ -29,7 +29,7 @@ public class VanillaWidgetComponent extends BaseUIComponent {
       this.horizontalSizing.set(Sizing.fixed(this.widget.getWidth()));
       this.verticalSizing.set(Sizing.fixed(this.widget.getHeight()));
       if (widget instanceof EditBox) {
-         this.margins(Insets.none());
+         this.carpetGUI$margins(Insets.none());
       }
 
    }
@@ -38,8 +38,8 @@ public class VanillaWidgetComponent extends BaseUIComponent {
       return this.hovered;
    }
 
-   public void mount(ParentUIComponent parent, int x, int y) {
-      super.mount(parent, x, y);
+   public void carpetGUI$mount(ParentUIComponent parent, int x, int y) {
+      super.carpetGUI$mount(parent, x, y);
       this.applyToWidget();
    }
 
@@ -86,34 +86,34 @@ public class VanillaWidgetComponent extends BaseUIComponent {
       }
    }
 
-   public BaseUIComponent margins(Insets margins) {
-      return this.widget instanceof EditBox ? super.margins(margins.add(1, 1, 1, 1)) : super.margins(margins);
+   public BaseUIComponent carpetGUI$margins(Insets margins) {
+      return this.widget instanceof EditBox ? super.carpetGUI$margins(margins.add(1, 1, 1, 1)) : super.carpetGUI$margins(margins);
    }
 
-   public void inflate(Size space) {
-      super.inflate(space);
+   public void carpetGUI$inflate(Size space) {
+      super.carpetGUI$inflate(space);
       this.applyToWidget();
    }
 
-   public void updateX(int x) {
-      super.updateX(x);
+   public void carpetGUI$updateX(int x) {
+      super.carpetGUI$updateX(x);
       this.applyToWidget();
    }
 
-   public void updateY(int y) {
-      super.updateY(y);
+   public void carpetGUI$updateY(int y) {
+      super.carpetGUI$updateY(y);
       this.applyToWidget();
    }
 
    private void applyToWidget() {
       AbstractWidgetAccessor accessor = (AbstractWidgetAccessor)this.widget;
-      accessor.carpetGUI$setX(this.x + this.widget.xOffset());
-      accessor.carpetGUI$setY(this.y + this.widget.yOffset());
-      accessor.carpetGUI$setWidth(this.width + this.widget.widthOffset());
-      accessor.carpetGUI$setHeight(this.height + this.widget.heightOffset());
+      accessor.carpetGUI$setX(this.x + this.widget.carpetGUI$xOffset());
+      accessor.carpetGUI$setY(this.y + this.widget.carpetGUI$yOffset());
+      accessor.carpetGUI$setWidth(this.width + this.widget.carpetGUI$widthOffset());
+      accessor.carpetGUI$setHeight(this.height + this.widget.carpetGUI$heightOffset());
    }
 
-   public <C extends UIComponent> C configure(Consumer<C> closure) {
+   public <C extends UIComponent> C carpetGUI$configure(Consumer<C> closure) {
       try {
          this.runAndDeferEvents(() -> closure.accept((C) this.widget));
       } catch (ClassCastException theUserDidBadItWasNotMyFault) {
@@ -127,35 +127,35 @@ public class VanillaWidgetComponent extends BaseUIComponent {
       super.notifyParentIfMounted();
    }
 
-   public void draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+   public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
       this.widget.extractRenderState(graphics, mouseX, mouseY, 0.0F);
    }
 
-   public boolean shouldDrawTooltip(double mouseX, double mouseY) {
-      return this.widget.visible && this.widget.active && super.shouldDrawTooltip(mouseX, mouseY);
+   public boolean carpetGUI$shouldDrawTooltip(double mouseX, double mouseY) {
+      return this.widget.visible && this.widget.active && super.carpetGUI$shouldDrawTooltip(mouseX, mouseY);
    }
 
-   public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
-      return this.widget.mouseClicked(new MouseButtonEvent((double)this.x + click.x(), (double)this.y + click.y(), click.buttonInfo()), doubled) | super.onMouseDown(click, doubled);
+   public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
+      return this.widget.mouseClicked(new MouseButtonEvent((double)this.x + click.x(), (double)this.y + click.y(), click.buttonInfo()), doubled) | super.carpetGUI$onMouseDown(click, doubled);
    }
 
-   public boolean onMouseUp(MouseButtonEvent click) {
-      return this.widget.mouseReleased(new MouseButtonEvent((double)this.x + click.x(), (double)this.y + click.y(), click.buttonInfo())) | super.onMouseUp(click);
+   public boolean carpetGUI$onMouseUp(MouseButtonEvent click) {
+      return this.widget.mouseReleased(new MouseButtonEvent((double)this.x + click.x(), (double)this.y + click.y(), click.buttonInfo())) | super.carpetGUI$onMouseUp(click);
    }
 
-   public boolean onMouseScroll(double mouseX, double mouseY, double amount) {
-      return this.widget.mouseScrolled((double)this.x + mouseX, (double)this.y + mouseY, (double)0.0F, amount) | super.onMouseScroll(mouseX, mouseY, amount);
+   public boolean carpetGUI$onMouseScroll(double mouseX, double mouseY, double amount) {
+      return this.widget.mouseScrolled((double)this.x + mouseX, (double)this.y + mouseY, (double)0.0F, amount) | super.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
    }
 
-   public boolean onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
-      return this.widget.mouseDragged(new MouseButtonEvent((double)this.x + click.x(), (double)this.y + click.y(), click.buttonInfo()), deltaX, deltaY) | super.onMouseDrag(click, deltaX, deltaY);
+   public boolean carpetGUI$onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
+      return this.widget.mouseDragged(new MouseButtonEvent((double)this.x + click.x(), (double)this.y + click.y(), click.buttonInfo()), deltaX, deltaY) | super.carpetGUI$onMouseDrag(click, deltaX, deltaY);
    }
 
-   public boolean onCharTyped(CharacterEvent input) {
-      return this.widget.charTyped(input) | super.onCharTyped(input);
+   public boolean carpetGUI$onCharTyped(CharacterEvent input) {
+      return this.widget.charTyped(input) | super.carpetGUI$onCharTyped(input);
    }
 
-   public boolean onKeyPress(KeyEvent input) {
-      return this.widget.keyPressed(input) | super.onKeyPress(input);
+   public boolean carpetGUI$onKeyPress(KeyEvent input) {
+      return this.widget.keyPressed(input) | super.carpetGUI$onKeyPress(input);
    }
 }

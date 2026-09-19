@@ -3,7 +3,6 @@ package ml.mypals.carpetgui.ui.component;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import ml.mypals.carpetgui.ui.container.FlowLayout;
 import ml.mypals.carpetgui.ui.container.UIContainers;
 import ml.mypals.carpetgui.ui.core.Sizing;
@@ -60,11 +59,5 @@ public final class UIComponents {
 
    public static VanillaWidgetComponent wrapVanillaWidget(AbstractWidget widget) {
       return new VanillaWidgetComponent(widget);
-   }
-
-   public static <T extends UIComponent> T createWithSizing(Supplier<T> componentMaker, Sizing horizontalSizing, Sizing verticalSizing) {
-      T component = (T)(componentMaker.get());
-      component.sizing(horizontalSizing, verticalSizing);
-      return component;
    }
 }

@@ -2,7 +2,6 @@ package ml.mypals.carpetgui.ui.base;
 
 import java.util.List;
 import java.util.function.Consumer;
-import ml.mypals.carpetgui.ui.core.AnimatableProperty;
 import ml.mypals.carpetgui.ui.core.CursorStyle;
 import ml.mypals.carpetgui.ui.core.Insets;
 import ml.mypals.carpetgui.ui.core.ParentUIComponent;
@@ -11,7 +10,6 @@ import ml.mypals.carpetgui.ui.core.Size;
 import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.UIComponent;
 import ml.mypals.carpetgui.ui.event.UIEvents.*;
-import ml.mypals.carpetgui.ui.util.EventSource;
 import ml.mypals.carpetgui.ui.util.EventStream;
 import ml.mypals.carpetgui.ui.util.FocusHandler;
 import ml.mypals.carpetgui.ui.util.Observable;
@@ -26,10 +24,10 @@ public abstract class BaseUIComponent implements UIComponent {
    protected @Nullable String id = null;
    protected boolean mounted = false;
    protected int batchedEvents = 0;
-   protected final AnimatableProperty<Insets> margins = AnimatableProperty.<Insets>of(Insets.none());
-   protected final AnimatableProperty<Positioning> positioning = AnimatableProperty.<Positioning>of(Positioning.layout());
-   protected final AnimatableProperty<Sizing> horizontalSizing = AnimatableProperty.<Sizing>of(Sizing.content());
-   protected final AnimatableProperty<Sizing> verticalSizing = AnimatableProperty.<Sizing>of(Sizing.content());
+   protected final Observable<Insets> margins = Observable.<Insets>of(Insets.none());
+   protected final Observable<Positioning> positioning = Observable.<Positioning>of(Positioning.layout());
+   protected final Observable<Sizing> horizontalSizing = Observable.<Sizing>of(Sizing.content());
+   protected final Observable<Sizing> verticalSizing = Observable.<Sizing>of(Sizing.content());
    protected final EventStream<MouseDown> mouseDownEvents = MouseDown.newStream();
    protected final EventStream<MouseUp> mouseUpEvents = MouseUp.newStream();
    protected final EventStream<MouseScroll> mouseScrollEvents = MouseScroll.newStream();
@@ -65,7 +63,7 @@ public abstract class BaseUIComponent implements UIComponent {
       throw new UnsupportedOperationException(this.getClass().getSimpleName() + " does not support Sizing.content() on the vertical axis");
    }
 
-   public void inflate(Size space) {
+   public void carpetGUI$inflate(Size space) {
       this.space = space;
       this.applySizing();
       this.dirty = false;
@@ -90,7 +88,7 @@ public abstract class BaseUIComponent implements UIComponent {
       }
    }
 
-   public <C extends UIComponent> C configure(Consumer<C> closure) {
+   public <C extends UIComponent> C carpetGUI$configure(Consumer<C> closure) {
       try {
          this.runAndDeferEvents(() -> closure.accept((C) this));
          return (C)this;
@@ -115,8 +113,8 @@ public abstract class BaseUIComponent implements UIComponent {
 
    }
 
-   public void update(float delta, int mouseX, int mouseY) {
-      UIComponent.super.update(delta, mouseX, mouseY);
+   public void carpetGUI$update(float delta, int mouseX, int mouseY) {
+      UIComponent.super.carpetGUI$update(delta, mouseX, mouseY);
       boolean nowHovered = this.isInBoundingBox((double)mouseX, (double)mouseY);
       if (this.hovered != nowHovered) {
          this.updateHoveredState(mouseX, mouseY, nowHovered);
@@ -139,181 +137,181 @@ public abstract class BaseUIComponent implements UIComponent {
 
    }
 
-   public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
+   public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
       return ((MouseDown)this.mouseDownEvents.sink()).onMouseDown(click, doubled);
    }
 
-   public EventSource<MouseDown> mouseDown() {
-      return this.mouseDownEvents.source();
+   public EventStream<MouseDown> carpetGUI$mouseDown() {
+      return this.mouseDownEvents;
    }
 
-   public boolean onMouseUp(MouseButtonEvent click) {
+   public boolean carpetGUI$onMouseUp(MouseButtonEvent click) {
       return ((MouseUp)this.mouseUpEvents.sink()).onMouseUp(click);
    }
 
-   public EventSource<MouseUp> mouseUp() {
-      return this.mouseUpEvents.source();
+   public EventStream<MouseUp> carpetGUI$mouseUp() {
+      return this.mouseUpEvents;
    }
 
-   public boolean onMouseScroll(double mouseX, double mouseY, double amount) {
+   public boolean carpetGUI$onMouseScroll(double mouseX, double mouseY, double amount) {
       return ((MouseScroll)this.mouseScrollEvents.sink()).onMouseScroll(mouseX, mouseY, amount);
    }
 
-   public EventSource<MouseScroll> mouseScroll() {
-      return this.mouseScrollEvents.source();
+   public EventStream<MouseScroll> carpetGUI$mouseScroll() {
+      return this.mouseScrollEvents;
    }
 
-   public boolean onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
+   public boolean carpetGUI$onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
       return ((MouseDrag)this.mouseDragEvents.sink()).onMouseDrag(click, deltaX, deltaY);
    }
 
-   public EventSource<MouseDrag> mouseDrag() {
-      return this.mouseDragEvents.source();
+   public EventStream<MouseDrag> carpetGUI$mouseDrag() {
+      return this.mouseDragEvents;
    }
 
-   public boolean onKeyPress(KeyEvent input) {
+   public boolean carpetGUI$onKeyPress(KeyEvent input) {
       return ((KeyPress)this.keyPressEvents.sink()).onKeyPress(input);
    }
 
-   public EventSource<KeyPress> keyPress() {
-      return this.keyPressEvents.source();
+   public EventStream<KeyPress> carpetGUI$keyPress() {
+      return this.keyPressEvents;
    }
 
-   public boolean onCharTyped(CharacterEvent input) {
+   public boolean carpetGUI$onCharTyped(CharacterEvent input) {
       return ((CharTyped)this.charTypedEvents.sink()).onCharTyped(input);
    }
 
-   public EventSource<CharTyped> charTyped() {
-      return this.charTypedEvents.source();
+   public EventStream<CharTyped> carpetGUI$charTyped() {
+      return this.charTypedEvents;
    }
 
-   public void onFocusGained(UIComponent.FocusSource source) {
+   public void carpetGUI$onFocusGained(UIComponent.FocusSource source) {
       ((FocusGained)this.focusGainedEvents.sink()).onFocusGained(source);
    }
 
-   public EventSource<FocusGained> focusGained() {
-      return this.focusGainedEvents.source();
+   public EventStream<FocusGained> carpetGUI$focusGained() {
+      return this.focusGainedEvents;
    }
 
-   public void onFocusLost() {
+   public void carpetGUI$onFocusLost() {
       ((FocusLost)this.focusLostEvents.sink()).onFocusLost();
    }
 
-   public EventSource<FocusLost> focusLost() {
-      return this.focusLostEvents.source();
+   public EventStream<FocusLost> carpetGUI$focusLost() {
+      return this.focusLostEvents;
    }
 
-   public EventSource<MouseEnter> mouseEnter() {
-      return this.mouseEnterEvents.source();
+   public EventStream<MouseEnter> carpetGUI$mouseEnter() {
+      return this.mouseEnterEvents;
    }
 
-   public EventSource<MouseLeave> mouseLeave() {
-      return this.mouseLeaveEvents.source();
+   public EventStream<MouseLeave> carpetGUI$mouseLeave() {
+      return this.mouseLeaveEvents;
    }
 
-   public CursorStyle cursorStyle() {
+   public CursorStyle carpetGUI$cursorStyle() {
       return this.cursorStyle;
    }
 
-   public BaseUIComponent cursorStyle(CursorStyle style) {
+   public BaseUIComponent carpetGUI$cursorStyle(CursorStyle style) {
       this.cursorStyle = style;
       return this;
    }
 
-   public UIComponent tooltip(List<ClientTooltipComponent> tooltip) {
+   public UIComponent carpetGUI$tooltip(List<ClientTooltipComponent> tooltip) {
       this.tooltip = tooltip;
       return this;
    }
 
-   public List<ClientTooltipComponent> tooltip() {
+   public List<ClientTooltipComponent> carpetGUI$tooltip() {
       return this.tooltip;
    }
 
-   public void mount(ParentUIComponent parent, int x, int y) {
+   public void carpetGUI$mount(ParentUIComponent parent, int x, int y) {
       this.parent = parent;
       this.mounted = true;
       this.moveTo(x, y);
    }
 
-   public void dismount(UIComponent.DismountReason reason) {
+   public void carpetGUI$dismount(UIComponent.DismountReason reason) {
       this.parent = null;
       this.mounted = false;
    }
 
-   public ParentUIComponent parent() {
+   public ParentUIComponent carpetGUI$parent() {
       return this.parent;
    }
 
-   public @Nullable FocusHandler focusHandler() {
-      return this.hasParent() ? this.parent.focusHandler() : null;
+   public @Nullable FocusHandler carpetGUI$focusHandler() {
+      return this.hasParent() ? this.parent.carpetGUI$focusHandler() : null;
    }
 
-   public BaseUIComponent positioning(Positioning positioning) {
+   public BaseUIComponent carpetGUI$positioning(Positioning positioning) {
       this.positioning.set(positioning);
       return this;
    }
 
-   public AnimatableProperty<Positioning> positioning() {
+   public Observable<Positioning> carpetGUI$positioning() {
       return this.positioning;
    }
 
-   public BaseUIComponent margins(Insets margins) {
+   public BaseUIComponent carpetGUI$margins(Insets margins) {
       this.margins.set(margins);
       return this;
    }
 
-   public AnimatableProperty<Insets> margins() {
+   public Observable<Insets> carpetGUI$margins() {
       return this.margins;
    }
 
-   public UIComponent horizontalSizing(Sizing horizontalSizing) {
+   public UIComponent carpetGUI$horizontalSizing(Sizing horizontalSizing) {
       this.horizontalSizing.set(horizontalSizing);
       return this;
    }
 
-   public AnimatableProperty<Sizing> horizontalSizing() {
+   public Observable<Sizing> carpetGUI$horizontalSizing() {
       return this.horizontalSizing;
    }
 
-   public UIComponent verticalSizing(Sizing verticalSizing) {
+   public UIComponent carpetGUI$verticalSizing(Sizing verticalSizing) {
       this.verticalSizing.set(verticalSizing);
       return this;
    }
 
-   public AnimatableProperty<Sizing> verticalSizing() {
+   public Observable<Sizing> carpetGUI$verticalSizing() {
       return this.verticalSizing;
    }
 
-   public UIComponent id(@Nullable String id) {
+   public UIComponent carpetGUI$id(@Nullable String id) {
       this.id = id;
       return this;
    }
 
-   public @Nullable String id() {
+   public @Nullable String carpetGUI$id() {
       return this.id;
    }
 
-   public int x() {
+   public int carpetGUI$x() {
       return this.x;
    }
 
-   public void updateX(int x) {
+   public void carpetGUI$updateX(int x) {
       this.x = x;
    }
 
-   public int y() {
+   public int carpetGUI$y() {
       return this.y;
    }
 
-   public void updateY(int y) {
+   public void carpetGUI$updateY(int y) {
       this.y = y;
    }
 
-   public int width() {
+   public int carpetGUI$width() {
       return this.width;
    }
 
-   public int height() {
+   public int carpetGUI$height() {
       return this.height;
    }
 }

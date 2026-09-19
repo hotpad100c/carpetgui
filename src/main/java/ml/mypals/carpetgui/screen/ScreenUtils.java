@@ -42,9 +42,9 @@ public class ScreenUtils {
       FlowLayout wrapper = UIContainers.horizontalFlow(Sizing.fixed(w + 2), Sizing.fixed(h));
       wrapper.verticalAlignment(VerticalAlignment.CENTER);
       wrapper.horizontalAlignment(HorizontalAlignment.CENTER);
-      wrapper.cursorStyle(CursorStyle.HAND);
+      wrapper.carpetGUI$cursorStyle(CursorStyle.HAND);
       wrapper.child(makeTexture(initTex, w, h));
-      wrapper.mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
+      wrapper.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
          Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
          onClick.accept(wrapper);
          return true;
@@ -115,13 +115,13 @@ public class ScreenUtils {
    }
 
    public static void showSaveGroupDialog(FlowLayout rootComponent, OverlayContainer<FlowLayout> dialogOverlay) {
-      if (dialogOverlay.parent() == null) {
+      if (dialogOverlay.carpetGUI$parent() == null) {
          rootComponent.child(rootComponent.children().size(), dialogOverlay);
       }
    }
 
    public static void hideSaveDialog(FlowLayout rootComponent, OverlayContainer<FlowLayout> dialogOverlay) {
-      if (dialogOverlay != null && dialogOverlay.parent() != null) {
+      if (dialogOverlay != null && dialogOverlay.carpetGUI$parent() != null) {
          rootComponent.removeChild(dialogOverlay);
       }
 
@@ -151,12 +151,12 @@ public class ScreenUtils {
       b.surface(Surface.flat(905969663).and(Surface.outline(1442840575)));
       b.verticalAlignment(VerticalAlignment.CENTER);
       b.horizontalAlignment(HorizontalAlignment.CENTER);
-      b.cursorStyle(CursorStyle.HAND);
+      b.carpetGUI$cursorStyle(CursorStyle.HAND);
       b.padding(Insets.of(0, 0, 2, 2));
       b.child(UIComponents.label(label).color(Color.WHITE));
-      b.mouseEnter().subscribe((MouseEnter)() -> b.surface(Surface.flat(905969663).and(Surface.outline(-1))));
-      b.mouseLeave().subscribe((MouseLeave)() -> b.surface(Surface.flat(905969663).and(Surface.outline(1442840575))));
-      b.mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
+      b.carpetGUI$mouseEnter().subscribe((MouseEnter)() -> b.surface(Surface.flat(905969663).and(Surface.outline(-1))));
+      b.carpetGUI$mouseLeave().subscribe((MouseLeave)() -> b.surface(Surface.flat(905969663).and(Surface.outline(1442840575))));
+      b.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
          Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
          action.run();
          return true;

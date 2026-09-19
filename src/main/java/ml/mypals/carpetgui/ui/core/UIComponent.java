@@ -5,8 +5,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import ml.mypals.carpetgui.ui.event.UIEvents.*;
-import ml.mypals.carpetgui.ui.util.EventSource;
+import ml.mypals.carpetgui.ui.util.EventStream;
 import ml.mypals.carpetgui.ui.util.FocusHandler;
+import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -22,45 +23,45 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface UIComponent extends PositionedRectangle {
-   void draw(OwoUIGraphics var1, int var2, int var3, float var4, float var5);
+   void carpetGUI$draw(OwoUIGraphics var1, int var2, int var3, float var4, float var5);
 
    default void drawTooltip(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
-      if (this.shouldDrawTooltip((double)mouseX, (double)mouseY)) {
-         context.drawTooltip(Minecraft.getInstance().font, mouseX, mouseY, this.tooltip());
+      if (this.carpetGUI$shouldDrawTooltip((double)mouseX, (double)mouseY)) {
+         context.drawTooltip(Minecraft.getInstance().font, mouseX, mouseY, this.carpetGUI$tooltip());
       }
    }
 
    default void drawFocusHighlight(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
-      context.drawRectOutline(this.x(), this.y(), this.width(), this.height(), -1);
+      context.drawRectOutline(this.carpetGUI$x(), this.carpetGUI$y(), this.carpetGUI$width(), this.carpetGUI$height(), -1);
    }
 
    @Contract(
       pure = true
    )
-   @Nullable ParentUIComponent parent();
+   @Nullable ParentUIComponent carpetGUI$parent();
 
    @Contract(
       pure = true
    )
-   @Nullable FocusHandler focusHandler();
+   @Nullable FocusHandler carpetGUI$focusHandler();
 
-   UIComponent positioning(Positioning var1);
-
-   @Contract(
-      pure = true
-   )
-   AnimatableProperty<Positioning> positioning();
-
-   UIComponent margins(Insets var1);
+   UIComponent carpetGUI$positioning(Positioning var1);
 
    @Contract(
       pure = true
    )
-   AnimatableProperty<Insets> margins();
+   Observable<Positioning> carpetGUI$positioning();
+
+   UIComponent carpetGUI$margins(Insets var1);
+
+   @Contract(
+      pure = true
+   )
+   Observable<Insets> carpetGUI$margins();
 
    default UIComponent sizing(Sizing horizontalSizing, Sizing verticalSizing) {
-      this.horizontalSizing(horizontalSizing);
-      this.verticalSizing(verticalSizing);
+      this.carpetGUI$horizontalSizing(horizontalSizing);
+      this.carpetGUI$verticalSizing(verticalSizing);
       return this;
    }
 
@@ -69,25 +70,25 @@ public interface UIComponent extends PositionedRectangle {
       return this;
    }
 
-   UIComponent horizontalSizing(Sizing var1);
+   UIComponent carpetGUI$horizontalSizing(Sizing var1);
 
    @Contract(
       pure = true
    )
-   AnimatableProperty<Sizing> horizontalSizing();
+   Observable<Sizing> carpetGUI$horizontalSizing();
 
-   UIComponent verticalSizing(Sizing var1);
+   UIComponent carpetGUI$verticalSizing(Sizing var1);
 
    @Contract(
       pure = true
    )
-   AnimatableProperty<Sizing> verticalSizing();
+   Observable<Sizing> carpetGUI$verticalSizing();
 
-   UIComponent id(@Nullable String var1);
+   UIComponent carpetGUI$id(@Nullable String var1);
 
-   @Nullable String id();
+   @Nullable String carpetGUI$id();
 
-   UIComponent tooltip(@Nullable List<ClientTooltipComponent> var1);
+   UIComponent carpetGUI$tooltip(@Nullable List<ClientTooltipComponent> var1);
 
    default UIComponent tooltip(@NotNull Collection<Component> tooltip) {
       ArrayList<ClientTooltipComponent> components = new ArrayList();
@@ -96,7 +97,7 @@ public interface UIComponent extends PositionedRectangle {
          components.add(ClientTooltipComponent.create(line.getVisualOrderText()));
       }
 
-      this.tooltip(components);
+      this.carpetGUI$tooltip(components);
       return this;
    }
 
@@ -107,41 +108,41 @@ public interface UIComponent extends PositionedRectangle {
          components.add(ClientTooltipComponent.create(line));
       }
 
-      this.tooltip(components);
+      this.carpetGUI$tooltip(components);
       return this;
    }
 
    @Contract(
       pure = true
    )
-   @Nullable List<ClientTooltipComponent> tooltip();
+   @Nullable List<ClientTooltipComponent> carpetGUI$tooltip();
 
-   default boolean shouldDrawTooltip(double mouseX, double mouseY) {
-      return this.tooltip() != null && !this.tooltip().isEmpty() && this.isInBoundingBox(mouseX, mouseY);
+   default boolean carpetGUI$shouldDrawTooltip(double mouseX, double mouseY) {
+      return this.carpetGUI$tooltip() != null && !this.carpetGUI$tooltip().isEmpty() && this.isInBoundingBox(mouseX, mouseY);
    }
 
-   void inflate(Size var1);
+   void carpetGUI$inflate(Size var1);
 
-   void mount(ParentUIComponent var1, int var2, int var3);
+   void carpetGUI$mount(ParentUIComponent var1, int var2, int var3);
 
-   void dismount(DismountReason var1);
+   void carpetGUI$dismount(DismountReason var1);
 
-   <C extends UIComponent> C configure(Consumer<C> var1);
+   <C extends UIComponent> C carpetGUI$configure(Consumer<C> var1);
 
    @Contract(
       pure = true
    )
    default boolean hasParent() {
-      return this.parent() != null;
+      return this.carpetGUI$parent() != null;
    }
 
    default ParentUIComponent root() {
-      ParentUIComponent root = this.parent();
+      ParentUIComponent root = this.carpetGUI$parent();
       if (root == null) {
          return null;
       } else {
          while(root.hasParent()) {
-            root = root.parent();
+            root = root.carpetGUI$parent();
          }
 
          return root;
@@ -150,59 +151,55 @@ public interface UIComponent extends PositionedRectangle {
 
    default void remove() {
       if (this.hasParent()) {
-         this.parent().queue(() -> this.parent().removeChild(this));
+         this.carpetGUI$parent().queue(() -> this.carpetGUI$parent().removeChild(this));
       }
    }
 
-   boolean onMouseDown(MouseButtonEvent var1, boolean var2);
+   boolean carpetGUI$onMouseDown(MouseButtonEvent var1, boolean var2);
 
-   EventSource<MouseDown> mouseDown();
+   EventStream<MouseDown> carpetGUI$mouseDown();
 
-   boolean onMouseUp(MouseButtonEvent var1);
+   boolean carpetGUI$onMouseUp(MouseButtonEvent var1);
 
-   EventSource<MouseUp> mouseUp();
+   EventStream<MouseUp> carpetGUI$mouseUp();
 
-   boolean onMouseScroll(double var1, double var3, double var5);
+   boolean carpetGUI$onMouseScroll(double var1, double var3, double var5);
 
-   EventSource<MouseScroll> mouseScroll();
+   EventStream<MouseScroll> carpetGUI$mouseScroll();
 
-   boolean onMouseDrag(MouseButtonEvent var1, double var2, double var4);
+   boolean carpetGUI$onMouseDrag(MouseButtonEvent var1, double var2, double var4);
 
-   EventSource<MouseDrag> mouseDrag();
+   EventStream<MouseDrag> carpetGUI$mouseDrag();
 
-   boolean onKeyPress(KeyEvent var1);
+   boolean carpetGUI$onKeyPress(KeyEvent var1);
 
-   EventSource<KeyPress> keyPress();
+   EventStream<KeyPress> carpetGUI$keyPress();
 
-   boolean onCharTyped(CharacterEvent var1);
+   boolean carpetGUI$onCharTyped(CharacterEvent var1);
 
-   EventSource<CharTyped> charTyped();
+   EventStream<CharTyped> carpetGUI$charTyped();
 
-   default boolean canFocus(FocusSource source) {
+   default boolean carpetGUI$canFocus(FocusSource source) {
       return false;
    }
 
-   void onFocusGained(FocusSource var1);
+   void carpetGUI$onFocusGained(FocusSource var1);
 
-   EventSource<FocusGained> focusGained();
+   EventStream<FocusGained> carpetGUI$focusGained();
 
-   void onFocusLost();
+   void carpetGUI$onFocusLost();
 
-   EventSource<FocusLost> focusLost();
+   EventStream<FocusLost> carpetGUI$focusLost();
 
-   EventSource<MouseEnter> mouseEnter();
+   EventStream<MouseEnter> carpetGUI$mouseEnter();
 
-   EventSource<MouseLeave> mouseLeave();
+   EventStream<MouseLeave> carpetGUI$mouseLeave();
 
-   CursorStyle cursorStyle();
+   CursorStyle carpetGUI$cursorStyle();
 
-   UIComponent cursorStyle(CursorStyle var1);
+   UIComponent carpetGUI$cursorStyle(CursorStyle var1);
 
-   default void update(float delta, int mouseX, int mouseY) {
-      this.margins().update(delta);
-      this.positioning().update(delta);
-      this.horizontalSizing().update(delta);
-      this.verticalSizing().update(delta);
+   default void carpetGUI$update(float delta, int mouseX, int mouseY) {
    }
 
    default boolean isInBoundingBox(double x, double y) {
@@ -210,51 +207,51 @@ public interface UIComponent extends PositionedRectangle {
    }
 
    default Size fullSize() {
-      Insets margins = (Insets)this.margins().get();
-      return Size.of(this.width() + margins.horizontal(), this.height() + margins.vertical());
+      Insets margins = (Insets)this.carpetGUI$margins().get();
+      return Size.of(this.carpetGUI$width() + margins.horizontal(), this.carpetGUI$height() + margins.vertical());
    }
 
    @Contract(
       pure = true
    )
-   int width();
+   int carpetGUI$width();
 
    @Contract(
       pure = true
    )
-   int height();
+   int carpetGUI$height();
 
    @Contract(
       pure = true
    )
-   int x();
+   int carpetGUI$x();
 
    default int baseX() {
-      return this.x();
+      return this.carpetGUI$x();
    }
 
-   void updateX(int var1);
+   void carpetGUI$updateX(int var1);
 
    @Contract(
       pure = true
    )
-   int y();
+   int carpetGUI$y();
 
    default int baseY() {
-      return this.y();
+      return this.carpetGUI$y();
    }
 
-   void updateY(int var1);
+   void carpetGUI$updateY(int var1);
 
    default void moveTo(int x, int y) {
-      this.updateX(x);
-      this.updateY(y);
+      this.carpetGUI$updateX(x);
+      this.carpetGUI$updateY(y);
    }
 
    default MutableComponent inspectorDescriptor() {
-      Insets margins = (Insets)this.margins().get();
-      int var10000 = this.x();
-      MutableComponent var2 = Component.literal(var10000 + "," + this.y() + " (" + this.width() + "," + this.height() + ")");
+      Insets margins = (Insets)this.carpetGUI$margins().get();
+      int var10000 = this.carpetGUI$x();
+      MutableComponent var2 = Component.literal(var10000 + "," + this.carpetGUI$y() + " (" + this.carpetGUI$width() + "," + this.carpetGUI$height() + ")");
       int var10001 = margins.top();
       return var2.append(Component.literal(" <" + var10001 + "," + margins.bottom() + "," + margins.left() + "," + margins.right() + ">").setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)));
    }

@@ -24,7 +24,8 @@ public class CarpetClientNetworkMixin {
 )}
    )
    private static Tag onRuleSet(CompoundTag instance, String string, Operation<Tag> original) {
-      CompoundTag ruleNBT = (CompoundTag)original.call(new Object[]{instance, string});
+      CompoundTag ruleNBT = (CompoundTag)original.call(instance, string);
+      // CompoundTag ruleNBT = (CompoundTag)original.call(new Object[]{instance, string});
       if (ruleNBT.contains("Manager")) {
          String ruleName = (String)ruleNBT.getString("Rule").get();
          String managerName = (String)ruleNBT.getString("Manager").get();

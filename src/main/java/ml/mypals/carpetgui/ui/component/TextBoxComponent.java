@@ -7,7 +7,6 @@ import ml.mypals.carpetgui.mixin.ui.EditBoxAccessor;
 import ml.mypals.carpetgui.ui.core.CursorStyle;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
 import ml.mypals.carpetgui.ui.core.Sizing;
-import ml.mypals.carpetgui.ui.util.EventSource;
 import ml.mypals.carpetgui.ui.util.EventStream;
 import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.client.Minecraft;
@@ -29,7 +28,7 @@ public class TextBoxComponent extends EditBox {
       super(Minecraft.getInstance().font, 0, 0, 0, 0, Component.empty());
       this.textValue.observe(str -> this.changedEvents.sink().onChanged(str));
       this.sizing(horizontalSizing, Sizing.content());
-      this.showsBackground.observe((a) -> this.widgetWrapper().notifyParentIfMounted());
+      this.showsBackground.observe((a) -> this.carpetGUI$widgetWrapper().notifyParentIfMounted());
    }
 
    /** @deprecated */
@@ -54,12 +53,12 @@ public class TextBoxComponent extends EditBox {
    }
 
    public void updateX(int x) {
-      super.updateX(x);
+      super.carpetGUI$updateX(x);
       ((EditBoxAccessor)this).carpetGUI$updateTextPosition();
    }
 
    public void updateY(int y) {
-      super.updateY(y);
+      super.carpetGUI$updateY(y);
       ((EditBoxAccessor)this).carpetGUI$updateTextPosition();
    }
 
@@ -68,8 +67,8 @@ public class TextBoxComponent extends EditBox {
       this.showsBackground.set(drawsBackground);
    }
 
-   public EventSource<OnChanged> onChanged() {
-      return this.changedEvents.source();
+   public EventStream<OnChanged> onChanged() {
+      return this.changedEvents;
    }
 
    public TextBoxComponent text(String text) {
