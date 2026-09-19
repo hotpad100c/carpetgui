@@ -1,343 +1,269 @@
 package ml.mypals.carpetgui.screen.ruleGroup;
 
-import io.wispforest.owo.ui.base.BaseOwoScreen;
-import io.wispforest.owo.ui.component.UIComponents;
-import io.wispforest.owo.ui.component.TextBoxComponent;
-import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.*;
-import ml.mypals.carpetgui.localChache.RulesCacheManager;
-import ml.mypals.carpetgui.network.RuleData;
-import ml.mypals.carpetgui.network.client.CarpetGUIClientPacketHandler;
-import ml.mypals.carpetgui.screen.ScreenTabBar;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.ChatFormatting;
-import net.minecraft.util.Util;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import static ml.mypals.carpetgui.CarpetGUIClient.cachedCompleteRules;
-import static ml.mypals.carpetgui.CarpetGUIClient.cachedManagers;
-import static ml.mypals.carpetgui.screen.ScreenUtils.*;
+import java.util.Map;
+import ml.mypals.carpetgui.CarpetGUIClient;
+import ml.mypals.carpetgui.localChache.RulesCacheManager;
+import ml.mypals.carpetgui.network.RuleData;
+import ml.mypals.carpetgui.network.client.CarpetGUIClientPacketHandler;
+import ml.mypals.carpetgui.screen.ScreenTabBar;
+import ml.mypals.carpetgui.screen.ScreenUtils;
+import ml.mypals.carpetgui.ui.base.BaseOwoScreen;
+import ml.mypals.carpetgui.ui.component.TextBoxComponent;
+import ml.mypals.carpetgui.ui.component.UIComponents;
+import ml.mypals.carpetgui.ui.container.FlowLayout;
+import ml.mypals.carpetgui.ui.container.ScrollContainer;
+import ml.mypals.carpetgui.ui.container.UIContainers;
+import ml.mypals.carpetgui.ui.core.Color;
+import ml.mypals.carpetgui.ui.core.CursorStyle;
+import ml.mypals.carpetgui.ui.core.HorizontalAlignment;
+import ml.mypals.carpetgui.ui.core.Insets;
+import ml.mypals.carpetgui.ui.core.OwoUIAdapter;
+import ml.mypals.carpetgui.ui.core.Positioning;
+import ml.mypals.carpetgui.ui.core.Sizing;
+import ml.mypals.carpetgui.ui.core.Surface;
+import ml.mypals.carpetgui.ui.core.UIComponent;
+import ml.mypals.carpetgui.ui.core.VerticalAlignment;
+import ml.mypals.carpetgui.ui.event.UIEvents.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Util;
+import org.jetbrains.annotations.NotNull;
 
 @Environment(EnvType.CLIENT)
 public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
-    private FlowLayout leftContent;
-    private FlowLayout rightContent;
-    public boolean requestingRulesForNewGroup = false;
-    private List<TextBoxComponent> currentBoxes = new ArrayList<>();
-    private RuleGroup currentGroup;
+   private FlowLayout leftContent;
+   private FlowLayout rightContent;
+   public boolean requestingRulesForNewGroup = false;
+   private List<TextBoxComponent> currentBoxes = new ArrayList();
+   private RuleGroup currentGroup;
 
-    public RuleGroupScreen() {
-        super();
-    }
+   protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
+      return OwoUIAdapter.<FlowLayout>create(this, UIContainers::verticalFlow);
+   }
 
-    @Override
-    protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/::verticalFlow);
-    }
-    @Override
-    protected void build(FlowLayout root) {
-        ScreenTabBar.build(buildMain(root), ScreenTabBar.Tab.GROUPS);
-    }
-    protected FlowLayout buildMain(FlowLayout root) {
+   protected void build(FlowLayout root) {
+      ScreenTabBar.build(this.buildMain(root), ScreenTabBar.Tab.GROUPS);
+   }
 
-        var master = makeMasterContainer(this.width, this.height, root);
+   protected FlowLayout buildMain(FlowLayout root) {
+      Map.Entry<FlowLayout, FlowLayout> master = ScreenUtils.makeMasterContainer(this.width, this.height, root);
+      CarpetGUIClient.cachedManagers = RulesCacheManager.loadKnownManagers();
+      List<RuleGroup> groups = RuleGroupLoader.loadAll();
+      this.leftContent = UIContainers.verticalFlow(Sizing.fill(100), Sizing.content());
+      this.leftContent.gap(2);
+      this.leftContent.padding(Insets.of(2));
+      if (!groups.isEmpty()) {
+         RuleGroup selected = (RuleGroup)groups.getFirst();
+         this.currentGroup = selected;
+         this.currentBoxes = new ArrayList();
 
-        cachedManagers = RulesCacheManager.loadKnownManagers();
+         for(RuleCommand cmd : selected.commands()) {
+            this.leftContent.child(this.buildRow(cmd, this.currentBoxes));
+         }
+      }
 
-        List<RuleGroup> groups = RuleGroupLoader.loadAll();
+      ScrollContainer<FlowLayout> rulesScroll = UIContainers.<FlowLayout>verticalScroll(Sizing.fill(100), Sizing.fill(80), this.leftContent);
+      rulesScroll.surface(Surface.outline(1427050255));
+      FlowLayout bottomBar = this.buildBottomBar();
+      FlowLayout leftPanel = UIContainers.verticalFlow(Sizing.fill(80), Sizing.fill(99));
+      leftPanel.padding(Insets.of(2));
+      leftPanel.child(rulesScroll.sizing(Sizing.fill(100), Sizing.fill(90)));
+      leftPanel.child(bottomBar.positioning(Positioning.relative(0, 99)).sizing(Sizing.fill(99), Sizing.fill(8)));
+      this.rightContent = UIContainers.verticalFlow(Sizing.fill(90), Sizing.content());
+      this.rightContent.gap(2);
 
+      for(RuleGroup group : groups) {
+         this.rightContent.child(this.buildGroupEntry(group));
+      }
 
-        this.leftContent = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalFlow(Sizing.fill(100), Sizing.content());
-        this.leftContent.gap(2);
-        leftContent.padding(Insets.of(2));
+      ScrollContainer<FlowLayout> rightScroll = UIContainers.<FlowLayout>verticalScroll(Sizing.fill(20), Sizing.fill(99), this.rightContent);
+      ((FlowLayout)master.getValue()).child(leftPanel);
+      ((FlowLayout)master.getValue()).child(rightScroll);
+      root.child((UIComponent)master.getKey());
+      return (FlowLayout)master.getKey();
+   }
 
-        if(!groups.isEmpty()){
-            RuleGroup selected = groups.getFirst();
-            this.currentGroup = selected;
-            this.currentBoxes = new ArrayList<>();
+   public void onFilesDrop(@NotNull List<Path> files) {
+      Path saveDir = RuleGroupLoader.GROUPS_DIR;
 
-            for (RuleCommand cmd : selected.commands()) {
-                this.leftContent.child(buildRow(cmd, this.currentBoxes));
-            }
-        }
+      for(Path path : files) {
+         try {
+            Files.copy(path, saveDir.resolve(path.getFileName()));
+         } catch (IOException var6) {
+         }
+      }
 
-        var rulesScroll = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalScroll(
-                Sizing.fill(100),
-                Sizing.fill(80),
-                this.leftContent
-        );
+      this.rebuildRightPanel();
+   }
 
-        rulesScroll.surface(Surface.outline(0x550F0F0F));
-        FlowLayout bottomBar = buildBottomBar();
+   private FlowLayout buildBottomBar() {
+      FlowLayout bar = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
+      bar.verticalAlignment(VerticalAlignment.CENTER);
+      bar.horizontalAlignment(HorizontalAlignment.CENTER);
+      bar.padding(Insets.of(2));
+      bar.gap(6);
+      FlowLayout exec = ScreenUtils.btn(Component.translatable("gui.rulegroups.execute"), Sizing.content(), Sizing.fill(100), this::executeCurrent);
+      FlowLayout file = ScreenUtils.btn(Component.translatable("gui.rulegroups.file"), Sizing.content(), Sizing.fill(100), () -> Util.getPlatform().openFile(RuleGroupLoader.GROUPS_DIR.toFile()));
+      FlowLayout newGroup = ScreenUtils.btn(Component.translatable("gui.rulegroups.new"), Sizing.content(), Sizing.fill(100), () -> {
+         this.requestingRulesForNewGroup = true;
+         CarpetGUIClientPacketHandler.openRuleEditScreen(false);
+      });
+      FlowLayout addCmd = ScreenUtils.btn(Component.translatable("gui.rulegroups.addcommand"), Sizing.content(), Sizing.fill(100), this::addCommandToCurrentGroup);
+      bar.child(exec);
+      bar.child(addCmd);
+      bar.child(file);
+      bar.child(newGroup);
+      return bar;
+   }
 
-        FlowLayout leftPanel = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalFlow(Sizing.fill(80), Sizing.fill(99));
-        leftPanel.padding(Insets.of(2));
-        leftPanel.child(rulesScroll.sizing(Sizing.fill(100), Sizing.fill(90)));
-        leftPanel.child(bottomBar.positioning(Positioning.relative(0, 99))
-                .sizing(Sizing.fill(99), Sizing.fill(8)));
+   private void addCommandToCurrentGroup() {
+      if (this.currentGroup != null) {
+         int id = !this.currentGroup.commands().isEmpty() ? ((RuleCommand)this.currentGroup.commands().getLast()).id() + 1 : 0;
+         RuleCommand blank = new RuleCommand(id, (String)null, (String)null, "", false, false);
+         this.currentGroup.commands().add(blank);
+         this.leftContent.child(this.buildRow(blank, this.currentBoxes));
+      }
+   }
 
-        this.rightContent = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalFlow(Sizing.fill(90), Sizing.content());
-        rightContent.gap(2);
+   private void saveCurrent() {
+      if (this.currentGroup != null) {
+         List<RuleCommand> updated = new ArrayList();
 
-        for (RuleGroup group : groups) {
-            rightContent.child(buildGroupEntry(group));
-        }
+         for(int i = 0; i < this.currentGroup.commands().size(); ++i) {
+            RuleCommand cm = (RuleCommand)this.currentGroup.commands().get(i);
+            updated.add(new RuleCommand(cm.id(), cm.prefix(), cm.ruleName(), ((TextBoxComponent)this.currentBoxes.get(i)).getValue(), cm.locked(), cm.understandable()));
+         }
 
-        var rightScroll = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.verticalScroll(
-                Sizing.fill(20),
-                Sizing.fill(99),
-                rightContent
-        );
+         RuleGroupLoader.save(new RuleGroup(this.currentGroup.name(), this.currentGroup.filePath(), updated));
+      }
+   }
 
-        master.getValue().child(leftPanel);
-        master.getValue().child(rightScroll);
-        root.child(master.getKey());
+   private void executeCurrent() {
+      if (this.currentGroup != null) {
+         Minecraft mc = Minecraft.getInstance();
+         if (mc.player != null && mc.getConnection() != null) {
+            List<RuleCommand> cmds = this.currentGroup.commands();
 
-        return master.getKey();
-    }
-
-    @Override
-    public void onFilesDrop(@NotNull List<Path> files) {
-        Path saveDir = RuleGroupLoader.GROUPS_DIR;
-        for (Path path : files) {
-            try {
-                Files.copy(path, saveDir.resolve(path.getFileName()));
-            } catch (IOException ignored) {
-            }
-        }
-        this.rebuildRightPanel();
-    }
-    private FlowLayout buildBottomBar() {
-        FlowLayout bar = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
-
-        bar.verticalAlignment(VerticalAlignment.CENTER);
-        bar.horizontalAlignment(HorizontalAlignment.CENTER);
-        bar.padding(Insets.of(2));
-        bar.gap(6);
-        FlowLayout exec = btn(
-                Component.translatable("gui.rulegroups.execute"),
-                Sizing.content(), Sizing.fill(100),
-                this::executeCurrent
-        );
-        FlowLayout file = btn(
-                Component.translatable("gui.rulegroups.file"),
-                Sizing.content(), Sizing.fill(100),
-                ()->Util.getPlatform().openFile(RuleGroupLoader.GROUPS_DIR.toFile())
-        );
-        FlowLayout newGroup = btn(
-                Component.translatable("gui.rulegroups.new"),
-                Sizing.content(), Sizing.fill(100),
-                () ->{
-                    requestingRulesForNewGroup = true;
-                    CarpetGUIClientPacketHandler.openRuleEditScreen(false);
-                }
-        );
-        FlowLayout addCmd = btn(
-                Component.translatable("gui.rulegroups.addcommand"),
-                Sizing.content(), Sizing.fill(100),
-                this::addCommandToCurrentGroup
-        );
-        bar.child(exec);
-        bar.child(addCmd);
-        bar.child(file);
-        bar.child(newGroup);
-
-        return bar;
-    }
-
-    private void addCommandToCurrentGroup() {
-        if (currentGroup == null) return;
-        int id = !currentGroup.commands().isEmpty() ? currentGroup.commands().getLast().id() + 1 : 0;
-        RuleCommand blank = new RuleCommand(
-                id,
-                null,
-                null,
-                "",
-                false,
-                false
-        );
-        currentGroup.commands().add(blank);
-        leftContent.child(buildRow(blank, currentBoxes));
-    }
-
-
-    private void saveCurrent() {
-        if (currentGroup == null) return;
-        List<RuleCommand> updated = new ArrayList<>();
-
-        for (int i = 0; i < currentGroup.commands().size(); i++) {
-            RuleCommand cm = currentGroup.commands().get(i);
-            updated.add(new RuleCommand(
-                    cm.id(),
-                    cm.prefix(),
-                    cm.ruleName(),
-                    currentBoxes.get(i).getValue(),
-                    cm.locked(),
-                    cm.understandable()));
-        }
-        RuleGroupLoader.save(new RuleGroup(currentGroup.name(), currentGroup.filePath(), updated));
-    }
-
-    private void executeCurrent() {
-        if (currentGroup == null) return;
-
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.getConnection() == null) return;
-
-        List<RuleCommand> cmds = currentGroup.commands();
-
-        for (int i = 0; i < cmds.size(); i++) {
-            RuleCommand cmd = cmds.get(i);
-            String val = i < currentBoxes.size() ? currentBoxes.get(i).getValue() : null;
-
-            String result = cmd.toCommand(val);
-            if (result.startsWith("/")) {
-                mc.getConnection().sendCommand(result.substring(1));
-            } else {
-                mc.getConnection().sendChat(result);
-            }
-        }
-    }
-
-    private FlowLayout buildGroupEntry(RuleGroup group) {
-        FlowLayout row = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.horizontalFlow(Sizing.fill(100), Sizing.fixed(20));
-        boolean selected = currentGroup.name().equals(group.name());
-        row.surface(Surface.flat(selected ? 0x50060606 : 0x20060606));
-        row.verticalAlignment(VerticalAlignment.CENTER);
-        row.horizontalAlignment(HorizontalAlignment.CENTER);
-        row.cursorStyle(CursorStyle.HAND);
-
-        String displayName = truncateWithEllipsis(group.name(), Minecraft.getInstance().font, 150);
-        var nameLabel = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.label(Component.literal(displayName))
-                .color(Color.WHITE)
-                .horizontalSizing(Sizing.fill(80));
-
-        nameLabel.tooltip(Component.literal(group.name()));
-        row.child(nameLabel);
-
-        //? if <1.21.9 {
-        /*row.mouseDown().subscribe((x, y, btn) -> {
-         *///?} else {
-        row.mouseDown().subscribe((mouseButtonEvent, btn) -> {
-        //?}
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
-            setGroup(group);
-            rebuildRightPanel();
-            return true;
-        });
-
-        FlowLayout del = buildSpriteToggle(
-                NO, 10, 11,
-                (wrapper) -> {
-                    RuleGroupLoader.delete(group);
-                    rebuildRightPanel();
-                    if (currentGroup != null && currentGroup.name().equals(group.name())) {
-                        leftContent.clearChildren();
-                        currentBoxes.clear();
-                        currentGroup = null;
-                    }
-                }
-        );
-
-        del.sizing(Sizing.fixed(14), Sizing.fixed(14));
-        row.child(del);
-
-        return row;
-    }
-
-    private void rebuildRightPanel() {
-        rightContent.clearChildren();
-        for (RuleGroup group : RuleGroupLoader.loadAll()) {
-            if (currentGroup == null) currentGroup = group;
-            rightContent.child(buildGroupEntry(group));
-        }
-    }
-
-    private FlowLayout buildRow(RuleCommand cmd, List<TextBoxComponent> valueBoxes) {
-        FlowLayout row = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.horizontalFlow(Sizing.fill(99), Sizing.fixed(10));
-
-        row.surface(Surface.flat(0x20060606));
-        row.verticalAlignment(VerticalAlignment.CENTER);
-        row.horizontalAlignment(HorizontalAlignment.LEFT);
-
-
-        row.mouseEnter().subscribe(() ->
-                row.surface(Surface.flat(0x40060606))
-        );
-        row.mouseLeave().subscribe(() ->
-                row.surface(Surface.flat(0x20060606))
-        );
-
-        String text = cmd.value() != null ? cmd.value() : "";
-        TextBoxComponent box;
-        if (cmd.prefix() != null) {
-            row.child(
-                    /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.label(Component.literal(cmd.prefix()).withStyle(ChatFormatting.BLUE))
-                            .horizontalSizing(Sizing.fill(12))
-            );
-
-            String translatedName = cmd.ruleName();
-            RuleData ruleData = cachedCompleteRules.get(cmd.ruleName());
-            if(ruleData != null){
-                translatedName = ruleData.localName;
+            for(int i = 0; i < cmds.size(); ++i) {
+               RuleCommand cmd = (RuleCommand)cmds.get(i);
+               String val = i < this.currentBoxes.size() ? ((TextBoxComponent)this.currentBoxes.get(i)).getValue() : null;
+               String result = cmd.toCommand(val);
+               if (result.startsWith("/")) {
+                  mc.getConnection().sendCommand(result.substring(1));
+               } else {
+                  mc.getConnection().sendChat(result);
+               }
             }
 
-            String displayName = truncateWithEllipsis(translatedName, Minecraft.getInstance().font, 150);
+         }
+      }
+   }
 
-            var nameLabel = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.label(Component.literal(displayName))
-                    .color(cmd.locked() ? Color.ofArgb(0xFFFFD700) : Color.WHITE)
-                    .horizontalSizing(Sizing.fill(50));
+   private FlowLayout buildGroupEntry(RuleGroup group) {
+      FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20));
+      boolean selected = this.currentGroup.name().equals(group.name());
+      row.surface(Surface.flat(selected ? 1342572038 : 537265670));
+      row.verticalAlignment(VerticalAlignment.CENTER);
+      row.horizontalAlignment(HorizontalAlignment.CENTER);
+      row.cursorStyle(CursorStyle.HAND);
+      String displayName = ScreenUtils.truncateWithEllipsis(group.name(), Minecraft.getInstance().font, 150);
+      UIComponent nameLabel = UIComponents.label(Component.literal(displayName)).color(Color.WHITE).horizontalSizing(Sizing.fill(80));
+      nameLabel.tooltip(Component.literal(group.name()));
+      row.child(nameLabel);
+      row.mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
+         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+         this.setGroup(group);
+         this.rebuildRightPanel();
+         return true;
+      });
+      FlowLayout del = ScreenUtils.buildSpriteToggle(ScreenUtils.NO, 10, 11, (wrapper) -> {
+         RuleGroupLoader.delete(group);
+         this.rebuildRightPanel();
+         if (this.currentGroup != null && this.currentGroup.name().equals(group.name())) {
+            this.leftContent.clearChildren();
+            this.currentBoxes.clear();
+            this.currentGroup = null;
+         }
 
-            String defaultHint = cmd.locked() ? Component.translatable("gui.tip.default").getString() : "";
-            nameLabel.tooltip(Component.literal(defaultHint + translatedName));
-            row.child(nameLabel);
+      });
+      del.sizing(Sizing.fixed(14), Sizing.fixed(14));
+      row.child(del);
+      return row;
+   }
 
-            box = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.textBox(Sizing.fill(30));
-        } else {
-            box = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.textBox(Sizing.fill(92));
-        }
-        box.focusGained().subscribe((focusSource) -> Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1)));
-        box.focusLost().subscribe(this::saveCurrent);
-        box.setMaxLength(114514);
-        box.text(text);
-        valueBoxes.add(box);
+   private void rebuildRightPanel() {
+      this.rightContent.clearChildren();
 
-        row.child(box);
+      for(RuleGroup group : RuleGroupLoader.loadAll()) {
+         if (this.currentGroup == null) {
+            this.currentGroup = group;
+         }
 
-        FlowLayout delRow = buildSpriteToggle(
-                NO, 10, 11,
-                (wrapper) -> {
-                    currentGroup.commands().remove(cmd);
-                    leftContent.removeChild(row);
-                }
-        );
+         this.rightContent.child(this.buildGroupEntry(group));
+      }
 
-        delRow.sizing(Sizing.fixed(12), Sizing.fixed(10)).positioning(Positioning.relative(100, 0));
-        row.child(delRow);
+   }
 
-        return row;
-    }
+   private FlowLayout buildRow(RuleCommand cmd, List<TextBoxComponent> valueBoxes) {
+      FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(99), Sizing.fixed(10));
+      row.surface(Surface.flat(537265670));
+      row.verticalAlignment(VerticalAlignment.CENTER);
+      row.horizontalAlignment(HorizontalAlignment.LEFT);
+      row.mouseEnter().subscribe((MouseEnter)() -> row.surface(Surface.flat(1074136582)));
+      row.mouseLeave().subscribe((MouseLeave)() -> row.surface(Surface.flat(537265670)));
+      String text = cmd.value() != null ? cmd.value() : "";
+      TextBoxComponent box;
+      if (cmd.prefix() != null) {
+         row.child(UIComponents.label(Component.literal(cmd.prefix()).withStyle(ChatFormatting.BLUE)).horizontalSizing(Sizing.fill(12)));
+         String translatedName = cmd.ruleName();
+         RuleData ruleData = (RuleData)CarpetGUIClient.cachedCompleteRules.get(cmd.ruleName());
+         if (ruleData != null) {
+            translatedName = ruleData.localName;
+         }
 
-    private void setGroup(RuleGroup group) {
-        this.currentGroup = group;
-        this.leftContent.clearChildren();
+         String displayName = ScreenUtils.truncateWithEllipsis(translatedName, Minecraft.getInstance().font, 150);
+         UIComponent nameLabel = UIComponents.label(Component.literal(displayName)).color(cmd.locked() ? Color.ofArgb(-10496) : Color.WHITE).horizontalSizing(Sizing.fill(50));
+         String defaultHint = cmd.locked() ? Component.translatable("gui.tip.default").getString() : "";
+         nameLabel.tooltip(Component.literal(defaultHint + translatedName));
+         row.child(nameLabel);
+         box = UIComponents.textBox(Sizing.fill(30));
+      } else {
+         box = UIComponents.textBox(Sizing.fill(92));
+      }
 
-        currentBoxes = new ArrayList<>();
+      box.focusGained().subscribe((FocusGained)(focusSource) -> Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F)));
+      box.focusLost().subscribe(this::saveCurrent);
+      box.setMaxLength(114514);
+      box.text(text);
+      valueBoxes.add(box);
+      row.child(box);
+      FlowLayout delRow = ScreenUtils.buildSpriteToggle(ScreenUtils.NO, 10, 11, (wrapper) -> {
+         this.currentGroup.commands().remove(cmd);
+         this.leftContent.removeChild(row);
+      });
+      delRow.sizing(Sizing.fixed(12), Sizing.fixed(10)).positioning(Positioning.relative(100, 0));
+      row.child(delRow);
+      return row;
+   }
 
-        for (RuleCommand cmd : group.commands()) {
-            leftContent.child(buildRow(cmd, currentBoxes));
-        }
-    }
+   private void setGroup(RuleGroup group) {
+      this.currentGroup = group;
+      this.leftContent.clearChildren();
+      this.currentBoxes = new ArrayList();
+
+      for(RuleCommand cmd : group.commands()) {
+         this.leftContent.child(this.buildRow(cmd, this.currentBoxes));
+      }
+
+   }
 }

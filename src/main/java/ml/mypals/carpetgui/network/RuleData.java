@@ -1,163 +1,88 @@
-/*
- * This file is part of the Yet Another Carpet Addition project, licensed under the
- * GNU Lesser General Public License v3.0
- *
- * Copyright (C) 2025  Ryan100c and contributors
- *
- * Yet Another Carpet Addition is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Yet Another Carpet Addition is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Yet Another Carpet Addition.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package ml.mypals.carpetgui.network;
-
-import carpet.api.settings.SettingsManager;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-//? if >1.20.1 {
-import net.minecraft.network.chat.contents.PlainTextContents;
-//?} else {
-/*import net.minecraft.network.chat.ComponentContents;
- *///?}
 
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 
 public class RuleData {
-    public String manager;
-    public String name;
-    public String localName;
-    public String defaultValue;
-    public String value;
-    public String description;
-    public String localDescription;
-    public String extraDescription;
-    public String localExtra;
-    public Class<?> type;
-    public List<String> suggestions;
-    public List<Map.Entry<String, String>> categories;
-    public boolean isGamerule = false;
+   public String manager;
+   public String name;
+   public String localName;
+   public String defaultValue;
+   public String value;
+   public String description;
+   public String localDescription;
+   public Class<?> type;
+   public List<String> suggestions;
+   public List<Map.Entry<String, String>> categories;
+   public boolean isGamerule;
 
-    public RuleData() {
-        this.manager = "";
-        this.name = "";
-        this.localName = "";
-        this.defaultValue = "";
-        this.value = "";
-        this.description = "";
-        this.localDescription = "";
-        this.extraDescription = "";
-        this.localExtra = "";
-        this.type = getClass();
-        this.suggestions = List.of();
-        this.categories = List.of();
-    }
+   public RuleData() {
+      this.isGamerule = false;
+      this.manager = "";
+      this.name = "";
+      this.localName = "";
+      this.defaultValue = "";
+      this.value = "";
+      this.description = "";
+      this.localDescription = "";
+      this.type = this.getClass();
+      this.suggestions = List.of();
+      this.categories = List.of();
+   }
 
-    public RuleData(String manager, String name, String localName, Class<?> type, String defaultValue, String value, String description, String localDescription, String extra, String localExtra, List<String> suggestions, List<Map.Entry<String, String>> categories) {
-        this.manager = manager;
-        this.name = name;
-        this.localName = localName;
-        this.defaultValue = defaultValue;
-        this.value = value;
-        this.description = description;
-        this.localDescription = localDescription;
-        this.extraDescription = extra;
-        this.localExtra = localExtra;
-        this.type = type;
-        this.suggestions = suggestions;
-        this.categories = categories;
-    }
+   public RuleData(String manager, String name, String localName, Class<?> type, String defaultValue, String value, String description, String localDescription, List<String> suggestions, List<Map.Entry<String, String>> categories) {
+      this.isGamerule = false;
+      this.manager = manager;
+      this.name = name;
+      this.localName = localName;
+      this.defaultValue = defaultValue;
+      this.value = value;
+      this.description = description;
+      this.localDescription = localDescription;
+      this.type = type;
+      this.suggestions = suggestions;
+      this.categories = categories;
+   }
 
-    public void write(FriendlyByteBuf buf) {
-        buf.writeUtf(this.manager);
+   public void write(FriendlyByteBuf buf) {
+      buf.writeUtf(this.manager);
+      buf.writeUtf(this.name);
+      buf.writeUtf(this.localName);
+      buf.writeUtf(this.type.toString());
+      buf.writeUtf(this.defaultValue);
+      buf.writeUtf(this.value);
+      buf.writeUtf(this.description);
+      buf.writeUtf(this.localDescription);
+      buf.writeCollection(this.suggestions, FriendlyByteBuf::writeUtf);
+      buf.writeCollection(this.categories, (bf, entry) -> {
+         bf.writeUtf((String)entry.getKey());
+         bf.writeUtf((String)entry.getValue());
+      });
+   }
 
-        buf.writeUtf(this.name);
-        buf.writeUtf(this.localName);
+   public RuleData(FriendlyByteBuf buf) {
+      this(buf.readUtf(), buf.readUtf(), buf.readUtf(), getRuleType(buf.readUtf()), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf), buf.readList((bf) -> Map.entry(bf.readUtf(), bf.readUtf())));
+      if (((String)((Map.Entry)this.categories.getFirst()).getKey()).equals("gamerule")) {
+         this.isGamerule = true;
+         this.localDescription = Component.translatable(this.localDescription).getString();
+         String[] ct = ((String)((Map.Entry)this.categories.getFirst()).getValue()).split(" : ");
+         this.categories = List.of(Map.entry((String)((Map.Entry)this.categories.getFirst()).getKey(), Component.translatable(ct[0]).getString()));
+      }
 
-        buf.writeUtf(this.type.toString());
+   }
 
-        buf.writeUtf(this.defaultValue);
-        buf.writeUtf(this.value);
+   public static Class<?> getRuleType(String name) {
+      Class var10000;
+      switch (name) {
+         case "Integer" -> var10000 = Integer.class;
+         case "Boolean" -> var10000 = Boolean.class;
+         case "Float" -> var10000 = Float.class;
+         case "Enum" -> var10000 = Enum.class;
+         default -> var10000 = String.class;
+      }
 
-        buf.writeUtf(this.description);
-        buf.writeUtf(this.localDescription);
-
-        buf.writeUtf(this.extraDescription);
-        buf.writeUtf(this.localExtra);
-
-        buf.writeCollection(suggestions, FriendlyByteBuf::writeUtf);
-        buf.writeCollection(categories, (bf, entry) -> {
-            bf.writeUtf(entry.getKey());
-            bf.writeUtf(entry.getValue());
-        });
-    }
-
-    public RuleData(FriendlyByteBuf buf) {
-        this(
-                buf.readUtf(),
-                buf.readUtf(), // name
-                buf.readUtf(), // localName
-                getRuleType(buf.readUtf()), // type
-                buf.readUtf(), // defaultValue
-                buf.readUtf(), // value
-                buf.readUtf(), //desc
-                buf.readUtf(), //localDesc
-                buf.readUtf(), //extra
-                buf.readUtf(), //localExtra
-                buf.readList(FriendlyByteBuf::readUtf), //suggestions
-                buf.readList((bf) -> Map.entry(bf.readUtf(), bf.readUtf())) //categories
-        );
-        if (this.categories.getFirst().getKey().equals("gamerule")) {
-            isGamerule = true;
-            this.localDescription = Component.translatable(localDescription).getString();
-            String[] ct = this.categories.getFirst().getValue().split(" : ");
-            this.categories = List.of(
-                    Map.entry(
-                            this.categories.getFirst().getKey(),
-                            Component.translatable(ct[0]).getString()
-                    ));
-        }
-    }
-
-    public static Class<?> getRuleType(String name) {
-        return switch (name) {
-            case "Integer" -> Integer.class;
-            case "Boolean" -> Boolean.class;
-            case "Float" -> Float.class;
-            case "Enum" -> Enum.class;
-            default -> String.class;
-        };
-    }
-
-    public static String getExtraDesc(String name, SettingsManager settingsManager) {
-        if (settingsManager.getCarpetRule(name) == null) return "";
-        return c(settingsManager.getCarpetRule(name).extraInfo()).getString();
-    }
-
-    public static Component c(List<Component> list) {
-        if (list.isEmpty()) return Component.empty();
-
-        //? if >1.20.1 {
-        var var0 = MutableComponent.create(PlainTextContents.EMPTY);
-        //?} else {
-        /*var var0 = MutableComponent.create(ComponentContents.EMPTY);
-         *///?}
-        for (Component component : list) {
-            var0.append("\n" + component.getString());
-        }
-
-        return var0;
-    }
-
+      return var10000;
+   }
 }

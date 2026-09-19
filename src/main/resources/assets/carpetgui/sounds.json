@@ -1,0 +1,7 @@
+{
+  "ui.carpetgui.interaction": {
+    "sounds": [
+      "carpetgui:ui_interaction"
+    ]
+  }
+}

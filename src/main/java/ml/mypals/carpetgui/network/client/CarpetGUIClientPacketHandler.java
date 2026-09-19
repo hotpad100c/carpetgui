@@ -1,5 +1,19 @@
 package ml.mypals.carpetgui.network.client;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 import ml.mypals.carpetgui.CarpetGUIClient;
 import ml.mypals.carpetgui.localChache.RulesCacheManager;
 import ml.mypals.carpetgui.network.RuleData;
@@ -13,340 +27,304 @@ import ml.mypals.carpetgui.screen.rulesEditScreen.RulesEditScreen;
 import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
-import static ml.mypals.carpetgui.CarpetGUIClient.*;
-
 public class CarpetGUIClientPacketHandler {
-    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+   private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
-    public static void handleHelloPacket(HelloPacketPayload payload) {
-        Minecraft.getInstance().execute(()-> CarpetGUIClient.hasModOnServer = true);
-    }
+   public static void handleHelloPacket(HelloPacketPayload payload) {
+      Minecraft.getInstance().execute(() -> CarpetGUIClient.hasModOnServer = true);
+   }
 
-    public static void handleRuleStackSync(RuleStackSyncPayload payload) {
-        Minecraft.getInstance().execute(() -> {
-            CarpetGUIClient.cachedRuleStackData = new RuleStackData(
-                    payload.activePrefabName(),
-                    payload.allPrefabNames(),
-                    payload.layers(),
-                    payload.pendingChanges(),
-                    payload.futureLayers()
-            );
+   public static void handleRuleStackSync(RuleStackSyncPayload payload) {
+      Minecraft.getInstance().execute(() -> {
+         CarpetGUIClient.cachedRuleStackData = new RuleStackData(payload.activePrefabName(), payload.allPrefabNames(), payload.layers(), payload.pendingChanges(), payload.futureLayers());
+         if (RuleStackScreen.INSTANCE != null) {
+            RuleStackScreen.INSTANCE.onSync();
+         }
 
-            if (RuleStackScreen.INSTANCE != null) {
-                RuleStackScreen.INSTANCE.onSync();
-            }
-        });
-    }
+      });
+   }
 
-    public static void handleRulesPacket(RulesPacketPayload payload) {
-        Minecraft.getInstance().execute(() -> {
-            Minecraft client = Minecraft.getInstance();
-            boolean fromRuleGroupScreen = client.screen instanceof RuleGroupScreen rgs
-                    && rgs.requestingRulesForNewGroup;
-
-            CarpetGUIClient.hasModOnServer = true;
-
-            if (!payload.isPartial()) {
-                handleCompletePacket(payload, fromRuleGroupScreen, client);
-            } else {
-                handlePartialPacket(payload, fromRuleGroupScreen, client);
+   public static void handleRulesPacket(RulesPacketPayload payload) {
+      Minecraft.getInstance().execute(() -> {
+         Minecraft client;
+         boolean var10000;
+         label22: {
+            client = Minecraft.getInstance();
+            Screen patt0$temp = client.gui.screen();
+            if (patt0$temp instanceof RuleGroupScreen rgs) {
+               if (rgs.requestingRulesForNewGroup) {
+                  var10000 = true;
+                  break label22;
+               }
             }
 
-            requesting = false;
-            client.setScreen(new RulesEditScreen(!fromRuleGroupScreen));
-        });
-    }
+            var10000 = false;
+         }
 
-    private static void handleCompletePacket(RulesPacketPayload payload,
-                                             boolean fromRuleGroupScreen,
-                                             Minecraft client) {
-        cachedCompleteRules.clear();
-        for (RuleData rule : payload.rules()) {
-            if (fromRuleGroupScreen) rule.value = rule.defaultValue;
-            cachedCompleteRules.put(rule.name, rule);
-        }
+         boolean fromRuleGroupScreen = var10000;
+         CarpetGUIClient.hasModOnServer = true;
+         if (!payload.isPartial()) {
+            handleCompletePacket(payload, fromRuleGroupScreen, client);
+         } else {
+            handlePartialPacket(payload, fromRuleGroupScreen, client);
+         }
 
-        refreshCachedCategories(cachedCompleteRules.values());
-        refreshDefaultAndFavoriteRules(payload.defaults(), fromRuleGroupScreen);
+         CarpetGUIClient.requesting = false;
+         client.setScreenAndShow(new RulesEditScreen(!fromRuleGroupScreen));
+      });
+   }
 
-        String lang = client.getLanguageManager().getSelected();
-        EXECUTOR.execute(() -> {
-            RulesCacheManager.saveCache(new ArrayList<>(cachedCompleteRules.values()),
-                    payload.defaults(), lang);
-            cachedManagers = RulesCacheManager.loadKnownManagers();
-        });
-    }
+   private static void handleCompletePacket(RulesPacketPayload payload, boolean fromRuleGroupScreen, Minecraft client) {
+      CarpetGUIClient.cachedCompleteRules.clear();
 
-    private static void handlePartialPacket(RulesPacketPayload payload,
-                                            boolean fromRuleGroupScreen,
-                                            Minecraft client) {
-        String lang = client.getLanguageManager().getSelected();
-        RulesCacheManager.RawCacheData rawCache = RulesCacheManager.loadRawCache();
+      for(RuleData rule : payload.rules()) {
+         if (fromRuleGroupScreen) {
+            rule.value = rule.defaultValue;
+         }
 
-        if (rawCache == null) {
-            ClientPlayNetworking.send(new RequestRulesPayload(lang, List.of()));
-            return;
-        }
+         CarpetGUIClient.cachedCompleteRules.put(rule.name, rule);
+      }
 
-        Map<String, RulesCacheManager.CachedRuleEntry> mergedMap = buildMergedMap(rawCache, payload.rules(), lang);
-        reconcileWithServerRules(mergedMap, rawCache, lang, fromRuleGroupScreen);
+      refreshCachedCategories(CarpetGUIClient.cachedCompleteRules.values());
+      refreshDefaultAndFavoriteRules(payload.defaults(), fromRuleGroupScreen);
+      String lang = client.getLanguageManager().getSelected();
+      EXECUTOR.execute(() -> {
+         RulesCacheManager.saveCache(new ArrayList(CarpetGUIClient.cachedCompleteRules.values()), payload.defaults(), lang);
+         CarpetGUIClient.cachedManagers = RulesCacheManager.loadKnownManagers();
+      });
+   }
 
-        for (RuleData rule : payload.rules()) {
-            cachedCompleteRules.put(rule.name, rule);
-        }
+   private static void handlePartialPacket(RulesPacketPayload payload, boolean fromRuleGroupScreen, Minecraft client) {
+      String lang = client.getLanguageManager().getSelected();
+      RulesCacheManager.RawCacheData rawCache = RulesCacheManager.loadRawCache();
+      if (rawCache == null) {
+         ClientPlayNetworking.send(new RequestRulesPayload(lang, List.of()));
+      } else {
+         Map<String, RulesCacheManager.CachedRuleEntry> mergedMap = buildMergedMap(rawCache, payload.rules(), lang);
+         reconcileWithServerRules(mergedMap, rawCache, lang, fromRuleGroupScreen);
 
-        refreshCachedCategories(cachedCompleteRules.values());
-        refreshDefaultAndFavoriteRules(payload.defaults(), fromRuleGroupScreen);
+         for(RuleData rule : payload.rules()) {
+            CarpetGUIClient.cachedCompleteRules.put(rule.name, rule);
+         }
 
-        new Thread(() -> {
+         refreshCachedCategories(CarpetGUIClient.cachedCompleteRules.values());
+         refreshDefaultAndFavoriteRules(payload.defaults(), fromRuleGroupScreen);
+         (new Thread(() -> {
             RulesCacheManager.saveRawCache(rawCache, mergedMap.values(), payload.defaults());
-            cachedManagers = RulesCacheManager.loadKnownManagers();
-        }, "carpetgui-cache-save").start();
-    }
+            CarpetGUIClient.cachedManagers = RulesCacheManager.loadKnownManagers();
+         }, "carpetgui-cache-save")).start();
+      }
+   }
 
-    private static Map<String, RulesCacheManager.CachedRuleEntry> buildMergedMap(
-            RulesCacheManager.RawCacheData rawCache,
-            List<RuleData> incomingRules,
-            String lang) {
+   private static Map<String, RulesCacheManager.CachedRuleEntry> buildMergedMap(RulesCacheManager.RawCacheData rawCache, List<RuleData> incomingRules, String lang) {
+      Map<String, RulesCacheManager.CachedRuleEntry> mergedMap = new LinkedHashMap();
 
-        Map<String, RulesCacheManager.CachedRuleEntry> mergedMap = new LinkedHashMap<>();
-        for (RulesCacheManager.CachedRuleEntry entry : rawCache.rules) {
-            mergedMap.put(entry.name, entry);
-        }
+      for(RulesCacheManager.CachedRuleEntry entry : rawCache.rules) {
+         mergedMap.put(entry.name, entry);
+      }
 
-        for (RuleData newRule : incomingRules) {
-            if (newRule.name == null) continue;
-
-            RulesCacheManager.CachedRuleEntry existing = mergedMap.get(newRule.name);
+      for(RuleData newRule : incomingRules) {
+         if (newRule.name != null) {
+            RulesCacheManager.CachedRuleEntry existing = (RulesCacheManager.CachedRuleEntry)mergedMap.get(newRule.name);
             if (existing != null) {
-                updateExistingCacheEntry(existing, newRule, rawCache, lang);
+               updateExistingCacheEntry(existing, newRule, rawCache, lang);
             } else {
-                mergedMap.put(newRule.name, createCacheEntry(newRule, lang));
+               mergedMap.put(newRule.name, createCacheEntry(newRule, lang));
             }
-        }
-        return mergedMap;
-    }
+         }
+      }
 
-    private static void updateExistingCacheEntry(RulesCacheManager.CachedRuleEntry existing,
-                                                 RuleData newRule,
-                                                 RulesCacheManager.RawCacheData rawCache,
-                                                 String lang) {
-        existing.localName.put(lang, newRule.localName);
-        existing.localDescription.put(lang, newRule.localDescription);
+      return mergedMap;
+   }
 
-        for (Map.Entry<String, String> cat : newRule.categories) {
-            rawCache.categories.stream()
-                    .filter(c -> c.key.equals(cat.getKey()))
-                    .findFirst()
-                    .ifPresentOrElse(
-                            c -> c.value.put(lang, cat.getValue()),
-                            () -> {
-                                RulesCacheManager.CachedCategoryEntry newCat = new RulesCacheManager.CachedCategoryEntry();
-                                newCat.key = cat.getKey();
-                                newCat.value = new HashMap<>(Map.of(lang, cat.getValue()));
-                                rawCache.categories.add(newCat);
-                            }
-                    );
-        }
-    }
+   private static void updateExistingCacheEntry(RulesCacheManager.CachedRuleEntry existing, RuleData newRule, RulesCacheManager.RawCacheData rawCache, String lang) {
+      existing.localName.put(lang, newRule.localName);
+      existing.localDescription.put(lang, newRule.localDescription);
 
-    private static RulesCacheManager.CachedRuleEntry createCacheEntry(RuleData rule, String lang) {
-        RulesCacheManager.CachedRuleEntry entry = new RulesCacheManager.CachedRuleEntry();
-        entry.name = rule.name;
-        entry.type = rule.type.getSimpleName();
-        entry.description = rule.description;
-        entry.defaultValue = rule.defaultValue;
-        entry.isGamerule = rule.isGamerule;
-        entry.manager = rule.manager;
-        entry.suggestions = rule.suggestions;
-        entry.localName = new HashMap<>(Map.of(lang, rule.localName));
-        entry.localDescription = new HashMap<>(Map.of(lang, rule.localDescription));
-        entry.categories = rule.categories.stream().map(Map.Entry::getKey).toList();
-        return entry;
-    }
+      for(Map.Entry<String, String> cat : newRule.categories) {
+         rawCache.categories.stream().filter((c) -> c.key.equals(cat.getKey())).findFirst().ifPresentOrElse((c) -> c.value.put(lang, (String)cat.getValue()), () -> {
+            RulesCacheManager.CachedCategoryEntry newCat = new RulesCacheManager.CachedCategoryEntry();
+            newCat.key = (String)cat.getKey();
+            newCat.value = new HashMap(Map.of(lang, (String)cat.getValue()));
+            rawCache.categories.add(newCat);
+         });
+      }
 
-    private static void reconcileWithServerRules(Map<String, RulesCacheManager.CachedRuleEntry> mergedMap,
-                                                 RulesCacheManager.RawCacheData rawCache,
-                                                 String lang,
-                                                 boolean fromRuleGroupScreen) {
-        if (incompleteRulesFromServer == null || incompleteRulesFromServer.isEmpty()) return;
+   }
 
-        Set<String> serverNames = incompleteRulesFromServer.stream()
-                .map(r -> r.name)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+   private static RulesCacheManager.CachedRuleEntry createCacheEntry(RuleData rule, String lang) {
+      RulesCacheManager.CachedRuleEntry entry = new RulesCacheManager.CachedRuleEntry();
+      entry.name = rule.name;
+      entry.type = rule.type.getSimpleName();
+      entry.description = rule.description;
+      entry.defaultValue = rule.defaultValue;
+      entry.isGamerule = rule.isGamerule;
+      entry.manager = rule.manager;
+      entry.suggestions = rule.suggestions;
+      entry.localName = new HashMap(Map.of(lang, rule.localName));
+      entry.localDescription = new HashMap(Map.of(lang, rule.localDescription));
+      entry.categories = rule.categories.stream().map(Map.Entry::getKey).toList();
+      return entry;
+   }
 
-        mergedMap.entrySet().removeIf(e ->
-                !e.getValue().isGamerule && !serverNames.contains(e.getKey()));
+   private static void reconcileWithServerRules(Map<String, RulesCacheManager.CachedRuleEntry> mergedMap, RulesCacheManager.RawCacheData rawCache, String lang, boolean fromRuleGroupScreen) {
+      if (CarpetGUIClient.incompleteRulesFromServer != null && !CarpetGUIClient.incompleteRulesFromServer.isEmpty()) {
+         Set<String> serverNames = (Set)CarpetGUIClient.incompleteRulesFromServer.stream().map((r) -> r.name).filter(Objects::nonNull).collect(Collectors.toSet());
+         mergedMap.entrySet().removeIf((e) -> !((RulesCacheManager.CachedRuleEntry)e.getValue()).isGamerule && !serverNames.contains(e.getKey()));
+         Map<String, String> serverValues = (Map)CarpetGUIClient.incompleteRulesFromServer.stream().filter((r) -> r.name != null).collect(Collectors.toMap((r) -> r.name, (r) -> r.value));
+         CarpetGUIClient.cachedCompleteRules.clear();
 
-        Map<String, String> serverValues = incompleteRulesFromServer.stream()
-                .filter(r -> r.name != null)
-                .collect(Collectors.toMap(r -> r.name, r -> r.value));
-
-        cachedCompleteRules.clear();
-        for (RulesCacheManager.CachedRuleEntry entry : mergedMap.values()) {
+         for(RulesCacheManager.CachedRuleEntry entry : mergedMap.values()) {
             RuleData rule = entry.toRuleData(lang, rawCache.categories);
-            rule.value = serverValues.getOrDefault(rule.name, rule.defaultValue);
-            if (fromRuleGroupScreen) rule.value = rule.defaultValue;
-            cachedCompleteRules.put(rule.name, rule);
-        }
-    }
-
-    private static void refreshCachedCategories(Collection<RuleData> rules) {
-        cachedCategories.clear();
-        for (RulesEditScreen.DefaultCategory entry : RulesEditScreen.DefaultCategory.values()) {
-            if (!entry.equals(RulesEditScreen.DefaultCategory.SEARCHING)) {
-                cachedCategories.add(entry.getName());
+            rule.value = (String)serverValues.getOrDefault(rule.name, rule.defaultValue);
+            if (fromRuleGroupScreen) {
+               rule.value = rule.defaultValue;
             }
-        }
-        for (RuleData data : rules) {
-            for (Map.Entry<?, String> entry : data.categories) {
-                cachedCategories.add(entry.getValue());
-            }
-        }
-    }
 
-    private static void refreshDefaultAndFavoriteRules(String defaults, boolean fromRuleGroupScreen) {
-        defaultRules.clear();
-        if (!fromRuleGroupScreen) {
-            Collections.addAll(defaultRules, defaults.split(";"));
-        }
-        favoriteRules.clear();
-        favoriteRules.addAll(CarpetGUIConfigManager.readFavoriteRules());
-    }
-    public static void openRuleEditScreen(boolean instantAffect) {
-        Minecraft client = Minecraft.getInstance();
-        if (hasModOnServer) {
-            String lang = client.getLanguageManager().getSelected();
-            List<String> knownRuleNames = new ArrayList<>();
+            CarpetGUIClient.cachedCompleteRules.put(rule.name, rule);
+         }
 
-            if (incompleteRulesFromServer != null && !incompleteRulesFromServer.isEmpty()) {
+      }
+   }
 
-                RulesCacheManager.RawCacheData rawCache = RulesCacheManager.loadRawCache();
+   private static void refreshCachedCategories(Collection<RuleData> rules) {
+      CarpetGUIClient.cachedCategories.clear();
 
-                if (rawCache != null) {
-                    Map<String, RulesCacheManager.CachedRuleEntry> cacheMap = rawCache.rules.stream()
-                            .collect(Collectors.toMap(r -> r.name, r -> r));
+      for(RulesEditScreen.DefaultCategory entry : RulesEditScreen.DefaultCategory.values()) {
+         if (!entry.equals(RulesEditScreen.DefaultCategory.SEARCHING)) {
+            CarpetGUIClient.cachedCategories.add(entry.getName());
+         }
+      }
 
-                    for (RuleData serverRule : incompleteRulesFromServer) {
-                        if (serverRule.name == null) continue;
+      for(RuleData data : rules) {
+         for(Map.Entry<?, String> entry : data.categories) {
+            CarpetGUIClient.cachedCategories.add((String)entry.getValue());
+         }
+      }
 
-                        RulesCacheManager.CachedRuleEntry cached = cacheMap.get(serverRule.name);
-                        if (cached == null) continue;
+   }
+
+   private static void refreshDefaultAndFavoriteRules(String defaults, boolean fromRuleGroupScreen) {
+      CarpetGUIClient.defaultRules.clear();
+      if (!fromRuleGroupScreen) {
+         Collections.addAll(CarpetGUIClient.defaultRules, defaults.split(";"));
+      }
+
+      CarpetGUIClient.favoriteRules.clear();
+      CarpetGUIClient.favoriteRules.addAll(CarpetGUIConfigManager.readFavoriteRules());
+   }
+
+   public static void openRuleEditScreen(boolean instantAffect) {
+      Minecraft client = Minecraft.getInstance();
+      if (CarpetGUIClient.hasModOnServer) {
+         String lang = client.getLanguageManager().getSelected();
+         List<String> knownRuleNames = new ArrayList();
+         if (CarpetGUIClient.incompleteRulesFromServer != null && !CarpetGUIClient.incompleteRulesFromServer.isEmpty()) {
+            RulesCacheManager.RawCacheData rawCache = RulesCacheManager.loadRawCache();
+            if (rawCache != null) {
+               Map<String, RulesCacheManager.CachedRuleEntry> cacheMap = (Map)rawCache.rules.stream().collect(Collectors.toMap((r) -> r.name, (r) -> r));
+
+               for(RuleData serverRule : CarpetGUIClient.incompleteRulesFromServer) {
+                  if (serverRule.name != null) {
+                     RulesCacheManager.CachedRuleEntry cached = (RulesCacheManager.CachedRuleEntry)cacheMap.get(serverRule.name);
+                     if (cached != null) {
                         boolean hasLocalName = cached.localName.containsKey(lang);
                         boolean hasLocalDesc = cached.localDescription.containsKey(lang);
-
-                        boolean hasAllCategories = rawCache.categories.stream()
-                                .filter(cat -> cached.categories.contains(cat.key))
-                                .allMatch(cat -> cat.value.containsKey(lang));
-
+                        boolean hasAllCategories = rawCache.categories.stream().filter((cat) -> cached.categories.contains(cat.key)).allMatch((cat) -> cat.value.containsKey(lang));
                         if (hasLocalName && hasLocalDesc && hasAllCategories) {
-                            knownRuleNames.add(serverRule.name);
+                           knownRuleNames.add(serverRule.name);
                         }
-                    }
-                }
+                     }
+                  }
+               }
             }
+         }
 
-            ClientPlayNetworking.send(new RequestRulesPayload(lang, knownRuleNames));
-            requesting = true;
-        } else {
-            openScreenFromCache(client, instantAffect);
-        }
-    }
-    private static void openScreenFromCache(Minecraft client, boolean instantAffect) {
-        String addr = getServerAddress(client);
-        if (addr == null) return;
+         ClientPlayNetworking.send(new RequestRulesPayload(lang, knownRuleNames));
+         CarpetGUIClient.requesting = true;
+      } else {
+         openScreenFromCache(client, instantAffect);
+      }
 
-        String lang = client.getLanguageManager().getSelected();
-        Optional<RulesCacheManager.CacheResult> cacheOpt = RulesCacheManager.loadCache(lang);
+   }
 
-        cacheOpt.ifPresent(cache -> {
-            client.execute(() -> {
-                cachedCompleteRules.clear();
-                for(RuleData ruleData: cache.rules()){
-                    CarpetGUIClient.cachedCompleteRules.put(ruleData.name, ruleData);
-                }
+   private static void openScreenFromCache(Minecraft client, boolean instantAffect) {
+      String addr = CarpetGUIClient.getServerAddress(client);
+      if (addr != null) {
+         String lang = client.getLanguageManager().getSelected();
+         Optional<RulesCacheManager.CacheResult> cacheOpt = RulesCacheManager.loadCache(lang);
+         cacheOpt.ifPresent((cache) -> client.execute(() -> {
+               CarpetGUIClient.cachedCompleteRules.clear();
 
-                cachedCategories.clear();
-                for (var entry : RulesEditScreen.DefaultCategory.values()) {
-                    if (!entry.equals(RulesEditScreen.DefaultCategory.SEARCHING)) {
-                        cachedCategories.add(entry.getName());
-                    }
-                }
-                cachedCategories.addAll(
-                        cache.rules().stream()
-                                .flatMap(r -> r.categories.stream())
-                                .distinct()
-                                .map(Map.Entry::getValue)
-                                .toList()
-                );
+               for(RuleData ruleData : cache.rules()) {
+                  CarpetGUIClient.cachedCompleteRules.put(ruleData.name, ruleData);
+               }
 
-                defaultRules.clear();
-                defaultRules.addAll(Arrays.stream(cache.defaults().split(";")).toList());
+               CarpetGUIClient.cachedCategories.clear();
 
-                favoriteRules.clear();
-                favoriteRules.addAll(CarpetGUIConfigManager.readFavoriteRules());
+               for(RulesEditScreen.DefaultCategory entry : RulesEditScreen.DefaultCategory.values()) {
+                  if (!entry.equals(RulesEditScreen.DefaultCategory.SEARCHING)) {
+                     CarpetGUIClient.cachedCategories.add(entry.getName());
+                  }
+               }
 
-                if (incompleteRulesFromServer != null && !incompleteRulesFromServer.isEmpty()) {
-                    Map<String, RuleData> cachedMap = new HashMap<>();
-                    for (RuleData rule : cachedCompleteRules.values()) {
-                        if (rule.name != null) {
-                            cachedMap.put(rule.name, rule);
-                        }
-                    }
+               CarpetGUIClient.cachedCategories.addAll(cache.rules().stream().flatMap((r) -> r.categories.stream()).distinct().map(Map.Entry::getValue).toList());
+               CarpetGUIClient.defaultRules.clear();
+               CarpetGUIClient.defaultRules.addAll(Arrays.stream(cache.defaults().split(";")).toList());
+               CarpetGUIClient.favoriteRules.clear();
+               CarpetGUIClient.favoriteRules.addAll(CarpetGUIConfigManager.readFavoriteRules());
+               if (CarpetGUIClient.incompleteRulesFromServer != null && !CarpetGUIClient.incompleteRulesFromServer.isEmpty()) {
+                  Map<String, RuleData> cachedMap = new HashMap();
 
-                    for (RuleData serverRule : incompleteRulesFromServer) {
-                        if (serverRule.name == null || serverRule.name.isEmpty()) {
-                            continue;
-                        }
+                  for(RuleData rule : CarpetGUIClient.cachedCompleteRules.values()) {
+                     if (rule.name != null) {
+                        cachedMap.put(rule.name, rule);
+                     }
+                  }
 
-                        RuleData existing = cachedMap.get(serverRule.name);
-
+                  for(RuleData serverRule : CarpetGUIClient.incompleteRulesFromServer) {
+                     if (serverRule.name != null && !serverRule.name.isEmpty()) {
+                        RuleData existing = (RuleData)cachedMap.get(serverRule.name);
                         if (existing != null) {
-                            existing.value = serverRule.value;
-                            if (serverRule.manager != null) {
-                                existing.manager = serverRule.manager;
-                            }
+                           existing.value = serverRule.value;
+                           if (serverRule.manager != null) {
+                              existing.manager = serverRule.manager;
+                           }
                         } else {
-                            RuleData newRule = new RuleData();
-                            newRule.manager = serverRule.manager;
-                            newRule.name = serverRule.name;
-                            newRule.value = serverRule.value;
-                            String unknown = Component.translatable("gui.tip.unknown_rule").getString();
-                            newRule.localName = serverRule.name;
-                            newRule.defaultValue = serverRule.value;
-                            newRule.description = unknown;
-                            newRule.localDescription = unknown;
-                            newRule.type = null;
-                            newRule.suggestions = serverRule.value.equals("true") || serverRule.value.equals("false") ? List.of("true", "false") : List.of("");
-                            newRule.categories = List.of(Map.entry("unkown", Component.translatable("gui.category.unknown").getString()));
-                            newRule.isGamerule = false;
-
-                            cachedCompleteRules.put(newRule.name, newRule);
-                            cachedMap.put(newRule.name, newRule);
+                           RuleData newRule = new RuleData();
+                           newRule.manager = serverRule.manager;
+                           newRule.name = serverRule.name;
+                           newRule.value = serverRule.value;
+                           String unknown = Component.translatable("gui.tip.unknown_rule").getString();
+                           newRule.localName = serverRule.name;
+                           newRule.defaultValue = serverRule.value;
+                           newRule.description = unknown;
+                           newRule.localDescription = unknown;
+                           newRule.type = null;
+                           newRule.suggestions = !serverRule.value.equals("true") && !serverRule.value.equals("false") ? List.of("") : List.of("true", "false");
+                           newRule.categories = List.of(Map.entry("unkown", Component.translatable("gui.category.unknown").getString()));
+                           newRule.isGamerule = false;
+                           CarpetGUIClient.cachedCompleteRules.put(newRule.name, newRule);
+                           cachedMap.put(newRule.name, newRule);
                         }
-                    }
+                     }
+                  }
 
-                    for (RuleData cachedRule : cachedCompleteRules.values()) {
-                        if (cachedRule.name == null) continue;
-
-                        boolean existsOnServer = incompleteRulesFromServer.stream()
-                                .anyMatch(sr -> sr.name != null && sr.name.equals(cachedRule.name));
-
+                  for(RuleData cachedRule : CarpetGUIClient.cachedCompleteRules.values()) {
+                     if (cachedRule.name != null) {
+                        boolean existsOnServer = CarpetGUIClient.incompleteRulesFromServer.stream().anyMatch((sr) -> sr.name != null && sr.name.equals(cachedRule.name));
                         if (!existsOnServer && !cachedRule.isGamerule) {
-                            cachedMap.remove(cachedRule.name);
+                           cachedMap.remove(cachedRule.name);
                         }
-                    }
-                }
-                client.setScreen(new RulesEditScreen(instantAffect));
-            });
-        });
-    }
+                     }
+                  }
+               }
+
+               client.setScreenAndShow(new RulesEditScreen(instantAffect));
+            }));
+      }
+   }
 }

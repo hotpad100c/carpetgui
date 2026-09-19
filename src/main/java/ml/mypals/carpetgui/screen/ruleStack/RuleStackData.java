@@ -1,13 +1,7 @@
 package ml.mypals.carpetgui.screen.ruleStack;
 
+import java.util.List;
 import ml.mypals.carpetgui.network.server.RuleStackSyncPayload;
 
-import java.util.List;
-
-public record RuleStackData(
-        String activePrefabName,
-        List<String> allPrefabNames,
-        List<RuleStackSyncPayload.LayerInfo> layers,
-        List<RuleStackSyncPayload.ChangeInfo> pendingChanges,
-        List<RuleStackSyncPayload.LayerInfo> futureLayers
-) {}
+public record RuleStackData(String activePrefabName, List<String> allPrefabNames, List<RuleStackSyncPayload.LayerInfo> layers, List<RuleStackSyncPayload.ChangeInfo> pendingChanges, List<RuleStackSyncPayload.LayerInfo> futureLayers) {
+}

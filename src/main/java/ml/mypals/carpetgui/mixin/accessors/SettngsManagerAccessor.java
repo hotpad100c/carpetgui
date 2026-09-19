@@ -6,12 +6,14 @@ import net.minecraft.commands.CommandSourceStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(SettingsManager.class)
+@Mixin({SettingsManager.class})
 public interface SettngsManagerAccessor {
-    @Invoker("setRule")
-    int carpetGUI$setRule(CommandSourceStack source, CarpetRule<?> rule, String newValue);
-    @Invoker("setDefault")
-    int carpetGUI$setDefault(CommandSourceStack source, CarpetRule<?> rule, String stringValue);
-    @Invoker("removeDefault")
-    int carpetGUI$removeDefault(CommandSourceStack source, CarpetRule<?> rule);
+   @Invoker("setRule")
+   int carpetGUI$setRule(CommandSourceStack var1, CarpetRule<?> var2, String var3);
+
+   @Invoker("setDefault")
+   int carpetGUI$setDefault(CommandSourceStack var1, CarpetRule<?> var2, String var3);
+
+   @Invoker("removeDefault")
+   int carpetGUI$removeDefault(CommandSourceStack var1, CarpetRule<?> var2);
 }

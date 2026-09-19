@@ -25,11 +25,21 @@
   "mixins": [
     "carpetgui.mixins.json"
   ],
+  "accessWidener": "carpetgui.accesswidener",
   "depends": {
     "fabricloader": "*",
     "minecraft": "${minecraft}",
-	"fabric-api": "*",
-    "carpet": "*",
-    "owo": "*"
+    "fabric-api": "*",
+    "carpet": "*"
+  },
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/client/gui/components/AbstractWidget": [
+        "ml/mypals/carpetgui/ui/inject/UIComponentStub"
+      ],
+      "net/minecraft/client/gui/components/EditBox": [
+        "ml/mypals/carpetgui/ui/inject/GreedyInputUIComponent"
+      ]
+    }
   }
 }

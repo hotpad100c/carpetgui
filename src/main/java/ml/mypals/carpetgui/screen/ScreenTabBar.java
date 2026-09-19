@@ -1,80 +1,88 @@
 package ml.mypals.carpetgui.screen;
-import io.wispforest.owo.ui.component.UIComponents;
-import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.*;
-import ml.mypals.carpetgui.CarpetGUIClient;
+
 import ml.mypals.carpetgui.network.client.CarpetGUIClientPacketHandler;
 import ml.mypals.carpetgui.network.client.RequestRuleStackPayload;
 import ml.mypals.carpetgui.screen.ruleGroup.RuleGroupScreen;
 import ml.mypals.carpetgui.screen.ruleStack.RuleStackScreen;
+import ml.mypals.carpetgui.ui.component.LabelComponent;
+import ml.mypals.carpetgui.ui.component.UIComponents;
+import ml.mypals.carpetgui.ui.container.FlowLayout;
+import ml.mypals.carpetgui.ui.container.UIContainers;
+import ml.mypals.carpetgui.ui.core.Color;
+import ml.mypals.carpetgui.ui.core.CursorStyle;
+import ml.mypals.carpetgui.ui.core.Insets;
+import ml.mypals.carpetgui.ui.core.Sizing;
+import ml.mypals.carpetgui.ui.core.Surface;
+import ml.mypals.carpetgui.ui.core.VerticalAlignment;
+import ml.mypals.carpetgui.ui.event.UIEvents.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 
-
 public class ScreenTabBar {
+   public static void build(FlowLayout root, Tab activeTab) {
+      FlowLayout tabBar = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(7));
+      tabBar.surface(Surface.flat(1712986650));
+      tabBar.verticalAlignment(VerticalAlignment.CENTER);
+      tabBar.gap(2);
+      tabBar.padding(Insets.of(2, 0, 4, 4));
 
-    public enum Tab {
-        RULES(0,   "gui.tab.rules"),
-        STACK(1,   "gui.tab.stack"),
-        GROUPS(2,  "gui.tab.groups");
+      for(Tab tab : ScreenTabBar.Tab.values()) {
+         boolean isActive = tab == activeTab;
+         LabelComponent label = UIComponents.label(Component.translatable(tab.key));
+         label.color(Color.ofArgb(isActive ? -1 : 1722460842));
+         FlowLayout btn = UIContainers.horizontalFlow(Sizing.content(), Sizing.fill(100));
+         btn.verticalAlignment(VerticalAlignment.CENTER);
+         btn.padding(Insets.horizontal(8));
+         btn.cursorStyle(CursorStyle.HAND);
+         btn.surface(Surface.flat(isActive ? 1724895183 : 0).and(Surface.outline(1722789807)));
+         btn.child(label);
+         if (!isActive) {
+            btn.mouseDown().subscribe((MouseDown)(mouseButtonEvent, b) -> {
+               onTabClick(tab);
+               Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+               return true;
+            });
+         }
 
-        public final int index;
-        public final String key;
-        Tab(int index, String key) { this.index = index; this.key = key; }
-    }
+         tabBar.child(btn);
+      }
 
-    public static void build(FlowLayout root, Tab activeTab) {
-        FlowLayout tabBar = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.horizontalFlow(
-                Sizing.fill(100), Sizing.fill(7));
-        tabBar.surface(Surface.flat(0x661A1A1A));
-        tabBar.verticalAlignment(VerticalAlignment.CENTER);
-        tabBar.gap(2);
-        tabBar.padding(Insets.of(2,0,4,4));
+      root.child(0, tabBar);
+   }
 
-        for (Tab tab : Tab.values()) {
-            boolean isActive = tab == activeTab;
+   private static void onTabClick(Tab tab) {
+      switch (tab.ordinal()) {
+         case 0:
+            CarpetGUIClientPacketHandler.openRuleEditScreen(true);
+            break;
+         case 1:
+            Minecraft.getInstance().setScreenAndShow(new RuleStackScreen());
+            ClientPlayNetworking.send(new RequestRuleStackPayload());
+            break;
+         case 2:
+            Minecraft.getInstance().setScreenAndShow(new RuleGroupScreen());
+      }
 
-            var label = /*? if <1.21.11 {*//*Components*//*?} else {*/UIComponents/*?}*/.label(Component.translatable(tab.key));
-            label.color(Color.ofArgb(isActive ? 0xFFFFFFFF : 0x66AAAAAA));
+   }
 
-            FlowLayout btn = /*? if <1.21.11 {*//*Containers*//*?} else {*/UIContainers/*?}*/.horizontalFlow(
-                    Sizing.content(), Sizing.fill(100));
-            btn.verticalAlignment(VerticalAlignment.CENTER);
-            btn.padding(Insets.horizontal(8));
-            btn.cursorStyle(CursorStyle.HAND);
-            btn.surface(Surface.flat(isActive ? 0x66CFCFCF : 0x00000000).and(Surface.outline(0x66AFAFAF)));
-            btn.child(label);
+   public static enum Tab {
+      RULES(0, "gui.tab.rules"),
+      STACK(1, "gui.tab.stack"),
+      GROUPS(2, "gui.tab.groups");
 
-            if (!isActive) {
-                //? if <1.21.9 {
-                /*btn.mouseDown().subscribe((x, y, b) -> {
-                 *///?} else {
-                btn.mouseDown().subscribe((mouseButtonEvent, b) -> {
-                //?}
-                    onTabClick(tab);
-                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
-                    return true;
-                });
-            }
+      public final int index;
+      public final String key;
 
-            tabBar.child(btn);
-        }
+      private Tab(int index, String key) {
+         this.index = index;
+         this.key = key;
+      }
 
-        root.child(0, tabBar);
-    }
-
-    private static void onTabClick(Tab tab) {
-        switch (tab) {
-            case RULES  -> CarpetGUIClientPacketHandler.openRuleEditScreen(true);
-            case STACK  -> {
-                Minecraft.getInstance().setScreen(new RuleStackScreen());
-                ClientPlayNetworking.send(new RequestRuleStackPayload());
-            }
-            case GROUPS -> Minecraft.getInstance().setScreen(new RuleGroupScreen());
-        }
-    }
+      private static Tab[] $values() {
+         return new Tab[]{RULES, STACK, GROUPS};
+      }
+   }
 }

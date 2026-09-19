@@ -31,7 +31,9 @@ dependencies {
     implementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
     implementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
-    implementation("io.wispforest:owo-lib:${property("deps.owo_version")}")
+    if (project.hasProperty("deps.owo_version")) {
+        implementation("io.wispforest:owo-lib:${property("deps.owo_version")}")
+    }
     //include("io.wispforest:owo-sentinel:${property("deps.owo_version")}")
 
     implementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
@@ -39,7 +41,7 @@ dependencies {
 
 loom {
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json") // Useful for interface injection
-    //accessWidenerPath = rootProject.file("src/main/resources/carpetgui.accesswidener")
+    accessWidenerPath = rootProject.file("src/main/resources/carpetgui.accesswidener")
 
     decompilerOptions.named("vineflower") {
         options.put("mark-corresponding-synthetics", "1") // Adds names to lambdas - useful for mixins
