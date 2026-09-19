@@ -12,10 +12,10 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 //? if <26.1 {
 
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-//?} else {
-/*import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-*///?}
+/*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+*///?} else {
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+//?}
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
@@ -34,8 +34,8 @@ import static ml.mypals.carpetgui.CarpetGUI.MOD_ID;
 public class CarpetGUIClient implements ClientModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
-    public static final String VERSION = /*$ mod_version*/ "1.3.2";
-    public static final String MINECRAFT = /*$ minecraft*/ "1.21.11";
+    public static final String VERSION = /*$ mod_version*/ "1.3.5";
+    public static final String MINECRAFT = /*$ minecraft*/ "26.1";
 
     public static KeyMapping carpetRulesKeyBind;
     public static RuleStackData cachedRuleStackData;
@@ -54,10 +54,10 @@ public class CarpetGUIClient implements ClientModInitializer {
         CarpetGUIConfigManager.initializeConfig();
 
         //? if <26.1 {
-        carpetRulesKeyBind = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-        //?} else {
-        /*carpetRulesKeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-        *///?}
+        /*carpetRulesKeyBind = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        *///?} else {
+        carpetRulesKeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        //?}
                 "carpetgui.key.carpetRulesKeyBind",
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_F9,

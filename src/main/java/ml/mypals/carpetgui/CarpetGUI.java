@@ -62,8 +62,8 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
     public static final String MOD_ID = "carpetgui";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final String VERSION = /*$ mod_version*/ "1.3.2";
-    public static final String MINECRAFT = /*$ minecraft*/ "1.21.11";
+    public static final String VERSION = /*$ mod_version*/ "1.3.5";
+    public static final String MINECRAFT = /*$ minecraft*/ "26.1";
 
     private static PrefabManager prefabManager;
 
@@ -82,12 +82,12 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
         //? if >=1.20.5 {
         
-        PayloadTypeRegistry.playC2S().register(RequestRulesPayload.ID, RequestRulesPayload.CODEC);
-        PayloadTypeRegistry.playC2S().register(RequestRuleStackPayload.ID, RequestRuleStackPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(RequestRulesPayload.ID, RequestRulesPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(RequestRuleStackPayload.ID, RequestRuleStackPayload.CODEC);
 
-        PayloadTypeRegistry.playS2C().register(RulesPacketPayload.ID, RulesPacketPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(HelloPacketPayload.ID, HelloPacketPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(RuleStackSyncPayload.ID, RuleStackSyncPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(RulesPacketPayload.ID, RulesPacketPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(HelloPacketPayload.ID, HelloPacketPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(RuleStackSyncPayload.ID, RuleStackSyncPayload.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(RequestRulesPayload.ID,
             (payload, context) ->
                 CarpetGUIServerPacketHandler.handleRequestRules(payload, context.player(),
@@ -197,10 +197,10 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
         //? if <1.21.11 {
         /*return server.getGameRules();
         *///?} else if <26.1 {
-        return server.getWorldData().getGameRules();
-        //?} else {
-        /*return server.getGameRules();
-        *///?}
+        /*return server.getWorldData().getGameRules();
+        *///?} else {
+        return server.getGameRules();
+        //?}
     }
     public static List<RuleData> getRules(SettingsManager settingsManager, String lang) {
         List<RuleData> rules = new ArrayList<>();
