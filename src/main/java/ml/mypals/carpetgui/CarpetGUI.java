@@ -70,7 +70,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
    public static final String MOD_ID = "carpetgui";
    public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
    public static final String VERSION = /*$ mod_version*/ "1.3.6";
-   public static final String MINECRAFT = /*$ minecraft*/ "1.17.1";
+   public static final String MINECRAFT = /*$ minecraft*/ "1.16.5";
    private static PrefabManager prefabManager;
 
    public void onInitialize() {
@@ -318,10 +318,10 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
             List<String> var9;
             try {
-               //?if<=1.17.1{
+               //? if <=1.17.1 {
                JsonParser parser = new JsonParser();
                JsonObject root = parser.parse(new JsonReader(reader)).getAsJsonObject();
-               //?}else{
+               //?} else {
                /*JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
                *///?}
                JsonObject rules = root.getAsJsonObject("rules");

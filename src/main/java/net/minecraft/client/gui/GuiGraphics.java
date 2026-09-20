@@ -2,8 +2,12 @@
 package net.minecraft.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.List;
+
+import com.mojang.blaze3d.vertex.Tesselator;
 import ml.mypals.carpetgui.mixin.ui.ScreenAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -47,7 +51,15 @@ public class GuiGraphics {
     }
 
     public void fillGradient(int minX, int minY, int maxX, int maxY, int color1, int color2) {
-        GuiComponent.fillGradient(this.pose, minX, minY, maxX, maxY, color1, color2, 0);
+        //?if<=1.16.5{
+
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferBuilder = tesselator.getBuilder();
+        bufferBuilder.begin(7, DefaultVertexFormat.POSITION_COLOR);
+        GuiComponent.fillGradient(this.pose.last().pose(), bufferBuilder ,minX, minY, maxX, maxY, color1, color2, 0);
+        //?}else{
+        /*GuiComponent.fillGradient(this.pose, minX, minY, maxX, maxY, color1, color2, 0);
+        *///?}
     }
 
     public void renderOutline(int x, int y, int width, int height, int color) {
@@ -130,12 +142,20 @@ public class GuiGraphics {
     }
 
     public void blit(ResourceLocation texture, int x, int y, int u, int v, int width, int height) {
-        RenderSystem.setShaderTexture(0, texture);
+        //? if <1.17 {
+        this.minecraft.getTextureManager().bind(texture);
+        //?} else {
+        /*RenderSystem.setShaderTexture(0, texture);
+        *///?}
         GuiComponent.blit(this.pose, x, y, 0, (float)u, (float)v, width, height, 256, 256);
     }
 
     public void blit(ResourceLocation texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
-        RenderSystem.setShaderTexture(0, texture);
+        //? if <1.17 {
+        this.minecraft.getTextureManager().bind(texture);
+        //?} else {
+        /*RenderSystem.setShaderTexture(0, texture);
+        *///?}
         GuiComponent.blit(this.pose, x, y, 0, u, v, width, height, textureWidth, textureHeight);
     }
 
@@ -145,13 +165,25 @@ public class GuiGraphics {
         }
     }
 
-    //? if <1.19.3 {
+    //? if <1.17 {
     public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y) {
+        if (this.minecraft.screen != null) {
+            List<FormattedCharSequence> lines = new java.util.ArrayList<>();
+            for (ClientTooltipComponent comp : components) {
+                if (comp != null && comp.getText() != null) {
+                    lines.add(comp.getText());
+                }
+            }
+            this.minecraft.screen.renderTooltip(this.pose, lines, x, y);
+        }
+    }
+    //?} elif <1.19.3 {
+    /*public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y) {
         if (this.minecraft.screen != null) {
             ((ScreenAccessor)this.minecraft.screen).carpetGUI$renderTooltipInternal(this.pose, components, x, y);
         }
     }
-    //?} else {
+    *///?} else {
     /*public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y) {
         this.renderTooltip(font, components, x, y, net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner.INSTANCE);
     }

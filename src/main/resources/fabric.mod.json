@@ -28,7 +28,8 @@
   "depends": {
     "fabricloader": "*",
     "minecraft": "${minecraft}",
-    "carpet": "*"
+    "carpet": "*",
+    "java": ">=${java_version}"
   },
   "custom": {
     "loom:injected_interfaces": {

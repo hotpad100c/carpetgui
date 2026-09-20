@@ -59,13 +59,13 @@ public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean 
     public static final ResourceLocation ID = PacketIDs.SYNC_RULES_ID;
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeCollection(this.rules, (b, v) -> v.write(b));
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.rules, (b, v) -> v.write(b));
         buf.writeUtf(this.defaults);
         buf.writeBoolean(this.isPartial);
     }
 
     public static RulesPacketPayload read(FriendlyByteBuf buf) {
-        return new RulesPacketPayload(buf.readList(RuleData::new), buf.readUtf(), buf.readBoolean());
+        return new RulesPacketPayload(ml.mypals.carpetgui.network.BufUtils.readList(buf, RuleData::new), buf.readUtf(), buf.readBoolean());
     }
 }
 //?}

@@ -172,7 +172,11 @@ public final class SettingsWatcher {
                 } else if (value instanceof GameRules.IntegerValue integerValue) {
                     int sv = Integer.parseInt(snapshot.value());
                     if (!(integerValue.get() == sv)) {
-                        integerValue.set(sv, source.getServer());
+                        //? if <1.18 {
+                        integerValue.tryDeserialize(snapshot.value());
+                        //?} else {
+                        /*integerValue.set(sv, source.getServer());
+                        *///?}
                     }
                 }
             } catch (Exception ignored) {

@@ -57,7 +57,7 @@ public class TextBoxComponent extends EditBox {
    @Override
    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
       boolean result = super.keyPressed(keyCode, scanCode, modifiers);
-      if (keyCode == com.mojang.blaze3d.platform.InputConstants.KEY_TAB) {
+      if (keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_TAB) {
          this.insertText("    ");
          return true;
       } else {

@@ -55,15 +55,15 @@ public class RuleData {
       buf.writeUtf(this.value);
       buf.writeUtf(this.description);
       buf.writeUtf(this.localDescription);
-      buf.writeCollection(this.suggestions, FriendlyByteBuf::writeUtf);
-      buf.writeCollection(this.categories, (bf, entry) -> {
+      BufUtils.writeCollection(buf, this.suggestions, FriendlyByteBuf::writeUtf);
+      BufUtils.writeCollection(buf, this.categories, (bf, entry) -> {
          bf.writeUtf((String)entry.getKey());
          bf.writeUtf((String)entry.getValue());
       });
    }
 
    public RuleData(FriendlyByteBuf buf) {
-      this(buf.readUtf(), buf.readUtf(), buf.readUtf(), getRuleType(buf.readUtf()), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf), buf.readList((bf) -> Map.entry(bf.readUtf(), bf.readUtf())));
+      this(buf.readUtf(), buf.readUtf(), buf.readUtf(), getRuleType(buf.readUtf()), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(), BufUtils.readList(buf, FriendlyByteBuf::readUtf), BufUtils.readList(buf, (bf) -> Map.entry(bf.readUtf(), bf.readUtf())));
       if (((String)((Map.Entry)this.categories.get(0)).getKey()).equals("gamerule")) {
          this.isGamerule = true;
          this.localDescription = new net.minecraft.network.chat.TranslatableComponent(this.localDescription).getString();

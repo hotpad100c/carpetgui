@@ -60,7 +60,11 @@ public abstract class BaseOwoScreen<R extends ParentUIComponent> extends Screen 
          }
 
          if (this.uiAdapter != null) {
-            this.addRenderableWidget(this.uiAdapter);
+            //? if <1.17 {
+            this.addWidget(this.uiAdapter);
+            //?} else {
+            /*this.addRenderableWidget(this.uiAdapter);
+            *///?}
          }
 
          //? if <1.20 {
@@ -87,6 +91,11 @@ public abstract class BaseOwoScreen<R extends ParentUIComponent> extends Screen 
    public void render(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float a) {
       if (!this.invalid) {
          super.render(poseStack, mouseX, mouseY, a);
+         //? if <1.17 {
+         if (this.uiAdapter != null) {
+            this.uiAdapter.render(poseStack, mouseX, mouseY, a);
+         }
+         //?}
       } else {
          this.onClose();
       }

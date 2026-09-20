@@ -225,10 +225,10 @@ public class PrefabManager {
          return false;
       } else {
          try {
-            //?if<=1.17.1{
+            //? if <=1.17.1 {
             JsonParser jsonParser = new JsonParser();
             JsonObject root = jsonParser.parse(Files.readString(this.saveFile)).getAsJsonObject();
-            //?}else{
+            //?} else {
             /*JsonObject root = JsonParser.parseString(Files.readString(this.saveFile)).getAsJsonObject();
              *///?}
 

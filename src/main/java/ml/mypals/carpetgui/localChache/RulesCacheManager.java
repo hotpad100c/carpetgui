@@ -64,9 +64,9 @@ public class RulesCacheManager {
                         String key = obj.get("key").getAsString();
                         JsonElement val = obj.get("value");
                         if (val != null && val.isJsonObject()) {
-                           //?if<=1.17.1{
+                           //? if <=1.17.1 {
                            oldCategoryValues.put(key, deepCopy(val.getAsJsonObject()));
-                           //?}else{
+                           //?} else {
                            /*oldCategoryValues.put(key, val.getAsJsonObject().deepCopy());
                             *///?}
                         }
@@ -518,9 +518,9 @@ public class RulesCacheManager {
       JsonElement el = ruleObj.get(field);
       if (el != null) {
          if (el.isJsonObject()) {
-            //?if<=1.17.1{
+            //? if <=1.17.1 {
             target.put(ruleName, deepCopy(el.getAsJsonObject()));
-            //?}else{
+            //?} else {
             /*target.put(ruleName, el.getAsJsonObject().deepCopy());
             *///?}
          }
@@ -528,7 +528,7 @@ public class RulesCacheManager {
       }
    }
 
-   //?if<=1.17.1{
+   //? if <=1.17.1 {
    private static JsonObject deepCopy(JsonObject jsonObject) {
       return GSON.fromJson(GSON.toJson(jsonObject), JsonObject.class);
    }

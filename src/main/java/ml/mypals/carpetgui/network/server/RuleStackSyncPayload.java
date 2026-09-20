@@ -75,14 +75,14 @@ public record RuleStackSyncPayload(
 
     public void write(FriendlyByteBuf buf) {
         buf.writeUtf(activePrefabName);
-        buf.writeCollection(allPrefabNames, FriendlyByteBuf::writeUtf);
-        buf.writeCollection(layers, (b, l) -> l.write(b));
-        buf.writeCollection(pendingChanges, (b, c) -> c.write(b));
-        buf.writeCollection(futureLayers, (b, l) -> l.write(b));
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, allPrefabNames, FriendlyByteBuf::writeUtf);
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, layers, (b, l) -> l.write(b));
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, pendingChanges, (b, c) -> c.write(b));
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, futureLayers, (b, l) -> l.write(b));
     }
 
     public static RuleStackSyncPayload read(FriendlyByteBuf buf) {
-        return new RuleStackSyncPayload(buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf), buf.readList(LayerInfo::read), buf.readList(ChangeInfo::read), buf.readList(LayerInfo::read));
+        return new RuleStackSyncPayload(buf.readUtf(), ml.mypals.carpetgui.network.BufUtils.readList(buf, FriendlyByteBuf::readUtf), ml.mypals.carpetgui.network.BufUtils.readList(buf, LayerInfo::read), ml.mypals.carpetgui.network.BufUtils.readList(buf, ChangeInfo::read), ml.mypals.carpetgui.network.BufUtils.readList(buf, LayerInfo::read));
     }
 //?}
 
@@ -108,10 +108,10 @@ public record RuleStackSyncPayload(
     public record LayerInfo(int id, String message, long timestamp, List<ChangeInfo> changes) {
         public void write(FriendlyByteBuf buf) {
             buf.writeInt(id); buf.writeUtf(message); buf.writeLong(timestamp);
-            buf.writeCollection(changes, (b, c) -> c.write(b));
+            ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, changes, (b, c) -> c.write(b));
         }
         public static LayerInfo read(FriendlyByteBuf buf) {
-            return new LayerInfo(buf.readInt(), buf.readUtf(), buf.readLong(), buf.readList(ChangeInfo::read));
+            return new LayerInfo(buf.readInt(), buf.readUtf(), buf.readLong(), ml.mypals.carpetgui.network.BufUtils.readList(buf, ChangeInfo::read));
         }
     }
 }

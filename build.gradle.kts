@@ -11,8 +11,7 @@ base.archivesName = property("mod.id") as String
 val requiredJava = when {
     stonecutter.eval(stonecutter.current.version, ">=1.20.6") -> JavaVersion.VERSION_21
     stonecutter.eval(stonecutter.current.version, ">=1.18") -> JavaVersion.VERSION_17
-    stonecutter.eval(stonecutter.current.version, ">=1.17") -> JavaVersion.VERSION_16
-    else -> JavaVersion.VERSION_1_8
+    else -> JavaVersion.VERSION_16
 }
 
 repositories {
@@ -49,6 +48,10 @@ dependencies {
         modImplementation(property("deps.carpet_dependency") as String)
     } else {
         modImplementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
+    }
+
+    if (stonecutter.eval(stonecutter.current.version, "<1.18")) {
+        compileOnly("org.slf4j:slf4j-api:1.7.30")
     }
 }
 
@@ -87,7 +90,8 @@ tasks {
             "id" to project.property("mod.id"),
             "name" to project.property("mod.name"),
             "version" to project.property("mod.version"),
-            "minecraft" to project.property("mod.mc_dep")
+            "minecraft" to project.property("mod.mc_dep"),
+            "java_version" to requiredJava.majorVersion
         )
 
         filesMatching("fabric.mod.json") { expand(props) }

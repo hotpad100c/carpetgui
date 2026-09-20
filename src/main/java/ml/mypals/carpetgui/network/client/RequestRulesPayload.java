@@ -58,11 +58,11 @@ public record RequestRulesPayload(String lang, List<String> knownRuleNames) {
 
     public void write(FriendlyByteBuf buf) {
         buf.writeUtf(this.lang);
-        buf.writeCollection(this.knownRuleNames, FriendlyByteBuf::writeUtf);
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.knownRuleNames, FriendlyByteBuf::writeUtf);
     }
 
     public static RequestRulesPayload read(FriendlyByteBuf buf) {
-        return new RequestRulesPayload(buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf));
+        return new RequestRulesPayload(buf.readUtf(), ml.mypals.carpetgui.network.BufUtils.readList(buf, FriendlyByteBuf::readUtf));
     }
 }
 //?}

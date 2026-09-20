@@ -5,7 +5,7 @@ plugins {
     // id("me.modmuss50.mod-publish-plugin") version "1.0.+" apply false
 }
 
-stonecutter active "1.17.1"
+stonecutter active "1.16.5"
 
 stonecutter tasks {
     order("runClient")
@@ -45,6 +45,8 @@ stonecutter parameters {
         string(eval(current.version, "<1.21.9")) {
             replace("InputConstants.isKeyDown(this.minecraft.getWindow(),", "InputConstants.isKeyDown(this.minecraft.getWindow().getWindow(),")
         }
+
+
         /*
         string(eval(current.version, "<1.21.11")) {
             replace("UIContainers.horizontalFlow", "Containers.horizontalFlow")

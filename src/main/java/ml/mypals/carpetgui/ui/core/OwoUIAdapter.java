@@ -15,8 +15,10 @@ import net.minecraft.client.gui.components.Widget;
 /*import net.minecraft.client.gui.components.Renderable;
 *///?}
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
+//? if >=1.17 {
+/*import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+*///?}
 import net.minecraft.client.gui.screens.Screen;
 //? if >=1.21.9 {
 /*import net.minecraft.client.input.CharacterEvent;
@@ -28,13 +30,16 @@ import ml.mypals.carpetgui.compat.input.KeyEvent;
 import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
 //?}
 
-public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListener,
+public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListener
 //? if <1.19 {
-Widget,
+, Widget
 //?} else {
-/*Renderable,
+/*, Renderable
 *///?}
-NarratableEntry {
+//? if >=1.17 {
+/*, NarratableEntry
+*///?}
+{
    private static boolean isRendering = false;
    public final R rootComponent;
    public final CursorAdapter cursorAdapter;
@@ -220,12 +225,14 @@ NarratableEntry {
    }
    //?}
 
-   public NarratableEntry.NarrationPriority narrationPriority() {
+   //? if >=1.17 {
+   /*public NarratableEntry.NarrationPriority narrationPriority() {
       return NarrationPriority.NONE;
    }
 
    public void updateNarration(NarrationElementOutput builder) {
    }
+   *///?}
 
    public static boolean isRendering() {
       return isRendering;
