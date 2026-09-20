@@ -5,7 +5,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import org.slf4j.Logger;
@@ -19,8 +19,8 @@ public final class UI {
    private UI() {
    }
 
-   public static Identifier id(String path) {
-      return Identifier.fromNamespaceAndPath("carpetgui", path);
+   public static ResourceLocation id(String path) {
+      return new ResourceLocation("carpetgui", path);
    }
 
    public static void debugWarn(Logger logger, String message) {
@@ -36,7 +36,11 @@ public final class UI {
    }
 
    public static final class Sounds {
-      public static final SoundEvent UI_INTERACTION = SoundEvent.createVariableRangeEvent(UI.id("ui.carpetgui.interaction"));
+      //? if <1.19 {
+      public static final SoundEvent UI_INTERACTION = new SoundEvent(UI.id("ui.carpetgui.interaction"));
+      //?} else {
+      /*public static final SoundEvent UI_INTERACTION = SoundEvent.createVariableRangeEvent(UI.id("ui.carpetgui.interaction"));
+      *///?}
 
       private Sounds() {
       }
@@ -48,7 +52,11 @@ public final class UI {
 
       @Environment(EnvType.CLIENT)
       public static void playButtonSound() {
-         play((SoundEvent)SoundEvents.UI_BUTTON_CLICK.value());
+         //? if <1.19 {
+         play(SoundEvents.UI_BUTTON_CLICK);
+         //?} else {
+         /*play((SoundEvent)SoundEvents.UI_BUTTON_CLICK.value());
+         *///?}
       }
 
       @Environment(EnvType.CLIENT)

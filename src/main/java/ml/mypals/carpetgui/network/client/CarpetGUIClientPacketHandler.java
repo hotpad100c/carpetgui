@@ -54,10 +54,10 @@ public class CarpetGUIClientPacketHandler {
          label22: {
             client = Minecraft.getInstance();
             //? if <26.2 {
-            /*Screen patt0$temp = client.screen;
-            *///?} else {
-            Screen patt0$temp = client.gui.screen();
-            //?}
+            Screen patt0$temp = client.screen;
+            //?} else {
+            /*Screen patt0$temp = client.gui.screen();
+            *///?}
             if (patt0$temp instanceof RuleGroupScreen rgs) {
                if (rgs.requestingRulesForNewGroup) {
                   var10000 = true;
@@ -77,7 +77,7 @@ public class CarpetGUIClientPacketHandler {
          }
 
          CarpetGUIClient.requesting = false;
-         client.setScreenAndShow(new RulesEditScreen(!fromRuleGroupScreen));
+         client.setScreen(new RulesEditScreen(!fromRuleGroupScreen));
       });
    }
 
@@ -94,18 +94,46 @@ public class CarpetGUIClientPacketHandler {
 
       refreshCachedCategories(CarpetGUIClient.cachedCompleteRules.values());
       refreshDefaultAndFavoriteRules(payload.defaults(), fromRuleGroupScreen);
-      String lang = client.getLanguageManager().getSelected();
+      String lang = getSelectedLanguage(client);
       EXECUTOR.execute(() -> {
          RulesCacheManager.saveCache(new ArrayList(CarpetGUIClient.cachedCompleteRules.values()), payload.defaults(), lang);
          CarpetGUIClient.cachedManagers = RulesCacheManager.loadKnownManagers();
       });
    }
 
+   public static String getSelectedLanguage(Minecraft client) {
+      //? if <1.19 {
+      return client.getLanguageManager().getSelected().getCode();
+      //?} else {
+      /*return client.getLanguageManager().getSelected();
+      *///?}
+   }
+
+   public static void send(RequestRulesPayload payload) {
+      //? if <1.19.4 {
+      net.minecraft.network.FriendlyByteBuf buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+      payload.write(buf);
+      ClientPlayNetworking.send(RequestRulesPayload.ID, buf);
+      //?} else {
+      /*ClientPlayNetworking.send(payload);
+      *///?}
+   }
+
+   public static void send(RequestRuleStackPayload payload) {
+      //? if <1.19.4 {
+      net.minecraft.network.FriendlyByteBuf buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+      payload.write(buf);
+      ClientPlayNetworking.send(RequestRuleStackPayload.ID, buf);
+      //?} else {
+      /*ClientPlayNetworking.send(payload);
+      *///?}
+   }
+
    private static void handlePartialPacket(RulesPacketPayload payload, boolean fromRuleGroupScreen, Minecraft client) {
-      String lang = client.getLanguageManager().getSelected();
+      String lang = getSelectedLanguage(client);
       RulesCacheManager.RawCacheData rawCache = RulesCacheManager.loadRawCache();
       if (rawCache == null) {
-         ClientPlayNetworking.send(new RequestRulesPayload(lang, List.of()));
+         send(new RequestRulesPayload(lang, List.of()));
       } else {
          Map<String, RulesCacheManager.CachedRuleEntry> mergedMap = buildMergedMap(rawCache, payload.rules(), lang);
          reconcileWithServerRules(mergedMap, rawCache, lang, fromRuleGroupScreen);
@@ -224,7 +252,7 @@ public class CarpetGUIClientPacketHandler {
    public static void openRuleEditScreen(boolean instantAffect) {
       Minecraft client = Minecraft.getInstance();
       if (CarpetGUIClient.hasModOnServer) {
-         String lang = client.getLanguageManager().getSelected();
+         String lang = getSelectedLanguage(client);
          List<String> knownRuleNames = new ArrayList();
          if (CarpetGUIClient.incompleteRulesFromServer != null && !CarpetGUIClient.incompleteRulesFromServer.isEmpty()) {
             RulesCacheManager.RawCacheData rawCache = RulesCacheManager.loadRawCache();
@@ -247,7 +275,7 @@ public class CarpetGUIClientPacketHandler {
             }
          }
 
-         ClientPlayNetworking.send(new RequestRulesPayload(lang, knownRuleNames));
+         send(new RequestRulesPayload(lang, knownRuleNames));
          CarpetGUIClient.requesting = true;
       } else {
          openScreenFromCache(client, instantAffect);
@@ -258,7 +286,7 @@ public class CarpetGUIClientPacketHandler {
    private static void openScreenFromCache(Minecraft client, boolean instantAffect) {
       String addr = CarpetGUIClient.getServerAddress(client);
       if (addr != null) {
-         String lang = client.getLanguageManager().getSelected();
+         String lang = getSelectedLanguage(client);
          Optional<RulesCacheManager.CacheResult> cacheOpt = RulesCacheManager.loadCache(lang);
          cacheOpt.ifPresent((cache) -> client.execute(() -> {
                CarpetGUIClient.cachedCompleteRules.clear();
@@ -302,14 +330,14 @@ public class CarpetGUIClientPacketHandler {
                            newRule.manager = serverRule.manager;
                            newRule.name = serverRule.name;
                            newRule.value = serverRule.value;
-                           String unknown = Component.translatable("gui.tip.unknown_rule").getString();
+                           String unknown = new net.minecraft.network.chat.TranslatableComponent("gui.tip.unknown_rule").getString();
                            newRule.localName = serverRule.name;
                            newRule.defaultValue = serverRule.value;
                            newRule.description = unknown;
                            newRule.localDescription = unknown;
                            newRule.type = null;
                            newRule.suggestions = !serverRule.value.equals("true") && !serverRule.value.equals("false") ? List.of("") : List.of("true", "false");
-                           newRule.categories = List.of(Map.entry("unkown", Component.translatable("gui.category.unknown").getString()));
+                           newRule.categories = List.of(Map.entry("unkown", new net.minecraft.network.chat.TranslatableComponent("gui.category.unknown").getString()));
                            newRule.isGamerule = false;
                            CarpetGUIClient.cachedCompleteRules.put(newRule.name, newRule);
                            cachedMap.put(newRule.name, newRule);
@@ -327,7 +355,7 @@ public class CarpetGUIClientPacketHandler {
                   }
                }
 
-               client.setScreenAndShow(new RulesEditScreen(instantAffect));
+               client.setScreen(new RulesEditScreen(instantAffect));
             }));
       }
    }

@@ -31,7 +31,7 @@ public class ScreenTabBar {
 
       for(Tab tab : ScreenTabBar.Tab.values()) {
          boolean isActive = tab == activeTab;
-         LabelComponent label = UIComponents.label(Component.translatable(tab.key));
+         LabelComponent label = UIComponents.label(new net.minecraft.network.chat.TranslatableComponent(tab.key));
          label.color(Color.ofArgb(isActive ? -1 : 1722460842));
          FlowLayout btn = UIContainers.horizontalFlow(Sizing.content(), Sizing.fill(100));
          btn.verticalAlignment(VerticalAlignment.CENTER);
@@ -59,11 +59,11 @@ public class ScreenTabBar {
             CarpetGUIClientPacketHandler.openRuleEditScreen(true);
             break;
          case 1:
-            Minecraft.getInstance().setScreenAndShow(new RuleStackScreen());
-            ClientPlayNetworking.send(new RequestRuleStackPayload());
+            Minecraft.getInstance().setScreen(new RuleStackScreen());
+            CarpetGUIClientPacketHandler.send(new RequestRuleStackPayload());
             break;
          case 2:
-            Minecraft.getInstance().setScreenAndShow(new RuleGroupScreen());
+            Minecraft.getInstance().setScreen(new RuleGroupScreen());
       }
 
    }

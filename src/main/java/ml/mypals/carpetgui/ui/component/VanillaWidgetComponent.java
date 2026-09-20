@@ -18,14 +18,14 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 //? if >=1.21.9 {
-import net.minecraft.client.input.CharacterEvent;
+/*import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-//?} else {
-/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
+*///?} else {
+import ml.mypals.carpetgui.compat.input.CharacterEvent;
 import ml.mypals.carpetgui.compat.input.KeyEvent;
 import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
-*///?}
+//?}
 
 public class VanillaWidgetComponent extends BaseUIComponent {
    private final AbstractWidget widget;
@@ -72,8 +72,8 @@ public class VanillaWidgetComponent extends BaseUIComponent {
       accessor.carpetGUI$setHeight(this.height);
       if (this.widget instanceof EditBox) {
          //? if >=1.21.6 {
-         ((EditBoxAccessor)this.widget).carpetGUI$updateTextPosition();
-         //?}
+         /*((EditBoxAccessor)this.widget).carpetGUI$updateTextPosition();
+         *///?}
       }
 
    }
@@ -133,12 +133,12 @@ public class VanillaWidgetComponent extends BaseUIComponent {
 
    public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
       //? if <1.20 {
-      /*this.widget.render(graphics.pose(), mouseX, mouseY, 0.0F);
-      *///?} elif <26.1 {
+      this.widget.render(graphics.pose(), mouseX, mouseY, 0.0F);
+      //?} elif <26.1 {
       /*this.widget.render(graphics, mouseX, mouseY, 0.0F);
       *///?} else {
-      this.widget.extractRenderState(graphics, mouseX, mouseY, 0.0F);
-      //?}
+      /*this.widget.extractRenderState(graphics, mouseX, mouseY, 0.0F);
+      *///?}
    }
 
    public boolean carpetGUI$shouldDrawTooltip(double mouseX, double mouseY) {
@@ -147,14 +147,14 @@ public class VanillaWidgetComponent extends BaseUIComponent {
 
    public boolean carpetGUI$onMouseScroll(double mouseX, double mouseY, double amount) {
       //? if <1.20.2 {
-      /*return this.widget.mouseScrolled((double)this.x + mouseX, (double)this.y + mouseY, amount) | super.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
-      *///?} else {
-      return this.widget.mouseScrolled((double)this.x + mouseX, (double)this.y + mouseY, (double)0.0F, amount) | super.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
-      //?}
+      return this.widget.mouseScrolled((double)this.x + mouseX, (double)this.y + mouseY, amount) | super.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
+      //?} else {
+      /*return this.widget.mouseScrolled((double)this.x + mouseX, (double)this.y + mouseY, (double)0.0F, amount) | super.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
+      *///?}
    }
 
    //? if <1.21.9 {
-   /*public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
+   public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
       return this.widget.mouseClicked((double)this.x + click.x(), (double)this.y + click.y(), click.button()) | super.carpetGUI$onMouseDown(click, doubled);
    }
 
@@ -173,8 +173,8 @@ public class VanillaWidgetComponent extends BaseUIComponent {
    public boolean carpetGUI$onKeyPress(KeyEvent input) {
       return this.widget.keyPressed(input.key(), input.scancode(), input.modifiers()) | super.carpetGUI$onKeyPress(input);
    }
-   *///?} else {
-   public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
+   //?} else {
+   /*public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
       return this.widget.mouseClicked(new MouseButtonEvent((double)this.x + click.x(), (double)this.y + click.y(), click.buttonInfo()), doubled) | super.carpetGUI$onMouseDown(click, doubled);
    }
 
@@ -193,5 +193,5 @@ public class VanillaWidgetComponent extends BaseUIComponent {
    public boolean carpetGUI$onKeyPress(KeyEvent input) {
       return this.widget.keyPressed(input) | super.carpetGUI$onKeyPress(input);
    }
-   //?}
+   *///?}
 }

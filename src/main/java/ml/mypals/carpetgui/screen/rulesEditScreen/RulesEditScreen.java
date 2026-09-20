@@ -36,9 +36,13 @@ import ml.mypals.carpetgui.ui.core.VerticalAlignment;
 import ml.mypals.carpetgui.ui.event.UIEvents.*;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+//? if >=1.21.9 {
+/*import net.minecraft.client.input.KeyEvent;
+*///?}
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -81,7 +85,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
          ScreenUtils.hideSaveDialog((FlowLayout)this.uiAdapter.rootComponent, this.dialogOverlay);
          if (!this.instantAffect) {
             this.instantAffect = true;
-            Minecraft.getInstance().setScreenAndShow(new RuleGroupScreen());
+            Minecraft.getInstance().setScreen(new RuleGroupScreen());
          }
 
       });
@@ -93,7 +97,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       searchRow.verticalAlignment(VerticalAlignment.CENTER);
       searchRow.padding(Insets.of(2, 2, 4, 4));
       searchRow.surface(Surface.flat(178956970));
-      TextureComponent searchIcon = UIComponents.texture(Identifier.fromNamespaceAndPath("carpetgui", "ui/search.png"), 0, 0, 10, 11, 10, 11);
+      TextureComponent searchIcon = UIComponents.texture(new ResourceLocation("carpetgui", "ui/search.png"), 0, 0, 10, 11, 10, 11);
       searchIcon.sizing(Sizing.fixed(10), Sizing.fixed(11));
       searchRow.child(searchIcon);
       this.searchBox = UIComponents.textBox(Sizing.fill(100));
@@ -126,21 +130,41 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       root.child((UIComponent)master.getKey());
       this.setCurrentCategory(RulesEditScreen.DefaultCategory.ALL.getName());
       //? if <1.21.9 {
-      /*ScreenKeyboardEvents.afterKeyPress(this).register((screen, key, scancode, modifiers) -> {
+      ScreenKeyboardEvents.afterKeyPress(this).register((screen, key, scancode, modifiers) -> {
          if ((modifiers & 2) != 0 && key == 83) {
             ScreenUtils.showSaveGroupDialog((FlowLayout)this.uiAdapter.rootComponent, this.dialogOverlay);
          }
       });
-      *///?} else {
-      ScreenKeyboardEvents.afterKeyPress(this).register((ScreenKeyboardEvents.AfterKeyPress)(screen, key) -> {
+      //?} else {
+      /*ScreenKeyboardEvents.afterKeyPress(this).register((ScreenKeyboardEvents.AfterKeyPress)(screen, key) -> {
          if ((key.modifiers() & 2) != 0 && key.key() == 83) {
             ScreenUtils.showSaveGroupDialog((FlowLayout)this.uiAdapter.rootComponent, this.dialogOverlay);
          }
 
       });
-      //?}
+      *///?}
       return (FlowLayout)master.getKey();
    }
+
+   //? if <1.21.9 {
+   @Override
+   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+      if ((Screen.hasControlDown() || (modifiers & 2) != 0) && keyCode == 83) {
+         ScreenUtils.showSaveGroupDialog((FlowLayout)this.uiAdapter.rootComponent, this.dialogOverlay);
+         return true;
+      }
+      return super.keyPressed(keyCode, scanCode, modifiers);
+   }
+   //?} else {
+   /*@Override
+   public boolean keyPressed(KeyEvent input) {
+      if ((Screen.hasControlDown() || input.hasControlDown()) && input.key() == 83) {
+         ScreenUtils.showSaveGroupDialog((FlowLayout)this.uiAdapter.rootComponent, this.dialogOverlay);
+         return true;
+      }
+      return super.keyPressed(input);
+   }
+   *///?}
 
    private void saveModifiedRulesAsGroup(String groupName) {
       List<RuleData> modifiedRules = CarpetGUIClient.cachedCompleteRules.values().stream().filter((r) -> !Objects.equals(r.defaultValue, r.value) || CarpetGUIClient.defaultRules.contains(r.name)).toList();
@@ -248,9 +272,9 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       } else if (Objects.equals(this.currentCategory, RulesEditScreen.DefaultCategory.MODIFIED.getName())) {
          stream = CarpetGUIClient.cachedCompleteRules.values().stream().filter((r) -> !r.defaultValue.equals(r.value));
       } else if (Objects.equals(this.currentCategory, RulesEditScreen.DefaultCategory.GAMERULES.getName())) {
-         stream = CarpetGUIClient.cachedCompleteRules.values().stream().filter((r) -> ((String)((Map.Entry)r.categories.getFirst()).getKey()).equals("gamerule"));
+         stream = CarpetGUIClient.cachedCompleteRules.values().stream().filter((r) -> !r.categories.isEmpty() && ((String)((Map.Entry)r.categories.get(0)).getKey()).equals("gamerule"));
       } else if (Objects.equals(this.currentCategory, RulesEditScreen.DefaultCategory.ALL.getName())) {
-         stream = CarpetGUIClient.cachedCompleteRules.values().stream().filter((r) -> !((String)((Map.Entry)r.categories.getFirst()).getKey()).equals("gamerule"));
+         stream = CarpetGUIClient.cachedCompleteRules.values().stream().filter((r) -> !r.categories.isEmpty() && !((String)((Map.Entry)r.categories.get(0)).getKey()).equals("gamerule"));
       } else {
          stream = CarpetGUIClient.cachedCompleteRules.values().stream().filter((r) -> r.categories.stream().anyMatch((e) -> Objects.equals(e.getValue(), this.currentCategory)));
       }
@@ -330,11 +354,11 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       public static Component getDisplayName(String name) {
          for(DefaultCategory df : values()) {
             if (df.getName().equals(name)) {
-               return Component.translatable("gui.category." + name);
+               return new net.minecraft.network.chat.TranslatableComponent("gui.category." + name);
             }
          }
 
-         return Component.translatable(name);
+         return new net.minecraft.network.chat.TranslatableComponent(name);
       }
 
       private static DefaultCategory[] $values() {

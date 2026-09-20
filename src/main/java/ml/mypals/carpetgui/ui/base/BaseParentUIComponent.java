@@ -16,14 +16,14 @@ import ml.mypals.carpetgui.ui.core.VerticalAlignment;
 import ml.mypals.carpetgui.ui.util.FocusHandler;
 import ml.mypals.carpetgui.ui.util.Observable;
 //? if >=1.21.9 {
-import net.minecraft.client.input.CharacterEvent;
+/*import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-//?} else {
-/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
+*///?} else {
+import ml.mypals.carpetgui.compat.input.CharacterEvent;
 import ml.mypals.carpetgui.compat.input.KeyEvent;
 import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
-*///?}
+//?}
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
@@ -302,9 +302,13 @@ public abstract class BaseParentUIComponent extends BaseUIComponent implements P
 
    }
 
+   private static int lerpInt(float delta, int start, int end) {
+      return (int) (start + delta * (end - start));
+   }
+
    protected Size calculateChildSpace(Size thisSpace) {
       Insets padding = (Insets)this.padding.get();
-      return Size.of(Mth.lerpInt(((Sizing)this.horizontalSizing.get()).contentFactor(), this.width - padding.horizontal(), thisSpace.width() - padding.horizontal()), Mth.lerpInt(((Sizing)this.verticalSizing.get()).contentFactor(), this.height - padding.vertical(), thisSpace.height() - padding.vertical()));
+      return Size.of(lerpInt(((Sizing)this.horizontalSizing.get()).contentFactor(), this.width - padding.horizontal(), thisSpace.width() - padding.horizontal()), lerpInt(((Sizing)this.verticalSizing.get()).contentFactor(), this.height - padding.vertical(), thisSpace.height() - padding.vertical()));
    }
 
    public BaseParentUIComponent carpetGUI$positioning(Positioning positioning) {

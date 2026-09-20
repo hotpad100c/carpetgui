@@ -5,7 +5,7 @@ plugins {
     // id("me.modmuss50.mod-publish-plugin") version "1.0.+" apply false
 }
 
-stonecutter active "26.3"
+stonecutter active "1.18.2"
 
 stonecutter tasks {
     order("runClient")
@@ -82,6 +82,15 @@ stonecutter parameters {
         }
         string(eval(current.version, ">=26.3")) {
             replace("com.mojang.blaze3d.pipeline.RenderPipeline", "com.mojang.renderpearl.api.pipeline.RenderPipeline")
+        }
+        string(eval(current.version, "<1.19")) {
+            replace("Component.translatable(", "new net.minecraft.network.chat.TranslatableComponent(")
+        }
+        string(eval(current.version, "<1.19")) {
+            replace("Component.literal(", "new net.minecraft.network.chat.TextComponent(")
+        }
+        string(eval(current.version, "<1.19")) {
+            replace("Component.empty()", "net.minecraft.network.chat.TextComponent.EMPTY")
         }
         string(eval(current.version, ">=26.3")) {
             replace("Util.getPlatform().openFile(RuleGroupLoader.GROUPS_DIR.toFile())", "com.mojang.blaze3d.Blaze3D.openPath(RuleGroupLoader.GROUPS_DIR)")

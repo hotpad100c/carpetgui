@@ -55,20 +55,20 @@ public class RuleData {
       buf.writeUtf(this.value);
       buf.writeUtf(this.description);
       buf.writeUtf(this.localDescription);
-      ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.suggestions, FriendlyByteBuf::writeUtf);
-      ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.categories, (bf, entry) -> {
+      buf.writeCollection(this.suggestions, FriendlyByteBuf::writeUtf);
+      buf.writeCollection(this.categories, (bf, entry) -> {
          bf.writeUtf((String)entry.getKey());
          bf.writeUtf((String)entry.getValue());
       });
    }
 
    public RuleData(FriendlyByteBuf buf) {
-      this(buf.readUtf(), buf.readUtf(), buf.readUtf(), getRuleType(buf.readUtf()), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(), ml.mypals.carpetgui.network.BufUtils.readList(buf, FriendlyByteBuf::readUtf), ml.mypals.carpetgui.network.BufUtils.readList(buf, (bf) -> Map.entry(bf.readUtf(), bf.readUtf())));
-      if (((String)((Map.Entry)this.categories.getFirst()).getKey()).equals("gamerule")) {
+      this(buf.readUtf(), buf.readUtf(), buf.readUtf(), getRuleType(buf.readUtf()), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf), buf.readList((bf) -> Map.entry(bf.readUtf(), bf.readUtf())));
+      if (((String)((Map.Entry)this.categories.get(0)).getKey()).equals("gamerule")) {
          this.isGamerule = true;
-         this.localDescription = Component.translatable(this.localDescription).getString();
-         String[] ct = ((String)((Map.Entry)this.categories.getFirst()).getValue()).split(" : ");
-         this.categories = List.of(Map.entry((String)((Map.Entry)this.categories.getFirst()).getKey(), Component.translatable(ct[0]).getString()));
+         this.localDescription = new net.minecraft.network.chat.TranslatableComponent(this.localDescription).getString();
+         String[] ct = ((String)((Map.Entry)this.categories.get(0)).getValue()).split(" : ");
+         this.categories = List.of(Map.entry((String)((Map.Entry)this.categories.get(0)).getKey(), new net.minecraft.network.chat.TranslatableComponent(ct[0]).getString()));
       }
 
    }

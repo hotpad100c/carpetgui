@@ -15,14 +15,14 @@ import ml.mypals.carpetgui.ui.util.FocusHandler;
 import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 //? if >=1.21.9 {
-import net.minecraft.client.input.CharacterEvent;
+/*import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-//?} else {
-/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
+*///?} else {
+import ml.mypals.carpetgui.compat.input.CharacterEvent;
 import ml.mypals.carpetgui.compat.input.KeyEvent;
 import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
-*///?}
+//?}
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BaseUIComponent implements UIComponent {

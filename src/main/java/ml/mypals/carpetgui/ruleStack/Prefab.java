@@ -73,7 +73,7 @@ public class Prefab {
    }
 
    public RuleLayer peek() {
-      return this.layers.isEmpty() ? null : (RuleLayer)this.layers.getLast();
+      return this.layers.isEmpty() ? null : (RuleLayer)this.layers.get(this.layers.size() - 1);
    }
 
    public int nextId() {

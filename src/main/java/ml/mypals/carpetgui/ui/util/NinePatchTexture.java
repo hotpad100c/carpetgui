@@ -8,20 +8,20 @@ import ml.mypals.carpetgui.ui.core.Color;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
 import ml.mypals.carpetgui.ui.core.PositionedRectangle;
 import ml.mypals.carpetgui.ui.core.Size;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class NinePatchTexture {
-   private final Identifier texture;
+   private final ResourceLocation texture;
    private final int u;
    private final int v;
    private final PatchSizing patchSizing;
    private final Size textureSize;
    private final boolean repeat;
-   private static final Map<Identifier, NinePatchTexture> REGISTRY = new HashMap<>();
+   private static final Map<ResourceLocation, NinePatchTexture> REGISTRY = new HashMap<>();
 
-   public NinePatchTexture(Identifier texture, int u, int v, PatchSizing patchSizing, Size textureSize, boolean repeat) {
+   public NinePatchTexture(ResourceLocation texture, int u, int v, PatchSizing patchSizing, Size textureSize, boolean repeat) {
       this.texture = texture;
       this.u = u;
       this.v = v;
@@ -30,11 +30,11 @@ public class NinePatchTexture {
       this.repeat = repeat;
    }
 
-   public NinePatchTexture(Identifier texture, int u, int v, Size cornerPatchSize, Size centerPatchSize, Size textureSize, boolean repeat) {
+   public NinePatchTexture(ResourceLocation texture, int u, int v, Size cornerPatchSize, Size centerPatchSize, Size textureSize, boolean repeat) {
       this(texture, u, v, new PatchSizing((Size)null, cornerPatchSize, centerPatchSize), textureSize, repeat);
    }
 
-   public NinePatchTexture(Identifier texture, int u, int v, Size patchSize, Size textureSize, boolean repeat) {
+   public NinePatchTexture(ResourceLocation texture, int u, int v, Size patchSize, Size textureSize, boolean repeat) {
       this(texture, u, v, new PatchSizing(patchSize, (Size)null, (Size)null), textureSize, repeat);
    }
 
@@ -125,23 +125,23 @@ public class NinePatchTexture {
       }
    }
 
-   public static void draw(Identifier texture, OwoUIGraphics context, int x, int y, int width, int height) {
+   public static void draw(ResourceLocation texture, OwoUIGraphics context, int x, int y, int width, int height) {
       ifPresent(texture, (ninePatchTexture) -> ninePatchTexture.draw(context, x, y, width, height, Color.WHITE));
    }
 
-   public static void draw(Identifier texture, OwoUIGraphics context, int x, int y, int width, int height, Color color) {
+   public static void draw(ResourceLocation texture, OwoUIGraphics context, int x, int y, int width, int height, Color color) {
       ifPresent(texture, (ninePatchTexture) -> ninePatchTexture.draw(context, x, y, width, height, color));
    }
 
-   public static void draw(Identifier texture, OwoUIGraphics context, PositionedRectangle rectangle) {
+   public static void draw(ResourceLocation texture, OwoUIGraphics context, PositionedRectangle rectangle) {
       ifPresent(texture, (ninePatchTexture) -> ninePatchTexture.draw(context, rectangle));
    }
 
-   public static void draw(Identifier texture, OwoUIGraphics context, PositionedRectangle rectangle, Color color) {
+   public static void draw(ResourceLocation texture, OwoUIGraphics context, PositionedRectangle rectangle, Color color) {
       ifPresent(texture, (ninePatchTexture) -> ninePatchTexture.draw(context, rectangle, color));
    }
 
-   private static void ifPresent(Identifier texture, Consumer<NinePatchTexture> action) {
+   private static void ifPresent(ResourceLocation texture, Consumer<NinePatchTexture> action) {
       NinePatchTexture patch = (NinePatchTexture)REGISTRY.get(texture);
       if (patch != null) {
          action.accept(patch);

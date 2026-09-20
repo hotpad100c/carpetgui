@@ -9,10 +9,10 @@ import java.util.function.Predicate;
 import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.ChatFormatting;
 //? if >=1.21.9 {
-import net.minecraft.client.input.MouseButtonEvent;
-//?} else {
-/*import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
-*///?}
+/*import net.minecraft.client.input.MouseButtonEvent;
+*///?} else {
+import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
+//?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -135,7 +135,7 @@ public interface ParentUIComponent extends UIComponent {
       Insets padding = (Insets)this.padding().get();
       MutableComponent var10000 = UIComponent.super.inspectorDescriptor();
       int var10001 = padding.top();
-      return var10000.append(Component.literal(" >" + var10001 + "," + padding.bottom() + "," + padding.left() + "," + padding.right() + "<").setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA)));
+      return var10000.append(new net.minecraft.network.chat.TextComponent(" >" + var10001 + "," + padding.bottom() + "," + padding.left() + "," + padding.right() + "<").setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA)));
    }
 
    default <T extends UIComponent> T childById(@NotNull Class<T> expectedClass, @NotNull String id) {

@@ -127,8 +127,12 @@ publishMods {
             id = "TQTTVgYE"
         }
     }
-
 }
+
+tasks.matching { it.name in listOf("runClient", "runServer") }.configureEach {
+    outputs.upToDateWhen { false }
+}
+
 /*
 // Publishes builds to a maven repository under `com.example:template:0.1.0+mc`
 publishing {

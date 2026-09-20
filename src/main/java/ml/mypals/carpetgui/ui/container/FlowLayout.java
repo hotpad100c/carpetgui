@@ -109,7 +109,7 @@ public class FlowLayout extends BaseParentUIComponent {
 
    public MutableComponent inspectorDescriptor() {
       MutableComponent descriptor = super.inspectorDescriptor();
-      return this.gap() == 0 ? descriptor : descriptor.append(Component.literal(" [" + this.gap() + "]"));
+      return this.gap() == 0 ? descriptor : descriptor.append(new net.minecraft.network.chat.TextComponent(" [" + this.gap() + "]"));
    }
 
    @FunctionalInterface

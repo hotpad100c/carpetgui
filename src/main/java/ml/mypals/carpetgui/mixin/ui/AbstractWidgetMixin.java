@@ -18,22 +18,22 @@ import ml.mypals.carpetgui.ui.util.EventStream;
 import ml.mypals.carpetgui.ui.util.FocusHandler;
 import ml.mypals.carpetgui.ui.util.Observable;
 //? if <26.1 {
-/*import net.minecraft.client.gui.GuiGraphics;
-*///?} else {
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-//?}
+import net.minecraft.client.gui.GuiGraphics;
+//?} else {
+/*import net.minecraft.client.gui.GuiGraphicsExtractor;
+*///?}
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 //? if >=1.21.9 {
-import net.minecraft.client.input.CharacterEvent;
+/*import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-//?} else {
-/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
+*///?} else {
+import ml.mypals.carpetgui.compat.input.CharacterEvent;
 import ml.mypals.carpetgui.compat.input.KeyEvent;
 import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
-*///?}
+//?}
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -48,6 +48,10 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
    public boolean active;
    @Shadow
    protected boolean isHovered;
+   //? if <1.19 {
+   @Shadow
+   protected abstract void setFocused(boolean var1);
+   //?}
    @Unique
    protected VanillaWidgetComponent wrapper = null;
 
@@ -300,7 +304,7 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
    }
 
    //? if >=26.1 {
-   @Inject(
+   /*@Inject(
       method = {"extractRenderState"},
       at = {@At(
    value = "INVOKE",
@@ -312,7 +316,7 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
          this.isHovered = this.isHovered && this.wrapper.hovered();
       }
    }
-   //?} elif >=1.20 {
+   *///?} elif >=1.20 {
    /*@Inject(
       method = {"render"},
       at = {@At(
@@ -325,18 +329,31 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
          this.isHovered = this.isHovered && this.wrapper.hovered();
       }
    }
-   *///?} else {
+   *///?} else if > 1.18.2 {
    /*@Inject(
       method = {"render"},
       at = {@At(
    value = "INVOKE",
    target = "Lnet/minecraft/client/gui/components/AbstractWidget;renderWidget(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V"
-)}
+   )}
+   )
+   private void setHovered(com.mojang.blaze3d.vertex.PoseStack extractor, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+      if (this.wrapper != null) {
+         this.isHovered = this.isHovered && this.wrapper.hovered();
+      }
+   }*/
+   //?}else{
+   @Inject(
+           method = {"render"},
+           at = {@At(
+                   value = "INVOKE",
+                   target = "Lnet/minecraft/client/gui/components/AbstractWidget;renderButton(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V"
+           )}
    )
    private void setHovered(com.mojang.blaze3d.vertex.PoseStack extractor, int mouseX, int mouseY, float delta, CallbackInfo ci) {
       if (this.wrapper != null) {
          this.isHovered = this.isHovered && this.wrapper.hovered();
       }
    }
-   *///?}
+   //?}
 }

@@ -24,20 +24,20 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
 public class ScreenUtils {
-   public static final Identifier RESET = rl("ui/reset.png");
-   public static final Identifier NO = rl("ui/x.png");
-   public static final Identifier LOCK_ON = rl("ui/lock.png");
-   public static final Identifier LOCK_OFF = rl("ui/unlock.png");
-   public static final Identifier LOVE_ON = rl("ui/loved.png");
-   public static final Identifier LOVE_OFF = rl("ui/love.png");
-   public static final Identifier TRUE_TEX = rl("ui/true_t.png");
-   public static final Identifier FALSE_TEX = rl("ui/false_t.png");
+   public static final ResourceLocation RESET = rl("ui/reset.png");
+   public static final ResourceLocation NO = rl("ui/x.png");
+   public static final ResourceLocation LOCK_ON = rl("ui/lock.png");
+   public static final ResourceLocation LOCK_OFF = rl("ui/unlock.png");
+   public static final ResourceLocation LOVE_ON = rl("ui/loved.png");
+   public static final ResourceLocation LOVE_OFF = rl("ui/love.png");
+   public static final ResourceLocation TRUE_TEX = rl("ui/true_t.png");
+   public static final ResourceLocation FALSE_TEX = rl("ui/false_t.png");
 
-   public static FlowLayout buildSpriteToggle(Identifier initTex, int w, int h, Consumer<FlowLayout> onClick) {
+   public static FlowLayout buildSpriteToggle(ResourceLocation initTex, int w, int h, Consumer<FlowLayout> onClick) {
       FlowLayout wrapper = UIContainers.horizontalFlow(Sizing.fixed(w + 2), Sizing.fixed(h));
       wrapper.verticalAlignment(VerticalAlignment.CENTER);
       wrapper.horizontalAlignment(HorizontalAlignment.CENTER);
@@ -64,16 +64,16 @@ public class ScreenUtils {
       return Map.entry(outline, content);
    }
 
-   public static Identifier rl(String path) {
-      return Identifier.fromNamespaceAndPath("carpetgui", path);
+   public static ResourceLocation rl(String path) {
+      return new ResourceLocation("carpetgui", path);
    }
 
-   public static void swapTexture(FlowLayout wrapper, Identifier newTex, int w, int h) {
+   public static void swapTexture(FlowLayout wrapper, ResourceLocation newTex, int w, int h) {
       wrapper.clearChildren();
       wrapper.child(makeTexture(newTex, w, h));
    }
 
-   public static TextureComponent makeTexture(Identifier tex, int w, int h) {
+   public static TextureComponent makeTexture(ResourceLocation tex, int w, int h) {
       TextureComponent t = UIComponents.texture(tex, 0, 0, w, h, w, h);
       t.sizing(Sizing.fixed(w), Sizing.fixed(h));
       return t;
@@ -82,16 +82,16 @@ public class ScreenUtils {
    public static DialogResult createSaveGroupDialog(Consumer<String> saveAction, Consumer<String> cancelAction) {
       FlowLayout saveDialog = UIContainers.verticalFlow(Sizing.fixed(200), Sizing.content());
       saveDialog.surface(Surface.VANILLA_TRANSLUCENT.and(Surface.outline(2010107855))).alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
-      saveDialog.child(UIComponents.label(Component.translatable("gui.rulegroups.save_group")).color(Color.WHITE).shadow(true));
+      saveDialog.child(UIComponents.label(new net.minecraft.network.chat.TranslatableComponent("gui.rulegroups.save_group")).color(Color.WHITE).shadow(true));
       TextBoxComponent nameBox = UIComponents.textBox(Sizing.fill(70));
       nameBox.setMaxLength(64);
       nameBox.text("modified_" + System.currentTimeMillis());
       saveDialog.child(nameBox);
       FlowLayout buttons = UIContainers.horizontalFlow(Sizing.fill(80), Sizing.fixed(26));
       buttons.gap(8).horizontalAlignment(HorizontalAlignment.CENTER);
-      ButtonComponent cancel = UIComponents.button(Component.translatable("gui.rulegroups.cancel"), (b) -> cancelAction.accept(""));
+      ButtonComponent cancel = UIComponents.button(new net.minecraft.network.chat.TranslatableComponent("gui.rulegroups.cancel"), (b) -> cancelAction.accept(""));
       cancel.sizing(Sizing.fill(40), Sizing.fixed(22));
-      ButtonComponent saveBtn = UIComponents.button(Component.translatable("gui.rulegroups.save"), (b) -> {
+      ButtonComponent saveBtn = UIComponents.button(new net.minecraft.network.chat.TranslatableComponent("gui.rulegroups.save"), (b) -> {
          String groupName = nameBox.getValue().trim();
          if (groupName.isEmpty()) {
             groupName = "modified_" + System.currentTimeMillis();
@@ -162,13 +162,13 @@ public class ScreenUtils {
    }
 
    public static Component buildTooltip(RuleData ruleData, String query) {
-      MutableComponent tip = Component.empty();
-      tip.append(highlight(ruleData.localName.isEmpty() ? ruleData.name : ruleData.localName, query).copy().withStyle(ChatFormatting.WHITE)).append("\n").append(highlight(ruleData.localDescription.isEmpty() ? ruleData.description : ruleData.localDescription, query).copy().withStyle(ChatFormatting.GRAY)).append("\n").append(Component.translatable("gui.screen.tooltip.defaultValue").withStyle(ChatFormatting.DARK_GREEN)).append(": " + ruleData.defaultValue).append("\n").append(Component.translatable("gui.screen.tooltip.currentValue").withStyle(ChatFormatting.DARK_GREEN)).append(": " + ruleData.value).append("\n").append(Component.translatable("gui.screen.tooltip.suggestions").withStyle(ChatFormatting.BLUE)).append(":");
+      MutableComponent tip = new net.minecraft.network.chat.TextComponent("");
+      tip.append(highlight(ruleData.localName.isEmpty() ? ruleData.name : ruleData.localName, query).copy().withStyle(ChatFormatting.WHITE)).append("\n").append(highlight(ruleData.localDescription.isEmpty() ? ruleData.description : ruleData.localDescription, query).copy().withStyle(ChatFormatting.GRAY)).append("\n").append(new net.minecraft.network.chat.TranslatableComponent("gui.screen.tooltip.defaultValue").withStyle(ChatFormatting.DARK_GREEN)).append(": " + ruleData.defaultValue).append("\n").append(new net.minecraft.network.chat.TranslatableComponent("gui.screen.tooltip.currentValue").withStyle(ChatFormatting.DARK_GREEN)).append(": " + ruleData.value).append("\n").append(new net.minecraft.network.chat.TranslatableComponent("gui.screen.tooltip.suggestions").withStyle(ChatFormatting.BLUE)).append(":");
       tip.append(" [");
 
       for(int i = 0; i < ruleData.suggestions.size(); ++i) {
          String var10001 = (String)ruleData.suggestions.get(i);
-         tip.append(Component.literal(var10001 + (i + 1 < ruleData.suggestions.size() ? ", " : "")).withStyle(ChatFormatting.GRAY));
+         tip.append(new net.minecraft.network.chat.TextComponent(var10001 + (i + 1 < ruleData.suggestions.size() ? ", " : "")).withStyle(ChatFormatting.GRAY));
       }
 
       tip.append("]");
@@ -177,7 +177,7 @@ public class ScreenUtils {
 
    public static Component highlight(String text, String query) {
       if (query != null && !query.isEmpty()) {
-         MutableComponent result = Component.empty().copy();
+         MutableComponent result = net.minecraft.network.chat.TextComponent.EMPTY.copy();
          String lowerText = text.toLowerCase();
          String lowerQuery = query.toLowerCase();
          int start = 0;

@@ -1,7 +1,7 @@
 package ml.mypals.carpetgui.compat.input;
 
 //? if <1.21.9 {
-/*import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.InputConstants;
 
 public record KeyEvent(int key, int scancode, int modifiers) {
     public int input() { return key; }
@@ -15,4 +15,4 @@ public record KeyEvent(int key, int scancode, int modifiers) {
     public boolean isLeft() { return key == InputConstants.KEY_LEFT; }
     public boolean isRight() { return key == InputConstants.KEY_RIGHT; }
 }
-*///?}
+//?}
