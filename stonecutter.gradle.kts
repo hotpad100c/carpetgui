@@ -7,13 +7,9 @@ plugins {
 
 stonecutter active "26.2"
 
-/*
-// Make newer versions be published last
 stonecutter tasks {
-    order("publishModrinth")
-    order("publishCurseforge")
+    order("runClient")
 }
- */
 
 // See https://stonecutter.kikugie.dev/wiki/config/params
 stonecutter parameters {

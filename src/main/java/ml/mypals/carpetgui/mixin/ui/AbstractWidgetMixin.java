@@ -299,7 +299,20 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
       return CursorStyle.POINTER;
    }
 
-   //? if <26.1 {
+   //? if >=26.1 {
+   @Inject(
+      method = {"extractRenderState"},
+      at = {@At(
+   value = "INVOKE",
+   target = "Lnet/minecraft/client/gui/components/AbstractWidget;extractWidgetRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"
+)}
+   )
+   private void setHovered(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+      if (this.wrapper != null) {
+         this.isHovered = this.isHovered && this.wrapper.hovered();
+      }
+   }
+   //?} elif >=1.20 {
    /*@Inject(
       method = {"render"},
       at = {@At(
@@ -313,17 +326,17 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
       }
    }
    *///?} else {
-   @Inject(
-      method = {"extractRenderState"},
+   /*@Inject(
+      method = {"render"},
       at = {@At(
    value = "INVOKE",
-   target = "Lnet/minecraft/client/gui/components/AbstractWidget;extractWidgetRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"
+   target = "Lnet/minecraft/client/gui/components/AbstractWidget;renderWidget(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V"
 )}
    )
-   private void setHovered(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+   private void setHovered(com.mojang.blaze3d.vertex.PoseStack extractor, int mouseX, int mouseY, float delta, CallbackInfo ci) {
       if (this.wrapper != null) {
          this.isHovered = this.isHovered && this.wrapper.hovered();
       }
    }
-   //?}
+   *///?}
 }

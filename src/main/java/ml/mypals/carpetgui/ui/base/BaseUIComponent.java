@@ -62,11 +62,11 @@ public abstract class BaseUIComponent implements UIComponent {
    }
 
    protected int determineHorizontalContentSize(Sizing sizing) {
-      throw new UnsupportedOperationException(this.getClass().getSimpleName() + " does not support Sizing.content() on the horizontal axis");
+      return Math.max(0, this.width);
    }
 
    protected int determineVerticalContentSize(Sizing sizing) {
-      throw new UnsupportedOperationException(this.getClass().getSimpleName() + " does not support Sizing.content() on the vertical axis");
+      return Math.max(0, this.height);
    }
 
    public void carpetGUI$inflate(Size space) {

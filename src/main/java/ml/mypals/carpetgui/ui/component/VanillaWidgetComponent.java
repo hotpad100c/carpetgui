@@ -98,16 +98,22 @@ public class VanillaWidgetComponent extends BaseUIComponent {
          return Minecraft.getInstance().font.width(this.widget.getMessage()) + (this.widget instanceof Checkbox ? 24 : 12);
       } else if (this.widget instanceof AbstractSliderButton) {
          return Minecraft.getInstance().font.width(this.widget.getMessage()) + 8;
+      } else if (this.widget.getWidth() > 0) {
+         return this.widget.getWidth();
       } else {
-         return super.determineHorizontalContentSize(sizing);
+         return 100;
       }
    }
 
    protected int determineVerticalContentSize(Sizing sizing) {
-      if (this.widget instanceof Button || this.widget instanceof Checkbox || this.widget instanceof AbstractSliderButton) {
+      if (this.widget instanceof EditBox textField) {
+         return ((EditBoxAccessor)textField).carpetGUI$bordered() ? 20 : 9;
+      } else if (this.widget instanceof Button || this.widget instanceof Checkbox || this.widget instanceof AbstractSliderButton) {
          return 20;
+      } else if (this.widget.getHeight() > 0) {
+         return this.widget.getHeight();
       } else {
-         return super.determineVerticalContentSize(sizing);
+         return 20;
       }
    }
 
