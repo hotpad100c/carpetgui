@@ -64,7 +64,11 @@ public class RulesCacheManager {
                         String key = obj.get("key").getAsString();
                         JsonElement val = obj.get("value");
                         if (val != null && val.isJsonObject()) {
-                           oldCategoryValues.put(key, val.getAsJsonObject().deepCopy());
+                           //?if<=1.17.1{
+                           oldCategoryValues.put(key, deepCopy(val.getAsJsonObject()));
+                           //?}else{
+                           /*oldCategoryValues.put(key, val.getAsJsonObject().deepCopy());
+                            *///?}
                         }
                      }
                   }
@@ -514,11 +518,21 @@ public class RulesCacheManager {
       JsonElement el = ruleObj.get(field);
       if (el != null) {
          if (el.isJsonObject()) {
-            target.put(ruleName, el.getAsJsonObject().deepCopy());
+            //?if<=1.17.1{
+            target.put(ruleName, deepCopy(el.getAsJsonObject()));
+            //?}else{
+            /*target.put(ruleName, el.getAsJsonObject().deepCopy());
+            *///?}
          }
 
       }
    }
+
+   //?if<=1.17.1{
+   private static JsonObject deepCopy(JsonObject jsonObject) {
+      return GSON.fromJson(GSON.toJson(jsonObject), JsonObject.class);
+   }
+   //?}
 
    private static String sanitize(String address) {
       return address.replaceAll("[^a-zA-Z0-9._\\-]", "_");

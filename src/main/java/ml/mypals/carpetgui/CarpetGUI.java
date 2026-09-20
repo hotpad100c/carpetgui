@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import com.google.gson.stream.JsonReader;
 import ml.mypals.carpetgui.network.RuleData;
 import ml.mypals.carpetgui.network.client.RequestRuleStackPayload;
 import ml.mypals.carpetgui.network.client.RequestRulesPayload;
@@ -68,7 +70,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
    public static final String MOD_ID = "carpetgui";
    public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
    public static final String VERSION = /*$ mod_version*/ "1.3.6";
-   public static final String MINECRAFT = /*$ minecraft*/ "1.18.2";
+   public static final String MINECRAFT = /*$ minecraft*/ "1.17.1";
    private static PrefabManager prefabManager;
 
    public void onInitialize() {
@@ -313,9 +315,15 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
          try {
             BufferedReader reader = Files.newBufferedReader(getOrgDefaultsConfigFile());
 
+
             List<String> var9;
             try {
-               JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+               //?if<=1.17.1{
+               JsonParser parser = new JsonParser();
+               JsonObject root = parser.parse(new JsonReader(reader)).getAsJsonObject();
+               //?}else{
+               /*JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+               *///?}
                JsonObject rules = root.getAsJsonObject("rules");
                List<String> result = new ArrayList<>();
                if (rules != null) {

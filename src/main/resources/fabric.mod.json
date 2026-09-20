@@ -28,7 +28,6 @@
   "depends": {
     "fabricloader": "*",
     "minecraft": "${minecraft}",
-    "fabric-api": "*",
     "carpet": "*"
   },
   "custom": {

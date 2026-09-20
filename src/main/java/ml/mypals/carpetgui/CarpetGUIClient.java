@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class CarpetGUIClient implements ClientModInitializer {
    public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
    public static final String VERSION = /*$ mod_version*/ "1.3.6";
-   public static final String MINECRAFT = /*$ minecraft*/ "1.18.2";
+   public static final String MINECRAFT = /*$ minecraft*/ "1.17.1";
    public static KeyMapping carpetRulesKeyBind;
    public static RuleStackData cachedRuleStackData;
    public static Map<String, RuleData> cachedCompleteRules = new HashMap();

@@ -225,7 +225,13 @@ public class PrefabManager {
          return false;
       } else {
          try {
-            JsonObject root = JsonParser.parseString(Files.readString(this.saveFile)).getAsJsonObject();
+            //?if<=1.17.1{
+            JsonParser jsonParser = new JsonParser();
+            JsonObject root = jsonParser.parse(Files.readString(this.saveFile)).getAsJsonObject();
+            //?}else{
+            /*JsonObject root = JsonParser.parseString(Files.readString(this.saveFile)).getAsJsonObject();
+             *///?}
+
             this.activeName = root.get("active").getAsString();
             this.committedSnapshot = new LinkedHashMap();
             root.getAsJsonObject("committedSnapshot").entrySet().forEach((ex) -> this.committedSnapshot.put((String)ex.getKey(), RuleValueSnapshot.fromJson(((JsonElement)ex.getValue()).getAsJsonObject())));

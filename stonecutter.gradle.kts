@@ -5,7 +5,7 @@ plugins {
     // id("me.modmuss50.mod-publish-plugin") version "1.0.+" apply false
 }
 
-stonecutter active "1.18.2"
+stonecutter active "1.17.1"
 
 stonecutter tasks {
     order("runClient")
