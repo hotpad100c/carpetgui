@@ -13,8 +13,13 @@ import ml.mypals.carpetgui.ui.core.ParentUIComponent;
 import ml.mypals.carpetgui.ui.core.Size;
 import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.UIComponent;
+//? if >=1.21.9 {
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.KeyEvent;
+import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
+*///?}
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -133,15 +138,15 @@ public class ScrollContainer<C extends UIComponent> extends BaseParentUIComponen
          this.lastScrollPosition = newScrollPosition;
       }
 
-      graphics.pose().pushMatrix();
+      graphics.push();
       double visualOffset = -(this.currentScrollPosition % (double)1.0F);
       if (visualOffset > 0.9999999 || visualOffset < 1.0E-7) {
          visualOffset = (double)0.0F;
       }
 
-      graphics.pose().translate((float)this.direction.choose(visualOffset, (double)0.0F), (float)this.direction.choose((double)0.0F, visualOffset));
+      graphics.translate((float)this.direction.choose(visualOffset, (double)0.0F), (float)this.direction.choose((double)0.0F, visualOffset));
       this.drawChildren(graphics, mouseX, mouseY, partialTicks, delta, this.childView);
-      graphics.pose().popMatrix();
+      graphics.pop();
       if (this.isInScrollbar((double)mouseX, (double)mouseY) || this.scrollbaring) {
          this.lastScrollbarInteractTime = System.currentTimeMillis() + 1500L;
       }

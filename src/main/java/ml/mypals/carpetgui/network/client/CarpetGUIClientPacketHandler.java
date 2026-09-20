@@ -53,7 +53,11 @@ public class CarpetGUIClientPacketHandler {
          boolean var10000;
          label22: {
             client = Minecraft.getInstance();
+            //? if <26.2 {
+            /*Screen patt0$temp = client.screen;
+            *///?} else {
             Screen patt0$temp = client.gui.screen();
+            //?}
             if (patt0$temp instanceof RuleGroupScreen rgs) {
                if (rgs.requestingRulesForNewGroup) {
                   var10000 = true;

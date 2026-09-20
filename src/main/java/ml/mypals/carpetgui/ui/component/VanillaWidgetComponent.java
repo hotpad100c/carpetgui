@@ -17,9 +17,15 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
+//? if >=1.21.9 {
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
+import ml.mypals.carpetgui.compat.input.KeyEvent;
+import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
+*///?}
 
 public class VanillaWidgetComponent extends BaseUIComponent {
    private final AbstractWidget widget;
@@ -58,36 +64,18 @@ public class VanillaWidgetComponent extends BaseUIComponent {
 
    }
 
-   protected int determineVerticalContentSize(Sizing sizing) {
-      if (!(this.widget instanceof Button) && !(this.widget instanceof Checkbox) && !(this.widget instanceof AbstractSliderButton)) {
-         AbstractWidget var3 = this.widget;
-         if (var3 instanceof EditBox) {
-            EditBox textField = (EditBox)var3;
-            return ((EditBoxAccessor)textField).carpetGUI$bordered() ? 20 : 9;
-         } else {
-            throw new UnsupportedOperationException(this.widget.getClass().getSimpleName() + " does not support Sizing.content() on the vertical axis");
-         }
-      } else {
-         return 20;
+   public void applyToWidget() {
+      AbstractWidgetAccessor accessor = (AbstractWidgetAccessor)this.widget;
+      accessor.carpetGUI$setX(this.x);
+      accessor.carpetGUI$setY(this.y);
+      accessor.carpetGUI$setWidth(this.width);
+      accessor.carpetGUI$setHeight(this.height);
+      if (this.widget instanceof EditBox) {
+         //? if >=1.21.6 {
+         ((EditBoxAccessor)this.widget).carpetGUI$updateTextPosition();
+         //?}
       }
-   }
 
-   protected int determineHorizontalContentSize(Sizing sizing) {
-      AbstractWidget var4 = this.widget;
-      if (var4 instanceof Button button) {
-         return Minecraft.getInstance().font.width(button.getMessage()) + 8;
-      } else {
-         var4 = this.widget;
-         if (var4 instanceof Checkbox checkbox) {
-            return Minecraft.getInstance().font.width(checkbox.getMessage()) + 24;
-         } else {
-            throw new UnsupportedOperationException(this.widget.getClass().getSimpleName() + " does not support Sizing.content() on the horizontal axis");
-         }
-      }
-   }
-
-   public BaseUIComponent carpetGUI$margins(Insets margins) {
-      return this.widget instanceof EditBox ? super.carpetGUI$margins(margins.add(1, 1, 1, 1)) : super.carpetGUI$margins(margins);
    }
 
    public void carpetGUI$inflate(Size space) {
@@ -105,12 +93,22 @@ public class VanillaWidgetComponent extends BaseUIComponent {
       this.applyToWidget();
    }
 
-   private void applyToWidget() {
-      AbstractWidgetAccessor accessor = (AbstractWidgetAccessor)this.widget;
-      accessor.carpetGUI$setX(this.x + this.widget.carpetGUI$xOffset());
-      accessor.carpetGUI$setY(this.y + this.widget.carpetGUI$yOffset());
-      accessor.carpetGUI$setWidth(this.width + this.widget.carpetGUI$widthOffset());
-      accessor.carpetGUI$setHeight(this.height + this.widget.carpetGUI$heightOffset());
+   protected int determineHorizontalContentSize(Sizing sizing) {
+      if (this.widget instanceof Button || this.widget instanceof Checkbox) {
+         return Minecraft.getInstance().font.width(this.widget.getMessage()) + (this.widget instanceof Checkbox ? 24 : 12);
+      } else if (this.widget instanceof AbstractSliderButton) {
+         return Minecraft.getInstance().font.width(this.widget.getMessage()) + 8;
+      } else {
+         return super.determineHorizontalContentSize(sizing);
+      }
+   }
+
+   protected int determineVerticalContentSize(Sizing sizing) {
+      if (this.widget instanceof Button || this.widget instanceof Checkbox || this.widget instanceof AbstractSliderButton) {
+         return 20;
+      } else {
+         return super.determineVerticalContentSize(sizing);
+      }
    }
 
    public <C extends UIComponent> C carpetGUI$configure(Consumer<C> closure) {
@@ -128,23 +126,54 @@ public class VanillaWidgetComponent extends BaseUIComponent {
    }
 
    public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
+      //? if <1.20 {
+      /*this.widget.render(graphics.pose(), mouseX, mouseY, 0.0F);
+      *///?} elif <26.1 {
+      /*this.widget.render(graphics, mouseX, mouseY, 0.0F);
+      *///?} else {
       this.widget.extractRenderState(graphics, mouseX, mouseY, 0.0F);
+      //?}
    }
 
    public boolean carpetGUI$shouldDrawTooltip(double mouseX, double mouseY) {
       return this.widget.visible && this.widget.active && super.carpetGUI$shouldDrawTooltip(mouseX, mouseY);
    }
 
+   public boolean carpetGUI$onMouseScroll(double mouseX, double mouseY, double amount) {
+      //? if <1.20.2 {
+      /*return this.widget.mouseScrolled((double)this.x + mouseX, (double)this.y + mouseY, amount) | super.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
+      *///?} else {
+      return this.widget.mouseScrolled((double)this.x + mouseX, (double)this.y + mouseY, (double)0.0F, amount) | super.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
+      //?}
+   }
+
+   //? if <1.21.9 {
+   /*public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
+      return this.widget.mouseClicked((double)this.x + click.x(), (double)this.y + click.y(), click.button()) | super.carpetGUI$onMouseDown(click, doubled);
+   }
+
+   public boolean carpetGUI$onMouseUp(MouseButtonEvent click) {
+      return this.widget.mouseReleased((double)this.x + click.x(), (double)this.y + click.y(), click.button()) | super.carpetGUI$onMouseUp(click);
+   }
+
+   public boolean carpetGUI$onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
+      return this.widget.mouseDragged((double)this.x + click.x(), (double)this.y + click.y(), click.button(), deltaX, deltaY) | super.carpetGUI$onMouseDrag(click, deltaX, deltaY);
+   }
+
+   public boolean carpetGUI$onCharTyped(CharacterEvent input) {
+      return this.widget.charTyped((char)input.codepoint(), input.modifiers()) | super.carpetGUI$onCharTyped(input);
+   }
+
+   public boolean carpetGUI$onKeyPress(KeyEvent input) {
+      return this.widget.keyPressed(input.key(), input.scancode(), input.modifiers()) | super.carpetGUI$onKeyPress(input);
+   }
+   *///?} else {
    public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
       return this.widget.mouseClicked(new MouseButtonEvent((double)this.x + click.x(), (double)this.y + click.y(), click.buttonInfo()), doubled) | super.carpetGUI$onMouseDown(click, doubled);
    }
 
    public boolean carpetGUI$onMouseUp(MouseButtonEvent click) {
       return this.widget.mouseReleased(new MouseButtonEvent((double)this.x + click.x(), (double)this.y + click.y(), click.buttonInfo())) | super.carpetGUI$onMouseUp(click);
-   }
-
-   public boolean carpetGUI$onMouseScroll(double mouseX, double mouseY, double amount) {
-      return this.widget.mouseScrolled((double)this.x + mouseX, (double)this.y + mouseY, (double)0.0F, amount) | super.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
    }
 
    public boolean carpetGUI$onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
@@ -158,4 +187,5 @@ public class VanillaWidgetComponent extends BaseUIComponent {
    public boolean carpetGUI$onKeyPress(KeyEvent input) {
       return this.widget.keyPressed(input) | super.carpetGUI$onKeyPress(input);
    }
+   //?}
 }

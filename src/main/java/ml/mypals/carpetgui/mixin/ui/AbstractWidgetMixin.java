@@ -17,13 +17,23 @@ import ml.mypals.carpetgui.ui.inject.UIComponentStub;
 import ml.mypals.carpetgui.ui.util.EventStream;
 import ml.mypals.carpetgui.ui.util.FocusHandler;
 import ml.mypals.carpetgui.ui.util.Observable;
+//? if <26.1 {
+/*import net.minecraft.client.gui.GuiGraphics;
+*///?} else {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?}
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+//? if >=1.21.9 {
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
+import ml.mypals.carpetgui.compat.input.KeyEvent;
+import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
+*///?}
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -289,6 +299,20 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
       return CursorStyle.POINTER;
    }
 
+   //? if <26.1 {
+   /*@Inject(
+      method = {"render"},
+      at = {@At(
+   value = "INVOKE",
+   target = "Lnet/minecraft/client/gui/components/AbstractWidget;renderWidget(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"
+)}
+   )
+   private void setHovered(GuiGraphics extractor, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+      if (this.wrapper != null) {
+         this.isHovered = this.isHovered && this.wrapper.hovered();
+      }
+   }
+   *///?} else {
    @Inject(
       method = {"extractRenderState"},
       at = {@At(
@@ -300,6 +324,6 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
       if (this.wrapper != null) {
          this.isHovered = this.isHovered && this.wrapper.hovered();
       }
-
    }
+   //?}
 }

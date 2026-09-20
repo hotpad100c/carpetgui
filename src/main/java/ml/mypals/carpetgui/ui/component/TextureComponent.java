@@ -5,9 +5,7 @@ import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
 import ml.mypals.carpetgui.ui.core.PositionedRectangle;
 import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.util.Observable;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
-import org.joml.Matrix3x2fStack;
 
 public class TextureComponent extends BaseUIComponent {
    protected final Identifier texture;
@@ -40,15 +38,14 @@ public class TextureComponent extends BaseUIComponent {
    }
 
    public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
-      Matrix3x2fStack matrices = graphics.pose();
-      matrices.pushMatrix();
-      matrices.translate((float)this.x, (float)this.y);
-      matrices.scale((float)this.width / (float)this.regionWidth, (float)this.height / (float)this.regionHeight);
+      graphics.push();
+      graphics.translate((float)this.x, (float)this.y);
+      graphics.scale((float)this.width / (float)this.regionWidth, (float)this.height / (float)this.regionHeight);
       PositionedRectangle visibleArea = (PositionedRectangle)this.visibleArea.get();
       int bottomEdge = Math.min(visibleArea.carpetGUI$y() + visibleArea.carpetGUI$height(), this.regionHeight);
       int rightEdge = Math.min(visibleArea.carpetGUI$x() + visibleArea.carpetGUI$width(), this.regionWidth);
-      graphics.blit(RenderPipelines.GUI_TEXTURED, this.texture, visibleArea.carpetGUI$x(), visibleArea.carpetGUI$y(), (float)(this.u + visibleArea.carpetGUI$x()), (float)(this.v + visibleArea.carpetGUI$y()), rightEdge - visibleArea.carpetGUI$x(), bottomEdge - visibleArea.carpetGUI$y(), rightEdge - visibleArea.carpetGUI$x(), bottomEdge - visibleArea.carpetGUI$y(), this.textureWidth, this.textureHeight);
-      matrices.popMatrix();
+      graphics.blitTexture(this.texture, visibleArea.carpetGUI$x(), visibleArea.carpetGUI$y(), (float)(this.u + visibleArea.carpetGUI$x()), (float)(this.v + visibleArea.carpetGUI$y()), rightEdge - visibleArea.carpetGUI$x(), bottomEdge - visibleArea.carpetGUI$y(), rightEdge - visibleArea.carpetGUI$x(), bottomEdge - visibleArea.carpetGUI$y(), this.textureWidth, this.textureHeight);
+      graphics.pop();
    }
 
    public TextureComponent visibleArea(PositionedRectangle visibleArea) {

@@ -125,12 +125,20 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       root.verticalAlignment(VerticalAlignment.CENTER);
       root.child((UIComponent)master.getKey());
       this.setCurrentCategory(RulesEditScreen.DefaultCategory.ALL.getName());
+      //? if <1.21.9 {
+      /*ScreenKeyboardEvents.afterKeyPress(this).register((screen, key, scancode, modifiers) -> {
+         if ((modifiers & 2) != 0 && key == 83) {
+            ScreenUtils.showSaveGroupDialog((FlowLayout)this.uiAdapter.rootComponent, this.dialogOverlay);
+         }
+      });
+      *///?} else {
       ScreenKeyboardEvents.afterKeyPress(this).register((ScreenKeyboardEvents.AfterKeyPress)(screen, key) -> {
          if ((key.modifiers() & 2) != 0 && key.key() == 83) {
             ScreenUtils.showSaveGroupDialog((FlowLayout)this.uiAdapter.rootComponent, this.dialogOverlay);
          }
 
       });
+      //?}
       return (FlowLayout)master.getKey();
    }
 

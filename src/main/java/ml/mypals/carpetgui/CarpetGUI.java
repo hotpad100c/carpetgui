@@ -31,13 +31,25 @@ import ml.mypals.carpetgui.ruleStack.PrefabManager;
 import ml.mypals.carpetgui.ruleStack.RuleStackCommand;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+//? if >=1.20.5 {
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+//?}
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
+//? if < 1.21.11 {
+/*import net.minecraft.world.level.GameRules;
+import net.minecraft.commands.CommandSourceStack;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import ml.mypals.carpetgui.mixin.accessors.GameRulesAccessor;
+import ml.mypals.carpetgui.mixin.accessors.TypeAccessor;
+import java.util.Objects;
+import static ml.mypals.carpetgui.settings.GamerulesDefaultValueSorter.gamerulesDefaultValues;
+*///?} else {
 import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRules;
+//?}
 import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,13 +65,36 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
    public void onInitialize() {
       CarpetServer.manageExtension(this);
       CommandRegistrationCallback.EVENT.register((CommandRegistrationCallback)(commandDispatcher, commandBuildContext, commandSelection) -> RuleStackCommand.register(commandDispatcher));
+      //? if >=1.20.5 {
       PayloadTypeRegistry.serverboundPlay().register(RequestRulesPayload.ID, RequestRulesPayload.CODEC);
       PayloadTypeRegistry.serverboundPlay().register(RequestRuleStackPayload.ID, RequestRuleStackPayload.CODEC);
       PayloadTypeRegistry.clientboundPlay().register(RulesPacketPayload.ID, RulesPacketPayload.CODEC);
       PayloadTypeRegistry.clientboundPlay().register(HelloPacketPayload.ID, HelloPacketPayload.CODEC);
       PayloadTypeRegistry.clientboundPlay().register(RuleStackSyncPayload.ID, RuleStackSyncPayload.CODEC);
-      ServerPlayNetworking.registerGlobalReceiver(RequestRulesPayload.ID, (payload, context) -> CarpetGUIServerPacketHandler.handleRequestRules(payload, context.player(), context.server()));
-      ServerPlayNetworking.registerGlobalReceiver(RequestRuleStackPayload.ID, (payload, context) -> CarpetGUIServerPacketHandler.handleRequestRuleStack(payload, context.player(), context.server()));
+      ServerPlayNetworking.registerGlobalReceiver(RequestRulesPayload.ID, (payload, context) -> CarpetGUIServerPacketHandler.handleRequestRules(payload, context.player(),
+         //? if <1.21.9 {
+         /*java.util.Objects.requireNonNull(context.player().getServer())
+         *///?} else {
+         context.server()
+         //?}
+      ));
+      ServerPlayNetworking.registerGlobalReceiver(RequestRuleStackPayload.ID, (payload, context) -> CarpetGUIServerPacketHandler.handleRequestRuleStack(payload, context.player(),
+         //? if <1.21.9 {
+         /*java.util.Objects.requireNonNull(context.player().getServer())
+         *///?} else {
+         context.server()
+         //?}
+      ));
+      //?} else {
+      /*ServerPlayNetworking.registerGlobalReceiver(RequestRuleStackPayload.ID.getId(),
+              (server, player, handler, buf, responseSender) ->
+                      CarpetGUIServerPacketHandler.handleRequestRuleStack(RequestRuleStackPayload.ID.read(buf), player, java.util.Objects.requireNonNull(player.getServer()))
+      );
+      ServerPlayNetworking.registerGlobalReceiver(RequestRulesPayload.ID.getId(),
+              (server, player, handler, buf, responseSender) ->
+                      CarpetGUIServerPacketHandler.handleRequestRules(RequestRulesPayload.ID.read(buf), player, java.util.Objects.requireNonNull(player.getServer()))
+      );
+      *///?}
       ServerPlayConnectionEvents.JOIN.register((ServerPlayConnectionEvents.Join)(impl, sender, server) -> sender.sendPacket(new HelloPacketPayload()));
    }
 
@@ -83,11 +118,34 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
       if (server == null) {
          return new ArrayList();
       } else {
+         //? if <1.21.11 {
+         /*GameRulesAccessor rulesAccessor = ((GameRulesAccessor) getGamerules());
+         for (Map.Entry<GameRules.Key<?>, GameRules.Value<?>> entry : rulesAccessor.carpetGUI$getRules().entrySet()) {
+            GameRules.Key<?> rule = entry.getKey();
+            GameRules.Value<?> value = entry.getValue();
+            GameRules.Type<?> type = ((TypeAccessor) value).carpetGUI$getType();
+            RequiredArgumentBuilder<CommandSourceStack, ?> argumentBuilder = type.createArgument("");
+
+            fakeCarpetRules.add(new RuleData(
+                    "gamerule",
+                    rule.getId(),
+                    rule.getId(),
+                    value.getClass(),
+                    gamerulesDefaultValues.get(rule),
+                    String.valueOf(server.getGameRules().getRule(rule)),
+                    rule.getDescriptionId(),
+                    rule.getDescriptionId(),
+                    argumentBuilder.getType().getExamples().stream().toList(),
+                    List.of(Map.entry("gamerule", "gui.category.gamerules : " + rule.getCategory().getDescriptionId()))
+            ));
+         }
+         *///?} else {
          GameRules gameRules = getGamerules();
 
          for(GameRule<?> rule : gameRules.availableRules().toList()) {
             fakeCarpetRules.add(new RuleData("gamerule", rule.id(), rule.id(), rule.valueClass(), rule.defaultValue().toString(), String.valueOf(gameRules.get(rule)), rule.getDescriptionId(), rule.getDescriptionId(), rule.argument().getExamples().stream().toList(), List.of(Map.entry("gamerule", "gui.category.gamerules : " + String.valueOf(rule.category().getDescriptionId())))));
          }
+         //?}
 
          return fakeCarpetRules;
       }
@@ -95,7 +153,13 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
    public static GameRules getGamerules() {
       MinecraftServer server = CarpetServer.minecraft_server;
+      //? if <1.21.11 {
+      /*return server.getGameRules();
+      *///?} else if <26.1 {
+      /*return server.getWorldData().getGameRules();
+      *///?} else {
       return server.getGameRules();
+      //?}
    }
 
    public static List<RuleData> getRules(SettingsManager settingsManager, String lang) {

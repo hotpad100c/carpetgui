@@ -2,23 +2,35 @@ package ml.mypals.carpetgui.network.server;
 
 import ml.mypals.carpetgui.network.PacketIDs;
 import net.minecraft.network.FriendlyByteBuf;
+
+//? if >= 1.20.5 {
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 
 public record HelloPacketPayload() implements CustomPacketPayload {
-   public static final CustomPacketPayload.Type<HelloPacketPayload> ID;
-   public static final StreamCodec<FriendlyByteBuf, HelloPacketPayload> CODEC;
+    public static final Type<HelloPacketPayload> ID = new Type<>(PacketIDs.HELLO_PACKET);
+    public static final StreamCodec<FriendlyByteBuf, HelloPacketPayload> CODEC = StreamCodec.ofMember(HelloPacketPayload::write, buf -> new HelloPacketPayload());
 
-   public void write(FriendlyByteBuf buf) {
-   }
+    public void write(FriendlyByteBuf buf) {}
 
-   public CustomPacketPayload.@NotNull Type<? extends CustomPacketPayload> type() {
-      return ID;
-   }
-
-   static {
-      ID = new CustomPacketPayload.Type(PacketIDs.HELLO_PACKET);
-      CODEC = StreamCodec.ofMember(HelloPacketPayload::write, (buf) -> new HelloPacketPayload());
-   }
+    @Override
+    public @NotNull Type<? extends CustomPacketPayload> type() {
+        return ID;
+    }
 }
+//?} else {
+/*import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
+
+public record HelloPacketPayload() implements FabricPacket {
+    public static final PacketType<HelloPacketPayload> ID = PacketType.create(PacketIDs.HELLO_PACKET, buf -> new HelloPacketPayload());
+
+    public void write(FriendlyByteBuf buf) {}
+
+    @Override
+    public PacketType<?> getType() {
+        return ID;
+    }
+}
+*///?}

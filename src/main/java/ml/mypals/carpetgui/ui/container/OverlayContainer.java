@@ -13,7 +13,11 @@ import ml.mypals.carpetgui.ui.core.Surface;
 import ml.mypals.carpetgui.ui.core.UIComponent;
 import ml.mypals.carpetgui.ui.event.UIEvents.KeyPress;
 import ml.mypals.carpetgui.ui.util.EventStream;
+//? if >=1.21.9 {
 import net.minecraft.client.input.MouseButtonEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
+*///?}
 import org.jetbrains.annotations.Nullable;
 
 public class OverlayContainer<C extends UIComponent> extends BaseParentUIComponent {

@@ -1,11 +1,14 @@
 {
   "required": true,
   "package": "ml.mypals.carpetgui.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "${java}",
   "mixins": [
     "CarpetClientNetworkMixin",
+    "GamerulesMixin",
     "accessors.CommandSourceStackMixin",
-    "accessors.SettngsManagerAccessor"
+    "accessors.GameRulesAccessor",
+    "accessors.SettngsManagerAccessor",
+    "accessors.TypeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -20,6 +23,7 @@
     "ui.EditBoxMixin",
     "ui.GuiGraphicsExtractorAccessor",
     "ui.MinecraftMixin",
+    "ui.ScreenAccessor",
     "ui.ScreenMixin"
   ]
 }

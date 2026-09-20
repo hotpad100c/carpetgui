@@ -1,7 +1,6 @@
 package ml.mypals.carpetgui.ui.component;
 
 import java.util.function.Consumer;
-import ml.mypals.carpetgui.mixin.ui.AbstractWidgetAccessor;
 import ml.mypals.carpetgui.ui.UI;
 import ml.mypals.carpetgui.ui.core.CursorStyle;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
@@ -9,10 +8,12 @@ import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.util.NinePatchTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+//? if <26.1 {
+/*import net.minecraft.client.gui.GuiGraphics;
+*///?} else {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?}
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.WidgetTooltipHolder;
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -28,21 +29,34 @@ public class ButtonComponent extends Button {
       this.sizing(Sizing.content());
    }
 
+   //? if <1.20 {
+   /*@Override
+   public void renderWidget(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float a) {
+      this.renderContents(new GuiGraphics(Minecraft.getInstance(), poseStack, Minecraft.getInstance().renderBuffers().bufferSource()), mouseX, mouseY, a);
+   }
+   protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+   *///?} elif <26.1 {
+   /*protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+   *///?} else {
    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+   //?}
       Identifier texture = this.active ? (this.isHovered ? HOVERED_TEXTURE : ACTIVE_TEXTURE) : DISABLED_TEXTURE;
       NinePatchTexture.draw(texture, (OwoUIGraphics)graphics, this.getX(), this.getY(), this.width, this.height);
 
       Font textRenderer = Minecraft.getInstance().font;
       int color = this.active ? -1 : -6250336;
       if (this.textShadow) {
+         //? if <26.1 {
+         /*graphics.drawCenteredString(textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, color);
+         *///?} else {
          graphics.centeredText(textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, color);
+         //?}
       } else {
+         //? if <26.1 {
+         /*graphics.drawString(textRenderer, this.getMessage(), (int)((float)this.getX() + (float)this.width / 2.0F - (float)textRenderer.width(this.getMessage()) / 2.0F), (int)((float)this.getY() + (float)(this.height - 8) / 2.0F), color, false);
+         *///?} else {
          graphics.text(textRenderer, this.getMessage(), (int)((float)this.getX() + (float)this.width / 2.0F - (float)textRenderer.width(this.getMessage()) / 2.0F), (int)((float)this.getY() + (float)(this.height - 8) / 2.0F), color, false);
-      }
-
-      WidgetTooltipHolder tooltip = ((AbstractWidgetAccessor)this).carpetGUI$getTooltip();
-      if (this.isHovered && tooltip.get() != null) {
-         graphics.setTooltipForNextFrame(textRenderer, tooltip.get().toCharSequence(Minecraft.getInstance()), DefaultTooltipPositioner.INSTANCE, mouseX, mouseY, false);
+         //?}
       }
    }
 

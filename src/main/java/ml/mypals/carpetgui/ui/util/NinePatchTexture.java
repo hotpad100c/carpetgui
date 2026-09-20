@@ -1,6 +1,5 @@
 package ml.mypals.carpetgui.ui.util;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -9,7 +8,6 @@ import ml.mypals.carpetgui.ui.core.Color;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
 import ml.mypals.carpetgui.ui.core.PositionedRectangle;
 import ml.mypals.carpetgui.ui.core.Size;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +19,7 @@ public class NinePatchTexture {
    private final PatchSizing patchSizing;
    private final Size textureSize;
    private final boolean repeat;
-   private static final Map<Identifier, NinePatchTexture> REGISTRY = new HashMap();
+   private static final Map<Identifier, NinePatchTexture> REGISTRY = new HashMap<>();
 
    public NinePatchTexture(Identifier texture, int u, int v, PatchSizing patchSizing, Size textureSize, boolean repeat) {
       this.texture = texture;
@@ -61,50 +59,40 @@ public class NinePatchTexture {
    }
 
    public void draw(OwoUIGraphics context, int x, int y, int width, int height, Color color) {
-      this.draw(context, RenderPipelines.GUI_TEXTURED, x, y, width, height, color);
-   }
-
-   public void draw(OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height) {
-      this.draw(context, pipeline, x, y, width, height, Color.WHITE);
-   }
-
-   public void draw(OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height, Color color) {
       int rightEdge = this.cornerPatchSize().width() + this.centerPatchSize().width();
       int bottomEdge = this.cornerPatchSize().height() + this.centerPatchSize().height();
-      context.blit(pipeline, this.texture, x, y, (float)this.u, (float)this.v, this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
-      context.blit(pipeline, this.texture, x + width - this.cornerPatchSize().width(), y, (float)(this.u + rightEdge), (float)this.v, this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
-      context.blit(pipeline, this.texture, x, y + height - this.cornerPatchSize().height(), (float)this.u, (float)(this.v + bottomEdge), this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
-      context.blit(pipeline, this.texture, x + width - this.cornerPatchSize().width(), y + height - this.cornerPatchSize().height(), (float)(this.u + rightEdge), (float)(this.v + bottomEdge), this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+      context.blitTexture(this.texture, x, y, (float)this.u, (float)this.v, this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+      context.blitTexture(this.texture, x + width - this.cornerPatchSize().width(), y, (float)(this.u + rightEdge), (float)this.v, this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+      context.blitTexture(this.texture, x, y + height - this.cornerPatchSize().height(), (float)this.u, (float)(this.v + bottomEdge), this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+      context.blitTexture(this.texture, x + width - this.cornerPatchSize().width(), y + height - this.cornerPatchSize().height(), (float)(this.u + rightEdge), (float)(this.v + bottomEdge), this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.cornerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
       if (this.repeat) {
-         this.drawRepeated(context, pipeline, x, y, width, height, color);
+         this.drawRepeated(context, x, y, width, height, color);
       } else {
-         this.drawStretched(context, pipeline, x, y, width, height, color);
+         this.drawStretched(context, x, y, width, height, color);
       }
-
    }
 
-   protected void drawStretched(OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height, Color color) {
+   protected void drawStretched(OwoUIGraphics context, int x, int y, int width, int height, Color color) {
       int doubleCornerHeight = this.cornerPatchSize().height() * 2;
       int doubleCornerWidth = this.cornerPatchSize().width() * 2;
       int rightEdge = this.cornerPatchSize().width() + this.centerPatchSize().width();
       int bottomEdge = this.cornerPatchSize().height() + this.centerPatchSize().height();
       if (width > doubleCornerWidth && height > doubleCornerHeight) {
-         context.blit(pipeline, this.texture, x + this.cornerPatchSize().width(), y + this.cornerPatchSize().height(), (float)(this.u + this.cornerPatchSize().width()), (float)(this.v + this.cornerPatchSize().height()), width - doubleCornerWidth, height - doubleCornerHeight, this.centerPatchSize().width(), this.centerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+         context.blitTexture(this.texture, x + this.cornerPatchSize().width(), y + this.cornerPatchSize().height(), (float)(this.u + this.cornerPatchSize().width()), (float)(this.v + this.cornerPatchSize().height()), width - doubleCornerWidth, height - doubleCornerHeight, this.centerPatchSize().width(), this.centerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
       }
 
       if (width > doubleCornerWidth) {
-         context.blit(pipeline, this.texture, x + this.cornerPatchSize().width(), y, (float)(this.u + this.cornerPatchSize().width()), (float)this.v, width - doubleCornerWidth, this.cornerPatchSize().height(), this.centerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
-         context.blit(pipeline, this.texture, x + this.cornerPatchSize().width(), y + height - this.cornerPatchSize().height(), (float)(this.u + this.cornerPatchSize().width()), (float)(this.v + bottomEdge), width - doubleCornerWidth, this.cornerPatchSize().height(), this.centerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+         context.blitTexture(this.texture, x + this.cornerPatchSize().width(), y, (float)(this.u + this.cornerPatchSize().width()), (float)this.v, width - doubleCornerWidth, this.cornerPatchSize().height(), this.centerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+         context.blitTexture(this.texture, x + this.cornerPatchSize().width(), y + height - this.cornerPatchSize().height(), (float)(this.u + this.cornerPatchSize().width()), (float)(this.v + bottomEdge), width - doubleCornerWidth, this.cornerPatchSize().height(), this.centerPatchSize().width(), this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
       }
 
       if (height > doubleCornerHeight) {
-         context.blit(pipeline, this.texture, x, y + this.cornerPatchSize().height(), (float)this.u, (float)(this.v + this.cornerPatchSize().height()), this.cornerPatchSize().width(), height - doubleCornerHeight, this.cornerPatchSize().width(), this.centerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
-         context.blit(pipeline, this.texture, x + width - this.cornerPatchSize().width(), y + this.cornerPatchSize().height(), (float)(this.u + rightEdge), (float)(this.v + this.cornerPatchSize().height()), this.cornerPatchSize().width(), height - doubleCornerHeight, this.cornerPatchSize().width(), this.centerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+         context.blitTexture(this.texture, x, y + this.cornerPatchSize().height(), (float)this.u, (float)(this.v + this.cornerPatchSize().height()), this.cornerPatchSize().width(), height - doubleCornerHeight, this.cornerPatchSize().width(), this.centerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+         context.blitTexture(this.texture, x + width - this.cornerPatchSize().width(), y + this.cornerPatchSize().height(), (float)(this.u + rightEdge), (float)(this.v + this.cornerPatchSize().height()), this.cornerPatchSize().width(), height - doubleCornerHeight, this.cornerPatchSize().width(), this.centerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
       }
-
    }
 
-   protected void drawRepeated(OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height, Color color) {
+   protected void drawRepeated(OwoUIGraphics context, int x, int y, int width, int height, Color color) {
       int doubleCornerHeight = this.cornerPatchSize().height() * 2;
       int doubleCornerWidth = this.cornerPatchSize().width() * 2;
       int rightEdge = this.cornerPatchSize().width() + this.centerPatchSize().width();
@@ -115,7 +103,7 @@ public class NinePatchTexture {
 
             for(int leftoverWidth = width - doubleCornerWidth; leftoverWidth > 0; leftoverWidth -= this.centerPatchSize().width()) {
                int drawWidth = Math.min(this.centerPatchSize().width(), leftoverWidth);
-               context.blit(pipeline, this.texture, x + this.cornerPatchSize().width() + leftoverWidth - drawWidth, y + this.cornerPatchSize().height() + leftoverHeight - drawHeight, (float)(this.u + this.cornerPatchSize().width() + this.centerPatchSize().width() - drawWidth), (float)(this.v + this.cornerPatchSize().height() + this.centerPatchSize().height() - drawHeight), drawWidth, drawHeight, drawWidth, drawHeight, this.textureSize.width(), this.textureSize.height(), color.argb());
+               context.blitTexture(this.texture, x + this.cornerPatchSize().width() + leftoverWidth - drawWidth, y + this.cornerPatchSize().height() + leftoverHeight - drawHeight, (float)(this.u + this.cornerPatchSize().width() + this.centerPatchSize().width() - drawWidth), (float)(this.v + this.cornerPatchSize().height() + this.centerPatchSize().height() - drawHeight), drawWidth, drawHeight, drawWidth, drawHeight, this.textureSize.width(), this.textureSize.height(), color.argb());
             }
          }
       }
@@ -123,35 +111,26 @@ public class NinePatchTexture {
       if (width > doubleCornerWidth) {
          for(int leftoverWidth = width - doubleCornerWidth; leftoverWidth > 0; leftoverWidth -= this.centerPatchSize().width()) {
             int drawWidth = Math.min(this.centerPatchSize().width(), leftoverWidth);
-            context.blit(pipeline, this.texture, x + this.cornerPatchSize().width() + leftoverWidth - drawWidth, y, (float)(this.u + this.cornerPatchSize().width() + this.centerPatchSize().width() - drawWidth), (float)this.v, drawWidth, this.cornerPatchSize().height(), drawWidth, this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
-            context.blit(pipeline, this.texture, x + this.cornerPatchSize().width() + leftoverWidth - drawWidth, y + height - this.cornerPatchSize().height(), (float)(this.u + this.cornerPatchSize().width() + this.centerPatchSize().width() - drawWidth), (float)(this.v + bottomEdge), drawWidth, this.cornerPatchSize().height(), drawWidth, this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+            context.blitTexture(this.texture, x + this.cornerPatchSize().width() + leftoverWidth - drawWidth, y, (float)(this.u + this.cornerPatchSize().width() + this.centerPatchSize().width() - drawWidth), (float)this.v, drawWidth, this.cornerPatchSize().height(), drawWidth, this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
+            context.blitTexture(this.texture, x + this.cornerPatchSize().width() + leftoverWidth - drawWidth, y + height - this.cornerPatchSize().height(), (float)(this.u + this.cornerPatchSize().width() + this.centerPatchSize().width() - drawWidth), (float)(this.v + bottomEdge), drawWidth, this.cornerPatchSize().height(), drawWidth, this.cornerPatchSize().height(), this.textureSize.width(), this.textureSize.height(), color.argb());
          }
       }
 
       if (height > doubleCornerHeight) {
          for(int leftoverHeight = height - doubleCornerHeight; leftoverHeight > 0; leftoverHeight -= this.centerPatchSize().height()) {
             int drawHeight = Math.min(this.centerPatchSize().height(), leftoverHeight);
-            context.blit(pipeline, this.texture, x, y + this.cornerPatchSize().height() + leftoverHeight - drawHeight, (float)this.u, (float)(this.v + this.cornerPatchSize().height() + this.centerPatchSize().height() - drawHeight), this.cornerPatchSize().width(), drawHeight, this.cornerPatchSize().width(), drawHeight, this.textureSize.width(), this.textureSize.height(), color.argb());
-            context.blit(pipeline, this.texture, x + width - this.cornerPatchSize().width(), y + this.cornerPatchSize().height() + leftoverHeight - drawHeight, (float)(this.u + rightEdge), (float)(this.v + this.cornerPatchSize().height() + this.centerPatchSize().height() - drawHeight), this.cornerPatchSize().width(), drawHeight, this.cornerPatchSize().width(), drawHeight, this.textureSize.width(), this.textureSize.height(), color.argb());
+            context.blitTexture(this.texture, x, y + this.cornerPatchSize().height() + leftoverHeight - drawHeight, (float)this.u, (float)(this.v + this.cornerPatchSize().height() + this.centerPatchSize().height() - drawHeight), this.cornerPatchSize().width(), drawHeight, this.cornerPatchSize().width(), drawHeight, this.textureSize.width(), this.textureSize.height(), color.argb());
+            context.blitTexture(this.texture, x + width - this.cornerPatchSize().width(), y + this.cornerPatchSize().height() + leftoverHeight - drawHeight, (float)(this.u + rightEdge), (float)(this.v + this.cornerPatchSize().height() + this.centerPatchSize().height() - drawHeight), this.cornerPatchSize().width(), drawHeight, this.cornerPatchSize().width(), drawHeight, this.textureSize.width(), this.textureSize.height(), color.argb());
          }
       }
-
    }
 
    public static void draw(Identifier texture, OwoUIGraphics context, int x, int y, int width, int height) {
-      draw(texture, context, RenderPipelines.GUI_TEXTURED, x, y, width, height);
+      ifPresent(texture, (ninePatchTexture) -> ninePatchTexture.draw(context, x, y, width, height, Color.WHITE));
    }
 
    public static void draw(Identifier texture, OwoUIGraphics context, int x, int y, int width, int height, Color color) {
-      draw(texture, context, RenderPipelines.GUI_TEXTURED, x, y, width, height, color);
-   }
-
-   public static void draw(Identifier texture, OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height) {
-      ifPresent(texture, (ninePatchTexture) -> ninePatchTexture.draw(context, pipeline, x, y, width, height));
-   }
-
-   public static void draw(Identifier texture, OwoUIGraphics context, RenderPipeline pipeline, int x, int y, int width, int height, Color color) {
-      ifPresent(texture, (ninePatchTexture) -> ninePatchTexture.draw(context, pipeline, x, y, width, height, color));
+      ifPresent(texture, (ninePatchTexture) -> ninePatchTexture.draw(context, x, y, width, height, color));
    }
 
    public static void draw(Identifier texture, OwoUIGraphics context, PositionedRectangle rectangle) {

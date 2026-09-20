@@ -16,10 +16,17 @@ public class MinecraftMixin {
    @Final
    private Window window;
 
+   //? if <26.1 {
+   /*@Inject(
+      method = {"resizeDisplay"},
+      at = {@At("TAIL")}
+   )
+   *///?} else {
    @Inject(
       method = {"resizeGui"},
       at = {@At("TAIL")}
    )
+   //?}
    private void captureResize(CallbackInfo ci) {
       ((WindowResizeCallback)WindowResizeCallback.EVENT.invoker()).onResized((Minecraft)(Object)this, this.window);
    }

@@ -24,7 +24,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 
@@ -165,7 +164,7 @@ public class ScreenUtils {
    }
 
    public static Component buildTooltip(RuleData ruleData, String query) {
-      MutableComponent tip = MutableComponent.create(PlainTextContents.EMPTY);
+      MutableComponent tip = Component.empty();
       tip.append(highlight(ruleData.localName.isEmpty() ? ruleData.name : ruleData.localName, query).copy().withStyle(ChatFormatting.WHITE)).append("\n").append(highlight(ruleData.localDescription.isEmpty() ? ruleData.description : ruleData.localDescription, query).copy().withStyle(ChatFormatting.GRAY)).append("\n").append(Component.translatable("gui.screen.tooltip.defaultValue").withStyle(ChatFormatting.DARK_GREEN)).append(": " + ruleData.defaultValue).append("\n").append(Component.translatable("gui.screen.tooltip.currentValue").withStyle(ChatFormatting.DARK_GREEN)).append(": " + ruleData.value).append("\n").append(Component.translatable("gui.screen.tooltip.suggestions").withStyle(ChatFormatting.BLUE)).append(":");
       tip.append(" [");
 

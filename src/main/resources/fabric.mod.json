@@ -25,7 +25,6 @@
   "mixins": [
     "carpetgui.mixins.json"
   ],
-  "accessWidener": "carpetgui.accesswidener",
   "depends": {
     "fabricloader": "*",
     "minecraft": "${minecraft}",

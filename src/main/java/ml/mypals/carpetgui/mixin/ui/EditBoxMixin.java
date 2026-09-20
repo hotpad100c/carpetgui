@@ -57,7 +57,11 @@ public abstract class EditBoxMixin extends AbstractWidget implements GreedyInput
    }
 
    @ModifyExpressionValue(
+      //? if <1.20.2 {
+      /*method = {"deleteChars"},
+      *///?} else {
       method = {"deleteCharsToPos"},
+      //?}
       at = {@At(
    value = "INVOKE",
    target = "Ljava/lang/StringBuilder;toString()Ljava/lang/String;"

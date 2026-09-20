@@ -37,17 +37,17 @@ stonecutter parameters {
             replace("Identifier", "ResourceLocation")
         }
 
-        string(eval(current.version, "<1.21.11")) {
-            replace("component.UIComponents", "component.Components")
+        string(eval(current.version, "<1.21.9")) {
+            replace("setScreenAndShow(", "setScreen(")
         }
-        string(eval(current.version, "<1.21.11")) {
-            replace("container.UIContainers", "container.Containers")
+        string(eval(current.version, "<1.21.9")) {
+            replace(".getWindow().handle()", ".getWindow().getWindow()")
         }
-        string(eval(current.version, "<1.21.11")) {
-            replace("BaseUIComponent", "BaseComponent")
+        string(eval(current.version, "<1.21.9")) {
+            replace("window.handle()", "window.getWindow()")
         }
-        string(eval(current.version, "<1.21.11")) {
-            replace("OwoUIGraphics", "OwoUIDrawContext")
+        string(eval(current.version, "<1.21.9")) {
+            replace("InputConstants.isKeyDown(this.minecraft.getWindow(),", "InputConstants.isKeyDown(this.minecraft.getWindow().getWindow(),")
         }
         /*
         string(eval(current.version, "<1.21.11")) {

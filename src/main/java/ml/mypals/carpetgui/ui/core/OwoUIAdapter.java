@@ -4,15 +4,25 @@ import com.mojang.blaze3d.platform.Window;
 import java.util.function.BiFunction;
 
 import net.minecraft.client.Minecraft;
+//? if <26.1 {
+/*import net.minecraft.client.gui.GuiGraphics;
+*///?} else {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?}
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+//? if >=1.21.9 {
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
+import ml.mypals.carpetgui.compat.input.KeyEvent;
+import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
+*///?}
 
 public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListener, Renderable, NarratableEntry {
    private static boolean isRendering = false;
@@ -34,9 +44,8 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    }
 
    public static <R extends ParentUIComponent> OwoUIAdapter<R> create(Screen screen, BiFunction<Sizing, Sizing, R> rootComponentMaker) {
-      R rootComponent = (R)(rootComponentMaker.apply(Sizing.fill(100), Sizing.fill(100)));
-      OwoUIAdapter<R> adapter = new OwoUIAdapter<R>(0, 0, screen.width, screen.height, rootComponent);
-      screen.addRenderableWidget(adapter);
+      R rootComponent = rootComponentMaker.apply(Sizing.fill(100), Sizing.fill(100));
+      OwoUIAdapter<R> adapter = new OwoUIAdapter<>(0, 0, screen.width, screen.height, rootComponent);
       screen.setFocused(adapter);
       return adapter;
    }
@@ -75,7 +84,26 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
       return this.height;
    }
 
+   private static float getDeltaTicks() {
+      //? if >=1.21.2 {
+      return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
+      //?} elif >=1.21 {
+      /*return Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
+      *///?} else {
+      /*return Minecraft.getInstance().getDeltaFrameTime();
+      *///?}
+   }
+
+   //? if <1.20 {
+   /*public void render(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float a) {
+      this.render(new GuiGraphics(Minecraft.getInstance(), poseStack, Minecraft.getInstance().renderBuffers().bufferSource()), mouseX, mouseY, a);
+   }
+   public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+   *///?} elif <26.1 {
+   /*public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+   *///?} else {
    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+   //?}
       if (!(graphics instanceof OwoUIGraphics)) {
          graphics = OwoUIGraphics.of(graphics);
       }
@@ -84,7 +112,7 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 
       try {
          isRendering = true;
-         float delta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
+         float delta = getDeltaTicks();
          Window window = Minecraft.getInstance().getWindow();
          this.rootComponent.carpetGUI$update(delta, mouseX, mouseY);
          graphics.enableScissor(0, 0, window.getWidth(), window.getHeight());
@@ -100,15 +128,23 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 
    }
 
+   //? if <26.1 {
+   /*public void drawTooltip(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+   *///?} else {
    public void drawTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+   //?}
       if (!(graphics instanceof OwoUIGraphics)) {
          graphics = OwoUIGraphics.of(graphics);
       }
 
       OwoUIGraphics owoContext = (OwoUIGraphics)graphics;
-      float delta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
+      float delta = getDeltaTicks();
       this.rootComponent.drawTooltip(owoContext, mouseX, mouseY, partialTicks, delta);
+      //? if >=26.1 {
       graphics.extractDeferredElements(mouseX, mouseY, partialTicks);
+      //?} elif >=1.21.9 {
+      /*graphics.renderDeferredElements();
+      *///?}
    }
 
    public boolean isMouseOver(double mouseX, double mouseY) {
@@ -122,16 +158,33 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
       return true;
    }
 
+   //? if <1.21.9 {
+   /*public boolean mouseClicked(double mouseX, double mouseY, int button) {
+      return this.rootComponent.carpetGUI$onMouseDown(new MouseButtonEvent(mouseX, mouseY, button), false);
+   }
+
+   public boolean mouseReleased(double mouseX, double mouseY, int button) {
+      return this.rootComponent.carpetGUI$onMouseUp(new MouseButtonEvent(mouseX, mouseY, button));
+   }
+
+   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+      return this.rootComponent.carpetGUI$onMouseDrag(new MouseButtonEvent(mouseX, mouseY, button), deltaX, deltaY);
+   }
+
+   public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+      return this.rootComponent.carpetGUI$onKeyPress(new KeyEvent(keyCode, scanCode, modifiers));
+   }
+
+   public boolean charTyped(char chr, int modifiers) {
+      return this.rootComponent.carpetGUI$onCharTyped(new CharacterEvent(chr, modifiers));
+   }
+   *///?} else {
    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
       return this.rootComponent.carpetGUI$onMouseDown(click, doubled);
    }
 
    public boolean mouseReleased(MouseButtonEvent click) {
       return this.rootComponent.carpetGUI$onMouseUp(click);
-   }
-
-   public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, verticalAmount);
    }
 
    public boolean mouseDragged(MouseButtonEvent click, double deltaX, double deltaY) {
@@ -145,6 +198,17 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    public boolean charTyped(CharacterEvent input) {
       return this.rootComponent.carpetGUI$onCharTyped(input);
    }
+   //?}
+
+   //? if >=1.20.2 {
+   public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, verticalAmount);
+   }
+   //?} else {
+   /*public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
+   }
+   *///?}
 
    public NarratableEntry.NarrationPriority narrationPriority() {
       return NarrationPriority.NONE;

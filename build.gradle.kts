@@ -38,10 +38,12 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
-    if(stonecutter.eval(stonecutter.current.version, "<=1.17.1") ){
-        modImplementation("com.github.glisco03:owo-lib:${property("deps.owo_version")}")
-    }else{
-        modImplementation("io.wispforest:owo-lib:${property("deps.owo_version")}")
+    if (project.hasProperty("deps.owo_version")) {
+        if(stonecutter.eval(stonecutter.current.version, "<=1.17.1") ){
+            modImplementation("com.github.glisco03:owo-lib:${property("deps.owo_version")}")
+        }else{
+            modImplementation("io.wispforest:owo-lib:${property("deps.owo_version")}")
+        }
     }
     modImplementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
 }

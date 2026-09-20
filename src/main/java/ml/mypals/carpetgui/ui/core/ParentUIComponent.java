@@ -8,7 +8,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.ChatFormatting;
+//? if >=1.21.9 {
 import net.minecraft.client.input.MouseButtonEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
+*///?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;

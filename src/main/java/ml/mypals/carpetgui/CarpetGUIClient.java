@@ -16,12 +16,18 @@ import ml.mypals.carpetgui.screen.ruleStack.RuleStackData;
 import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+//? if <26.1 {
+/*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+*///?} else {
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+//?}
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+//? if >=1.21.9 {
 import net.minecraft.client.KeyMapping.Category;
+//?}
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -44,7 +50,20 @@ public class CarpetGUIClient implements ClientModInitializer {
 
    public void onInitializeClient() {
       CarpetGUIConfigManager.initializeConfig();
-      carpetRulesKeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping("carpetgui.key.carpetRulesKeyBind", Type.KEYSYM, 298, Category.register(Identifier.fromNamespaceAndPath("carpetgui", "main"))));
+      //? if <26.1 {
+      /*carpetRulesKeyBind = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+      *///?} else {
+      carpetRulesKeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+      //?}
+         "carpetgui.key.carpetRulesKeyBind",
+         Type.KEYSYM,
+         298,
+         //? if <1.21.9 {
+         /*"key.category.carpetgui.main"
+         *///?} else {
+         Category.register(Identifier.fromNamespaceAndPath("carpetgui", "main"))
+         //?}
+      ));
       ClientTickEvents.END_CLIENT_TICK.register((ClientTickEvents.EndTick)(client) -> {
          if (carpetRulesKeyBind.consumeClick()) {
             CarpetGUIClientPacketHandler.openRuleEditScreen(true);
@@ -55,9 +74,32 @@ public class CarpetGUIClient implements ClientModInitializer {
          hasModOnServer = false;
          incompleteRulesFromServer.clear();
       });
+      //? if >=1.20.5 {
       ClientPlayNetworking.registerGlobalReceiver(HelloPacketPayload.ID, (payload, context) -> CarpetGUIClientPacketHandler.handleHelloPacket(payload));
       ClientPlayNetworking.registerGlobalReceiver(RuleStackSyncPayload.ID, (payload, context) -> CarpetGUIClientPacketHandler.handleRuleStackSync(payload));
       ClientPlayNetworking.registerGlobalReceiver(RulesPacketPayload.ID, (payload, context) -> CarpetGUIClientPacketHandler.handleRulesPacket(payload));
+      //?} else {
+      /*ClientPlayNetworking.registerGlobalReceiver(
+              HelloPacketPayload.ID,
+              (helloPacketPayload, localPlayer, packetSender) -> {
+                  CarpetGUIClientPacketHandler.handleHelloPacket(helloPacketPayload);
+              }
+      );
+
+      ClientPlayNetworking.registerGlobalReceiver(
+              RuleStackSyncPayload.ID,
+              (ruleStackSyncPayload, localPlayer, packetSender) -> {
+                  CarpetGUIClientPacketHandler.handleRuleStackSync(ruleStackSyncPayload);
+              }
+      );
+
+      ClientPlayNetworking.registerGlobalReceiver(
+              RulesPacketPayload.ID,
+              (rulesPacketPayload, localPlayer, packetSender) -> {
+                  CarpetGUIClientPacketHandler.handleRulesPacket(rulesPacketPayload);
+              }
+      );
+      *///?}
    }
 
    public static String getServerAddress(Minecraft client) {

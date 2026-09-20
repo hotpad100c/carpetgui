@@ -13,7 +13,11 @@ import ml.mypals.carpetgui.ui.core.Size;
 import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.Surface;
 import ml.mypals.carpetgui.ui.core.UIComponent;
+//? if >=1.21.9 {
 import net.minecraft.client.input.MouseButtonEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
+*///?}
 import net.minecraft.network.chat.Component;
 
 public class DropdownComponent extends FlowLayout {

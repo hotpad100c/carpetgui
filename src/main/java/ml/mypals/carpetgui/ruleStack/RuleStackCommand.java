@@ -16,7 +16,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+//? if >=1.21.11 {
 import net.minecraft.server.permissions.Permissions;
+//?}
 
 public final class RuleStackCommand {
    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("MM-dd HH:mm:ss");
@@ -25,7 +27,7 @@ public final class RuleStackCommand {
    }
 
    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-      dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("rulestack").requires((src) -> src.permissions().hasPermission(Permissions.COMMANDS_ADMIN))).then(((LiteralArgumentBuilder)Commands.literal("push").executes((c) -> doPush(c, ""))).then(Commands.argument("message", StringArgumentType.greedyString()).executes((c) -> doPush(c, StringArgumentType.getString(c, "message")))))).then(Commands.literal("pop").executes(RuleStackCommand::doPop))).then(Commands.literal("status").executes(RuleStackCommand::doStatus))).then(((LiteralArgumentBuilder)Commands.literal("show").executes(RuleStackCommand::doShowTop)).then(Commands.argument("layerId", StringArgumentType.word()).executes((c) -> doShowById(c, StringArgumentType.getString(c, "layerId")))))).then(Commands.literal("diff").executes(RuleStackCommand::doDiff))).then(Commands.literal("discard").executes(RuleStackCommand::discard))).then(((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("prefab").then(Commands.literal("list").executes(RuleStackCommand::doPrefabList))).then(Commands.literal("create").then(Commands.argument("name", StringArgumentType.word()).then(Commands.argument("forkCurrent", BoolArgumentType.bool()).executes((c) -> doPrefabCreate(c, StringArgumentType.getString(c, "name"), BoolArgumentType.getBool(c, "forkCurrent"))))))).then(Commands.literal("delete").then(Commands.argument("name", StringArgumentType.word()).suggests((c, b) -> {
+      dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("rulestack").requires((src) -> src/*? if >=1.21.11 {*/.permissions()/*?}*/.hasPermission(/*? if >=1.21.11 {*/Permissions.COMMANDS_ADMIN/*?} else {*//*2*//*?}*/))).then(((LiteralArgumentBuilder)Commands.literal("push").executes((c) -> doPush(c, ""))).then(Commands.argument("message", StringArgumentType.greedyString()).executes((c) -> doPush(c, StringArgumentType.getString(c, "message")))))).then(Commands.literal("pop").executes(RuleStackCommand::doPop))).then(Commands.literal("status").executes(RuleStackCommand::doStatus))).then(((LiteralArgumentBuilder)Commands.literal("show").executes(RuleStackCommand::doShowTop)).then(Commands.argument("layerId", StringArgumentType.word()).executes((c) -> doShowById(c, StringArgumentType.getString(c, "layerId")))))).then(Commands.literal("diff").executes(RuleStackCommand::doDiff))).then(Commands.literal("discard").executes(RuleStackCommand::discard))).then(((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("prefab").then(Commands.literal("list").executes(RuleStackCommand::doPrefabList))).then(Commands.literal("create").then(Commands.argument("name", StringArgumentType.word()).then(Commands.argument("forkCurrent", BoolArgumentType.bool()).executes((c) -> doPrefabCreate(c, StringArgumentType.getString(c, "name"), BoolArgumentType.getBool(c, "forkCurrent"))))))).then(Commands.literal("delete").then(Commands.argument("name", StringArgumentType.word()).suggests((c, b) -> {
          PrefabManager m = mgr();
          if (m != null) {
             m.getAllPrefabs().forEach((p) -> b.suggest(p.getName()));
@@ -329,7 +331,11 @@ public final class RuleStackCommand {
 
    private static int send(CommandContext<CommandSourceStack> ctx, Component component, boolean success, boolean broadcast) {
       if (success) {
+         //? if <1.20 {
+         /*((CommandSourceStack)ctx.getSource()).sendSuccess(component, broadcast);
+         *///?} else {
          ((CommandSourceStack)ctx.getSource()).sendSuccess(() -> component, broadcast);
+         //?}
       } else {
          ((CommandSourceStack)ctx.getSource()).sendFailure(component);
       }
