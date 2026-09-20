@@ -342,7 +342,7 @@ public abstract class AbstractWidgetMixin implements UIComponentStub, GuiEventLi
          this.isHovered = this.isHovered && this.wrapper.hovered();
       }
    }*/
-   //?}else{
+   //?} else {
    @Inject(
            method = {"render"},
            at = {@At(

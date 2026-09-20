@@ -205,6 +205,7 @@ public class RuleWidget {
       FlowLayout wrapper = UIContainers.verticalFlow(Sizing.fixed(70), Sizing.fill(100));
       wrapper.verticalAlignment(VerticalAlignment.CENTER);
       ScrollContainer<FlowLayout> scroll = UIContainers.<FlowLayout>verticalScroll(Sizing.fill(100), Sizing.fill(100), content);
+      scroll.scrollbarThiccness(5);
       wrapper.child(scroll);
       rightCol.child(wrapper);
    }

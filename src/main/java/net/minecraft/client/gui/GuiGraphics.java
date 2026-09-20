@@ -77,18 +77,44 @@ public class GuiGraphics {
         return shadow ? font.drawShadow(this.pose, text, (float)x, (float)y, color) : font.draw(this.pose, text, (float)x, (float)y, color);
     }
 
+    //? if <1.19 {
+    private static final java.util.Deque<int[]> SCISSOR_STACK = new java.util.ArrayDeque<>();
+
+    private void applyScissor(int[] rect) {
+        if (rect == null) {
+            RenderSystem.disableScissor();
+            return;
+        }
+        com.mojang.blaze3d.platform.Window window = this.minecraft.getWindow();
+        double scale = window.getGuiScale();
+        int frameH = window.getHeight();
+        int x = Math.max(0, (int)(rect[0] * scale));
+        int y = Math.max(0, (int)(frameH - rect[3] * scale));
+        int width = Math.max(0, (int)((rect[2] - rect[0]) * scale));
+        int height = Math.max(0, (int)((rect[3] - rect[1]) * scale));
+        RenderSystem.enableScissor(x, y, width, height);
+    }
+    //?}
+
     public void enableScissor(int minX, int minY, int maxX, int maxY) {
         //? if >=1.19 {
         /*GuiComponent.enableScissor(minX, minY, maxX, maxY);
         *///?} else {
-        com.mojang.blaze3d.platform.Window window = this.minecraft.getWindow();
-        double scale = window.getGuiScale();
-        int frameH = window.getHeight();
-        int x = Math.max(0, (int)(minX * scale));
-        int y = Math.max(0, (int)(frameH - maxY * scale));
-        int width = Math.max(0, (int)((maxX - minX) * scale));
-        int height = Math.max(0, (int)((maxY - minY) * scale));
-        RenderSystem.enableScissor(x, y, width, height);
+        int[] parent = SCISSOR_STACK.peek();
+        int[] next;
+        if (parent != null) {
+            int x1 = Math.max(parent[0], minX);
+            int y1 = Math.max(parent[1], minY);
+            int x2 = Math.min(parent[2], maxX);
+            int y2 = Math.min(parent[3], maxY);
+            if (x2 < x1) x2 = x1;
+            if (y2 < y1) y2 = y1;
+            next = new int[]{x1, y1, x2, y2};
+        } else {
+            next = new int[]{minX, minY, Math.max(minX, maxX), Math.max(minY, maxY)};
+        }
+        SCISSOR_STACK.push(next);
+        this.applyScissor(next);
         //?}
     }
 
@@ -96,7 +122,10 @@ public class GuiGraphics {
         //? if >=1.19 {
         /*GuiComponent.disableScissor();
         *///?} else {
-        RenderSystem.disableScissor();
+        if (!SCISSOR_STACK.isEmpty()) {
+            SCISSOR_STACK.pop();
+        }
+        this.applyScissor(SCISSOR_STACK.peek());
         //?}
     }
 

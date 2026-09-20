@@ -184,8 +184,20 @@ public class ScrollContainer<C extends UIComponent> extends BaseParentUIComponen
    }
 
    public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
-      if (this.isInScrollbar((double)this.x + click.x(), (double)this.y + click.y())) {
-         super.carpetGUI$onMouseDown(click, doubled);
+      double mouseX = (double)this.x + click.x();
+      double mouseY = (double)this.y + click.y();
+      if (this.isInScrollbar(mouseX, mouseY)) {
+         this.scrollbaring = true;
+         this.lastScrollbarInteractTime = System.currentTimeMillis() + 1500L;
+         Insets padding = (Insets)this.padding.get();
+         int contentSize = (Integer)this.direction.sizeGetter.apply(this) - (Integer)this.direction.insetGetter.apply(padding);
+         double trackSpace = (double)contentSize - this.lastScrollbarLength;
+         if (trackSpace > 0 && this.maxScroll > 0) {
+            double clickCoord = this.direction.choose(click.x(), click.y());
+            double trackStart = this.direction.choose((double)padding.left(), (double)padding.top());
+            double progress = (clickCoord - trackStart - this.lastScrollbarLength / 2.0) / trackSpace;
+            this.scrollTo(Mth.clamp(progress, 0.0, 1.0));
+         }
          return true;
       } else {
          return super.carpetGUI$onMouseDown(click, doubled);
@@ -246,7 +258,12 @@ public class ScrollContainer<C extends UIComponent> extends BaseParentUIComponen
    }
 
    protected boolean isInScrollbar(double mouseX, double mouseY) {
-      return this.isInBoundingBox(mouseX, mouseY) && this.direction.choose(mouseY, mouseX) >= (double)this.scrollbarOffset;
+      int minThickness = Math.max(6, this.scrollbarThiccness);
+      Insets padding = (Insets)this.padding.get();
+      int minOffset = this.direction == ScrollContainer.ScrollDirection.VERTICAL
+         ? this.x + this.width - padding.right() - minThickness
+         : this.y + this.height - padding.bottom() - minThickness;
+      return this.isInBoundingBox(mouseX, mouseY) && this.direction.choose(mouseY, mouseX) >= (double)minOffset;
    }
 
    public ScrollContainer<C> scrollTo(UIComponent component) {

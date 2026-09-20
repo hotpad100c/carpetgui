@@ -158,7 +158,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
    //?} else {
    /*@Override
    public boolean keyPressed(KeyEvent input) {
-      if ((Screen.hasControlDown() || input.hasControlDown()) && input.key() == 83) {
+      if (input.hasControlDown() && input.key() == 83) {
          ScreenUtils.showSaveGroupDialog((FlowLayout)this.uiAdapter.rootComponent, this.dialogOverlay);
          return true;
       }
