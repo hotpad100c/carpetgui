@@ -203,7 +203,13 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
 
             row.child(lbl);
             row.carpetGUI$mouseEnter().subscribe((MouseEnter)() -> {
-               if (data.pendingChanges().isEmpty() || InputConstants.isKeyDown(this.minecraft.getWindow(), 340)) {
+               if (data.pendingChanges().isEmpty() ||
+                        //? if < 26.3 {
+                        /*InputConstants.isKeyDown(this.minecraft.getWindow(), 340)*/
+                        //?} else {
+                        InputConstants.isKeyDown( 340)
+                        //?}
+               ) {
                   row.surface(row.surface().and(Surface.outline(Color.WHITE.argb())));
                }
 
@@ -212,7 +218,13 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
             if (!active) {
                row.carpetGUI$cursorStyle(CursorStyle.HAND);
                row.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
-                  if (!data.pendingChanges().isEmpty() && !InputConstants.isKeyDown(this.minecraft.getWindow(), 340)) {
+                  if (!data.pendingChanges().isEmpty() &&
+                          //? if < 26.3 {
+                          /*!InputConstants.isKeyDown(this.minecraft.getWindow(), 340)*/
+                          //?} else {
+                          !InputConstants.isKeyDown( 340)
+                         //?}
+                  ) {
                      return false;
                   } else {
                      this.sendCmd("rulestack prefab switch " + name);
@@ -239,7 +251,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       FlowLayout newButton = ScreenUtils.btn(Component.translatable("gui.rulegroups.save"), Sizing.fill(18), Sizing.fill(98), () -> {
          String n = nameBox.getValue().trim();
          if (!n.isEmpty()) {
-            this.sendCmd("rulestack prefab create " + n + " " + (InputConstants.isKeyDown(this.minecraft.getWindow(), 342) ? "true" : "false"));
+            this.sendCmd("rulestack prefab create " + n + " " + (/*? if < 26.3 {*//*InputConstants.isKeyDown(this.minecraft.getWindow(), 342)*//*?} else {*/InputConstants.isKeyDown(342)/*?}*/ ? "true" : "false"));
             this.prefabDynamic.clearChildren();
             this.prefabPanel = RuleStackScreen.PrefabPanel.NONE;
          }

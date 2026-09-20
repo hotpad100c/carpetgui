@@ -52,15 +52,13 @@ public class ScreenUtils {
    }
 
    public static Map.Entry<FlowLayout, FlowLayout> makeMasterContainer(int w, int h, FlowLayout root) {
-      ScaleHelper.Result scaleResult = ScreenUtils.ScaleHelper.compute(w, h);
-      FlowLayout outline = UIContainers.verticalFlow(Sizing.fixed(scaleResult.width), Sizing.fixed(scaleResult.height));
-      outline.surface(Surface.outline(1722789807));
-      FlowLayout content = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(95));
-      content.surface(Surface.flat(1996488704));
-      outline.padding(Insets.of(1));
-      root.padding(Insets.of(2, 2, 2, 2));
-      root.horizontalAlignment(HorizontalAlignment.CENTER);
-      root.verticalAlignment(VerticalAlignment.CENTER);
+      FlowLayout outline = UIContainers.verticalFlow(Sizing.fill(100), Sizing.fill(100));
+      outline.surface(Surface.flat(1996488704));
+      FlowLayout content = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(93));
+      outline.padding(Insets.none());
+      root.padding(Insets.none());
+      root.horizontalAlignment(HorizontalAlignment.LEFT);
+      root.verticalAlignment(VerticalAlignment.TOP);
       root.surface(Surface.blur(4.0F, 4.0F));
       outline.child(content);
       return Map.entry(outline, content);

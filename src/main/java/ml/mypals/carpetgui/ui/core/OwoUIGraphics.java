@@ -1,7 +1,7 @@
 package ml.mypals.carpetgui.ui.core;
 
 //? if >=1.21.6 {
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import net.minecraft.client.renderer.RenderPipelines;
 //?}
 import java.util.List;
@@ -212,9 +212,11 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
    }
 
    public void drawTooltip(Font textRenderer, int x, int y, List<ClientTooltipComponent> components, @Nullable Identifier texture) {
+      //?if>=26.3{
+      this.tooltip(textRenderer, components, x, y, DefaultTooltipPositioner.INSTANCE, texture,false);
       //? if >=1.21.4 {
-      ((GuiGraphicsExtractorAccessor)this).carpetGUI$tooltip(textRenderer, components, x, y, DefaultTooltipPositioner.INSTANCE, texture);
-      //?} else {
+      /*((GuiGraphicsExtractorAccessor)this).carpetGUI$tooltip(textRenderer, components, x, y, DefaultTooltipPositioner.INSTANCE, texture);
+      *///?} else {
       /*((GuiGraphicsExtractorAccessor)this).carpetGUI$tooltip(textRenderer, components, x, y, DefaultTooltipPositioner.INSTANCE);
       *///?}
    }

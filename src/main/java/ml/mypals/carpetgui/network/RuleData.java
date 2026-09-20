@@ -55,15 +55,15 @@ public class RuleData {
       buf.writeUtf(this.value);
       buf.writeUtf(this.description);
       buf.writeUtf(this.localDescription);
-      buf.writeCollection(this.suggestions, FriendlyByteBuf::writeUtf);
-      buf.writeCollection(this.categories, (bf, entry) -> {
+      ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.suggestions, FriendlyByteBuf::writeUtf);
+      ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.categories, (bf, entry) -> {
          bf.writeUtf((String)entry.getKey());
          bf.writeUtf((String)entry.getValue());
       });
    }
 
    public RuleData(FriendlyByteBuf buf) {
-      this(buf.readUtf(), buf.readUtf(), buf.readUtf(), getRuleType(buf.readUtf()), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf), buf.readList((bf) -> Map.entry(bf.readUtf(), bf.readUtf())));
+      this(buf.readUtf(), buf.readUtf(), buf.readUtf(), getRuleType(buf.readUtf()), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(), ml.mypals.carpetgui.network.BufUtils.readList(buf, FriendlyByteBuf::readUtf), ml.mypals.carpetgui.network.BufUtils.readList(buf, (bf) -> Map.entry(bf.readUtf(), bf.readUtf())));
       if (((String)((Map.Entry)this.categories.getFirst()).getKey()).equals("gamerule")) {
          this.isGamerule = true;
          this.localDescription = Component.translatable(this.localDescription).getString();

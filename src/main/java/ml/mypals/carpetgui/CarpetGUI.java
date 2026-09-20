@@ -59,7 +59,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
    public static final String MOD_ID = "carpetgui";
    public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
    public static final String VERSION = /*$ mod_version*/ "1.3.6";
-   public static final String MINECRAFT = /*$ minecraft*/ "26.2";
+   public static final String MINECRAFT = /*$ minecraft*/ "26.3";
    private static PrefabManager prefabManager;
 
    public void onInitialize() {
@@ -163,13 +163,13 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
    }
 
    public static List<RuleData> getRules(SettingsManager settingsManager, String lang) {
-      List<RuleData> rules = new ArrayList();
+      List<RuleData> rules = new ArrayList<>();
       String managerID = settingsManager.identifier();
       String originalLang = CarpetSettings.language;
       CarpetSettings.language = "en_us";
       Translations.updateLanguage();
-      Map<CarpetRule<?>, String> enNames = new HashMap();
-      Map<CarpetRule<?>, String> enDescs = new HashMap();
+      Map<CarpetRule<?>, String> enNames = new HashMap<>();
+      Map<CarpetRule<?>, String> enDescs = new HashMap<>();
       settingsManager.getCarpetRules().forEach((rulex) -> {
          enNames.put(rulex, rulex.name());
          enDescs.put(rulex, RuleHelper.translatedDescription(rulex));
@@ -201,7 +201,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
       try {
          BufferedReader reader = Files.newBufferedReader(path);
          String line = "";
-         List<String> result = new ArrayList();
+         List<String> result = new ArrayList<>();
 
          while((line = reader.readLine()) != null) {
             line = line.replaceAll("[\\r\\n]", "");
@@ -213,7 +213,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
          return result;
       } catch (IOException var5) {
-         return new ArrayList();
+         return new ArrayList<>();
       }
    }
 
@@ -224,7 +224,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
          try {
             BufferedReader reader = Files.newBufferedReader(getOrgDefaultsConfigFile());
 
-            Object var9;
+            List<String> var9;
             try {
                JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
                JsonObject rules = root.getAsJsonObject("rules");
@@ -252,9 +252,9 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                reader.close();
             }
 
-            return (List<String>)var9;
+            return var9;
          } catch (Exception var8) {
-            return new ArrayList();
+            return new ArrayList<>();
          }
       }
    }

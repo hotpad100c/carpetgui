@@ -45,7 +45,11 @@ dependencies {
             modImplementation("io.wispforest:owo-lib:${property("deps.owo_version")}")
         }
     }
-    modImplementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
+    if (project.hasProperty("deps.carpet_dependency")) {
+        modImplementation(property("deps.carpet_dependency") as String)
+    } else {
+        modImplementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
+    }
 }
 
 loom {
@@ -58,7 +62,10 @@ loom {
 
     runConfigs.all {
         ideConfigGenerated(true)
-        vmArgs("-Dmixin.debug.export=true") // Exports transformed classes for debugging
+        vmArgs("-Dmixin.debug.export=true", "-Xms1G", "-Xmx4G")
+        if (stonecutter.eval(stonecutter.current.version, ">=26.1")) {
+            vmArgs("--enable-native-access=ALL-UNNAMED", "--sun-misc-unsafe-memory-access=allow")
+        }
         runDir = "../../run" // Shares the run directory between versions
     }
 }

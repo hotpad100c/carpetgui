@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class CarpetGUIClient implements ClientModInitializer {
    public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
    public static final String VERSION = /*$ mod_version*/ "1.3.6";
-   public static final String MINECRAFT = /*$ minecraft*/ "26.2";
+   public static final String MINECRAFT = /*$ minecraft*/ "26.3";
    public static KeyMapping carpetRulesKeyBind;
    public static RuleStackData cachedRuleStackData;
    public static Map<String, RuleData> cachedCompleteRules = new HashMap();
@@ -56,7 +56,11 @@ public class CarpetGUIClient implements ClientModInitializer {
       carpetRulesKeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping(
       //?}
          "carpetgui.key.carpetRulesKeyBind",
-         Type.KEYSYM,
+         //? if < 26.3 {
+         /*Type.KEYSYM,
+         *///?} else {
+         Type.KEYBOARD,
+         //?}
          298,
          //? if <1.21.9 {
          /*"key.category.carpetgui.main"

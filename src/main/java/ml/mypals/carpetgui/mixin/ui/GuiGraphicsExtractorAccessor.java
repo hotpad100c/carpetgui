@@ -25,10 +25,12 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin({GuiGraphicsExtractor.class})
 //?}
 public interface GuiGraphicsExtractorAccessor {
-   //? if >=26.1 {
-   @Invoker("tooltip")
+   //?if >= 26.3{
+
+   //?}else if >=26.1 {
+   /*@Invoker("tooltip")
    void carpetGUI$tooltip(Font var1, List<ClientTooltipComponent> var2, int var3, int var4, ClientTooltipPositioner var5, @Nullable Identifier var6);
-   //?} elif >=1.21.6 {
+   *///?} elif >=1.21.6 {
    /*@Invoker("renderTooltip")
    void carpetGUI$tooltip(Font var1, List<ClientTooltipComponent> var2, int var3, int var4, ClientTooltipPositioner var5, @Nullable Identifier var6);
    *///?} elif >=1.21.4 {

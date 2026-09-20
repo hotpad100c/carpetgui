@@ -16,12 +16,12 @@ public record RequestRulesPayload(String lang, List<String> knownRuleNames) impl
             = StreamCodec.ofMember(RequestRulesPayload::write, RequestRulesPayload::new);
 
     public RequestRulesPayload(FriendlyByteBuf buf) {
-        this(buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf));
+        this(buf.readUtf(), ml.mypals.carpetgui.network.BufUtils.readList(buf, FriendlyByteBuf::readUtf));
     }
 
     public void write(FriendlyByteBuf buf) {
         buf.writeUtf(this.lang);
-        buf.writeCollection(this.knownRuleNames, FriendlyByteBuf::writeUtf);
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.knownRuleNames, FriendlyByteBuf::writeUtf);
     }
 
     @Override
@@ -37,12 +37,12 @@ public record RequestRulesPayload(String lang, List<String> knownRuleNames) impl
 
     public static final PacketType<RequestRulesPayload> ID = PacketType.create(
             PacketIDs.REQUEST_RULES_ID,
-            buf -> new RequestRulesPayload(buf.readUtf(), buf.readList(FriendlyByteBuf::readUtf))
+            buf -> new RequestRulesPayload(buf.readUtf(), ml.mypals.carpetgui.network.BufUtils.readList(buf, FriendlyByteBuf::readUtf))
     );
 
     public void write(FriendlyByteBuf buf) {
         buf.writeUtf(this.lang);
-        buf.writeCollection(this.knownRuleNames, FriendlyByteBuf::writeUtf);
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.knownRuleNames, FriendlyByteBuf::writeUtf);
     }
 
     @Override

@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 
 public class GuiGraphics {
@@ -77,12 +77,12 @@ public class GuiGraphics {
         GuiComponent.disableScissor();
     }
 
-    public void blit(ResourceLocation texture, int x, int y, int u, int v, int width, int height) {
+    public void blit(Identifier texture, int x, int y, int u, int v, int width, int height) {
         RenderSystem.setShaderTexture(0, texture);
         GuiComponent.blit(this.pose, x, y, 0, (float)u, (float)v, width, height, 256, 256);
     }
 
-    public void blit(ResourceLocation texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
+    public void blit(Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
         RenderSystem.setShaderTexture(0, texture);
         GuiComponent.blit(this.pose, x, y, 0, u, v, width, height, textureWidth, textureHeight);
     }

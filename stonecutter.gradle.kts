@@ -5,7 +5,7 @@ plugins {
     // id("me.modmuss50.mod-publish-plugin") version "1.0.+" apply false
 }
 
-stonecutter active "26.2"
+stonecutter active "26.3"
 
 stonecutter tasks {
     order("runClient")
@@ -73,6 +73,18 @@ stonecutter parameters {
         }
         string(eval(current.version, "<26.1")) {
             replace("PayloadTypeRegistry.clientboundPlay()", "PayloadTypeRegistry.playS2C()")
+        }
+        string(eval(current.version, ">=26.3")) {
+            replace("buf.writeCollection(", "ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, ")
+        }
+        string(eval(current.version, ">=26.3")) {
+            replace("buf.readList(", "ml.mypals.carpetgui.network.BufUtils.readList(buf, ")
+        }
+        string(eval(current.version, ">=26.3")) {
+            replace("com.mojang.blaze3d.pipeline.RenderPipeline", "com.mojang.renderpearl.api.pipeline.RenderPipeline")
+        }
+        string(eval(current.version, ">=26.3")) {
+            replace("Util.getPlatform().openFile(RuleGroupLoader.GROUPS_DIR.toFile())", "com.mojang.blaze3d.Blaze3D.openPath(RuleGroupLoader.GROUPS_DIR)")
         }
     }
 }

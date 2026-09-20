@@ -222,7 +222,8 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    }
 
    public static class CursorAdapter {
-      protected static final CursorStyle[] ACTIVE_STYLES = new CursorStyle[]{CursorStyle.POINTER, CursorStyle.TEXT, CursorStyle.HAND, CursorStyle.CROSSHAIR, CursorStyle.MOVE, CursorStyle.HORIZONTAL_RESIZE, CursorStyle.VERTICAL_RESIZE, CursorStyle.NWSE_RESIZE, CursorStyle.NESW_RESIZE, CursorStyle.NOT_ALLOWED};
+//? if <26.3 {
+      /*protected static final CursorStyle[] ACTIVE_STYLES = new CursorStyle[]{CursorStyle.POINTER, CursorStyle.TEXT, CursorStyle.HAND, CursorStyle.CROSSHAIR, CursorStyle.MOVE, CursorStyle.HORIZONTAL_RESIZE, CursorStyle.VERTICAL_RESIZE, CursorStyle.NWSE_RESIZE, CursorStyle.NESW_RESIZE, CursorStyle.NOT_ALLOWED};
       protected final java.util.EnumMap<CursorStyle, Long> cursors = new java.util.EnumMap<>(CursorStyle.class);
       protected final long windowHandle;
       protected CursorStyle lastCursorStyle;
@@ -270,5 +271,48 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
             this.disposed = true;
          }
       }
+*///?} else {
+      protected CursorStyle lastCursorStyle = CursorStyle.POINTER;
+      protected boolean disposed = false;
+
+      protected CursorAdapter() {}
+
+      public static CursorAdapter ofClientWindow() {
+         return new CursorAdapter();
+      }
+
+      public static CursorAdapter ofWindow(Window window) {
+         return new CursorAdapter();
+      }
+
+      public static CursorAdapter ofWindow(long windowHandle) {
+         return new CursorAdapter();
+      }
+
+      public void applyStyle(CursorStyle style) {
+         if (!this.disposed && this.lastCursorStyle != style) {
+            com.mojang.blaze3d.platform.cursor.CursorType cursorType = switch (style) {
+               case POINTER -> com.mojang.blaze3d.platform.cursor.CursorTypes.ARROW;
+               case TEXT -> com.mojang.blaze3d.platform.cursor.CursorTypes.IBEAM;
+               case HAND -> com.mojang.blaze3d.platform.cursor.CursorTypes.POINTING_HAND;
+               case CROSSHAIR -> com.mojang.blaze3d.platform.cursor.CursorTypes.CROSSHAIR;
+               case MOVE -> com.mojang.blaze3d.platform.cursor.CursorTypes.RESIZE_ALL;
+               case HORIZONTAL_RESIZE -> com.mojang.blaze3d.platform.cursor.CursorTypes.RESIZE_EW;
+               case VERTICAL_RESIZE -> com.mojang.blaze3d.platform.cursor.CursorTypes.RESIZE_NS;
+               case NOT_ALLOWED -> com.mojang.blaze3d.platform.cursor.CursorTypes.NOT_ALLOWED;
+               default -> com.mojang.blaze3d.platform.cursor.CursorType.DEFAULT;
+            };
+            Minecraft.getInstance().getWindow().selectCursor(cursorType);
+            this.lastCursorStyle = style;
+         }
+      }
+
+      public void dispose() {
+         if (!this.disposed) {
+            Minecraft.getInstance().getWindow().selectCursor(com.mojang.blaze3d.platform.cursor.CursorType.DEFAULT);
+            this.disposed = true;
+         }
+      }
+//?}
    }
 }

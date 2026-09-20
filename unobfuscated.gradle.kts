@@ -36,7 +36,11 @@ dependencies {
     }
     //include("io.wispforest:owo-sentinel:${property("deps.owo_version")}")
 
-    implementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
+    if (project.hasProperty("deps.carpet_dependency")) {
+        implementation(property("deps.carpet_dependency") as String)
+    } else {
+        implementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
+    }
 }
 
 loom {
