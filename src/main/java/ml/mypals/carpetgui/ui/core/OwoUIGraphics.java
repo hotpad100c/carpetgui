@@ -197,7 +197,7 @@ public class OwoUIGraphics extends GuiGraphics {
       *///?} elif >=1.21.4 {
       /*this.blit(net.minecraft.client.renderer.RenderType::guiTextured, texture, x, y, u, v, width, height, uWidth, vHeight, textureWidth, textureHeight, color);
       *///?} else {
-      this.blit(texture, x, y, u, v, width, height, textureWidth, textureHeight);
+      this.blit(texture, x, y, width, height, u, v, uWidth, vHeight, textureWidth, textureHeight);
       //?}
    }
 

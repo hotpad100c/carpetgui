@@ -168,7 +168,16 @@ public class GuiGraphics {
         //?} else {
         /*RenderSystem.setShaderTexture(0, texture);
         *///?}
-        GuiComponent.blit(this.pose, x, y, 0, u, v, width, height, textureWidth, textureHeight);
+        GuiComponent.blit(this.pose, x, y, u, v, width, height, textureWidth, textureHeight);
+    }
+
+    public void blit(ResourceLocation texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int textureWidth, int textureHeight) {
+        //? if <1.17 {
+        this.minecraft.getTextureManager().bind(texture);
+        //?} else {
+        /*RenderSystem.setShaderTexture(0, texture);
+        *///?}
+        GuiComponent.blit(this.pose, x, y, width, height, u, v, uWidth, vHeight, textureWidth, textureHeight);
     }
 
     public void renderComponentHoverEffect(Font font, Style style, int x, int y) {
