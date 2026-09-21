@@ -48,9 +48,11 @@ dependencies {
     }
 }
 
+val accesswidener = "carpetgui-26.1.accesswidener"
+
 loom {
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json") // Useful for interface injection
-    accessWidenerPath = rootProject.file("src/main/resources/carpetgui.accesswidener")
+    accessWidenerPath = rootProject.file("src/main/resources/accesswideners/$accesswidener")
 
     decompilerOptions.named("vineflower") {
         options.put("mark-corresponding-synthetics", "1") // Adds names to lambdas - useful for mixins
@@ -81,10 +83,17 @@ tasks {
             "name" to project.property("mod.name"),
             "version" to project.property("mod.version"),
             "minecraft" to project.property("mod.mc_dep"),
-            "java_version" to requiredJava.majorVersion
+            "java_version" to requiredJava.majorVersion,
+            "aw_file" to accesswidener
         )
 
         filesMatching("fabric.mod.json") { expand(props) }
+
+        filesMatching("accesswideners/*") {
+            if (name != accesswidener) {
+                exclude()
+            }
+        }
 
         val mixinJava = "JAVA_${requiredJava.majorVersion}"
         filesMatching("*.mixins.json") { expand("java" to mixinJava) }

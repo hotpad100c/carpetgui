@@ -1,0 +1,4 @@
+accessWidener v2 named
+
+# Needed by the vendored UI framework
+accessible method net/minecraft/client/gui/screens/Screen addRenderableWidget (Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;

@@ -55,7 +55,7 @@ public class LabelComponent extends BaseUIComponent {
       this.textClickHandler = (style) -> style != null && OwoUIGraphics.utilityScreen().handleTextClick(style, Minecraft.getInstance().gui.screen());
       //?}
       this.text = text;
-      this.wrappedText = new ArrayList();
+      this.wrappedText = new ArrayList<>();
       this.shadow = false;
       this.maxWidth = Integer.MAX_VALUE;
       Observable.observeAll((Runnable)(() -> this.notifyParentIfMounted()), this.lineHeight, this.lineSpacing);

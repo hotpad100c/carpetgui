@@ -31,6 +31,7 @@
     "carpet": "*",
     "java": ">=${java_version}"
   },
+  "accessWidener" : "accesswideners/${aw_file}",
   "custom": {
     "loom:injected_interfaces": {
       "net/minecraft/client/gui/components/AbstractWidget": [
