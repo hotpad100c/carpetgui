@@ -17,6 +17,10 @@ public final class BufUtils {
         }
     }
 
+    public static <T, B extends FriendlyByteBuf> void writeList(B buf, Collection<T> collection, BiConsumer<B, T> encoder) {
+        writeCollection(buf, collection, encoder);
+    }
+
     public static <T, B extends FriendlyByteBuf> List<T> readList(B buf, Function<B, T> decoder) {
         int size = buf.readVarInt();
         List<T> list = new ArrayList<>(size);
@@ -24,5 +28,9 @@ public final class BufUtils {
             list.add(decoder.apply(buf));
         }
         return list;
+    }
+
+    public static <T, B extends FriendlyByteBuf> List<T> readListSafe(B buf, Function<B, T> decoder) {
+        return readList(buf, decoder);
     }
 }

@@ -50,9 +50,7 @@ dependencies {
         modImplementation("carpet:fabric-carpet:${property("deps.carpet_version")}")
     }
 
-    if (stonecutter.eval(stonecutter.current.version, "<1.18")) {
-        compileOnly("org.slf4j:slf4j-api:1.7.30")
-    }
+
 }
 
 loom {

@@ -8,12 +8,12 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public final class UI {
    public static final String NAMESPACE = "carpetgui";
-   public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui/ui");
+   public static final Logger LOGGER = LogManager.getLogger("carpetgui/ui");
    public static final boolean DEBUG;
 
    private UI() {

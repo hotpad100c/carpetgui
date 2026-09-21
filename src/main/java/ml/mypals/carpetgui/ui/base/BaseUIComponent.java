@@ -13,7 +13,7 @@ import ml.mypals.carpetgui.ui.event.UIEvents.*;
 import ml.mypals.carpetgui.ui.util.EventStream;
 import ml.mypals.carpetgui.ui.util.FocusHandler;
 import ml.mypals.carpetgui.ui.util.Observable;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent;
 //? if >=1.21.9 {
 /*import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;

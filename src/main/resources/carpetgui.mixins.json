@@ -2,13 +2,15 @@
   "required": true,
   "package": "ml.mypals.carpetgui.mixin",
   "compatibilityLevel": "${java}",
+  "plugin": "ml.mypals.carpetgui.mixin.CarpetGUIMixinPlugin",
   "mixins": [
     "CarpetClientNetworkMixin",
     "GamerulesMixin",
     "accessors.CommandSourceStackMixin",
     "accessors.GameRulesAccessor",
     "accessors.SettngsManagerAccessor",
-    "accessors.TypeAccessor"
+    "accessors.TypeAccessor",
+    "compat.ChunkMapRecursionFixMixin"
   ],
   "injectors": {
     "defaultRequire": 1

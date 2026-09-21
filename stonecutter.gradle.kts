@@ -46,6 +46,27 @@ stonecutter parameters {
             replace("InputConstants.isKeyDown(this.minecraft.getWindow(),", "InputConstants.isKeyDown(this.minecraft.getWindow().getWindow(),")
         }
 
+        string(eval(current.version, "<1.18")) {
+            replace("org.slf4j.LoggerFactory", "org.apache.logging.log4j.LogManager")
+        }
+        string(eval(current.version, "<1.18")) {
+            replace("org.slf4j.Logger", "org.apache.logging.log4j.Logger")
+        }
+        string(eval(current.version, "<1.18")) {
+            replace("LoggerFactory.getLogger", "LogManager.getLogger")
+        }
+
+        string(eval(current.version, "<1.17")) {
+            replace("net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent", "ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent")
+        }
+
+        string(eval(current.version, "<1.17")) {
+            replace("buf.writeCollection(", "ml.mypals.carpetgui.network.BufUtils.writeList(buf, ")
+        }
+        string(eval(current.version, "<1.17")) {
+            replace("buf.readList(", "ml.mypals.carpetgui.network.BufUtils.readListSafe(buf, ")
+        }
+
 
         /*
         string(eval(current.version, "<1.21.11")) {

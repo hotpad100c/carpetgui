@@ -1,5 +1,5 @@
 //? if <1.17 {
-package net.minecraft.client.gui.screens.inventory.tooltip;
+package ml.mypals.carpetgui.compat.tooltip;
 
 import net.minecraft.util.FormattedCharSequence;
 

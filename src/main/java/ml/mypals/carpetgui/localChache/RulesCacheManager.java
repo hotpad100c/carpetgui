@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 import ml.mypals.carpetgui.network.RuleData;
 import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.fabricmc.loader.api.FabricLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class RulesCacheManager {
-   private static final Logger LOGGER = LoggerFactory.getLogger("carpetgui-cache");
+   private static final Logger LOGGER = LogManager.getLogger("carpetgui-cache");
    private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
    private static final Path CACHE_DIR;
    private static final Path KNOWN_MANAGERS_FILE;

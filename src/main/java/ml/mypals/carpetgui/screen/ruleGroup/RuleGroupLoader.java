@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.stream.Stream;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public final class RuleGroupLoader {
-   private static final Logger LOGGER = LoggerFactory.getLogger("carpetgui-groups");
+   private static final Logger LOGGER = LogManager.getLogger("carpetgui-groups");
    public static final Path GROUPS_DIR = FabricLoader.getInstance().getConfigDir().resolve("carpetgui").resolve("groups");
 
    private RuleGroupLoader() {

@@ -45,11 +45,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
-   private static final Logger log = LoggerFactory.getLogger(RulesEditScreen.class);
+   private static final Logger log = LogManager.getLogger(RulesEditScreen.class);
    public boolean instantAffect;
    private FlowLayout saveDialog;
    private OverlayContainer<FlowLayout> dialogOverlay;

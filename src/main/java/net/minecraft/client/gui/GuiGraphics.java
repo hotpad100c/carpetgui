@@ -10,7 +10,7 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.Tesselator;
 import ml.mypals.carpetgui.mixin.ui.ScreenAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent;
 //? if >=1.19.3 {
 /*import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 *///?}
@@ -51,13 +51,25 @@ public class GuiGraphics {
     }
 
     public void fillGradient(int minX, int minY, int maxX, int maxY, int color1, int color2) {
-        //?if<=1.16.5{
+        //? if <=1.16.5 {
 
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.disableAlphaTest();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.shadeModel(7425);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferBuilder = tesselator.getBuilder();
         bufferBuilder.begin(7, DefaultVertexFormat.POSITION_COLOR);
+
         GuiComponent.fillGradient(this.pose.last().pose(), bufferBuilder ,minX, minY, maxX, maxY, color1, color2, 0);
-        //?}else{
+
+        tesselator.end();
+        RenderSystem.shadeModel(7424);
+        RenderSystem.disableBlend();
+        RenderSystem.enableAlphaTest();
+        RenderSystem.enableTexture();
+        //?} else {
         /*GuiComponent.fillGradient(this.pose, minX, minY, maxX, maxY, color1, color2, 0);
         *///?}
     }

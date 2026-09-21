@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 //?} else {
 /*import net.minecraft.client.gui.GuiGraphicsExtractor;
 *///?}
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent;
 //? if >=1.20 {
 /*import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 *///?}

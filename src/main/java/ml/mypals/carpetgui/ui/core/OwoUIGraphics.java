@@ -20,7 +20,7 @@ import net.minecraft.client.gui.GuiGraphics;
 /*import net.minecraft.client.gui.GuiGraphicsExtractor;
 *///?}
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent;
 //? if >=1.20 {
 /*import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;

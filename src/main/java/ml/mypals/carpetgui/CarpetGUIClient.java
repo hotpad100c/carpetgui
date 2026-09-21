@@ -30,11 +30,11 @@ import net.minecraft.client.Minecraft;
 *///?}
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.resources.ResourceLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class CarpetGUIClient implements ClientModInitializer {
-   public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
+   public static final Logger LOGGER = LogManager.getLogger("carpetgui");
    public static final String VERSION = /*$ mod_version*/ "1.3.6";
    public static final String MINECRAFT = /*$ minecraft*/ "1.16.5";
    public static KeyMapping carpetRulesKeyBind;

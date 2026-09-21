@@ -16,7 +16,7 @@ public interface ScreenAccessor {
 //?} elif <1.19.3 {
 /*import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.List;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Style;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
@@ -31,7 +31,7 @@ public interface ScreenAccessor {
 *///?} else if <1.20 {
 /*import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.List;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.Style;
 import org.spongepowered.asm.mixin.gen.Invoker;

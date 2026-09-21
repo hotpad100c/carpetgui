@@ -16,11 +16,11 @@ public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean 
     public static final StreamCodec<FriendlyByteBuf, RulesPacketPayload> CODEC = StreamCodec.ofMember(RulesPacketPayload::write, RulesPacketPayload::new);
 
     public RulesPacketPayload(FriendlyByteBuf buf) {
-        this(buf.readList(RuleData::new), buf.readUtf(), buf.readBoolean());
+        this(ml.mypals.carpetgui.network.BufUtils.readListSafe(buf, RuleData::new), buf.readUtf(), buf.readBoolean());
     }
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeCollection(this.rules(), ((buf1, value) -> value.write(buf1)));
+        ml.mypals.carpetgui.network.BufUtils.writeList(buf, this.rules(), ((buf1, value) -> value.write(buf1)));
         buf.writeUtf(this.defaults);
         buf.writeBoolean(this.isPartial);
     }
@@ -38,11 +38,11 @@ public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean 
 
     public static final PacketType<RulesPacketPayload> ID = PacketType.create(
             PacketIDs.SYNC_RULES_ID,
-            buf -> new RulesPacketPayload(buf.readList(RuleData::new), buf.readUtf(), buf.readBoolean())
+            buf -> new RulesPacketPayload(ml.mypals.carpetgui.network.BufUtils.readListSafe(buf, RuleData::new), buf.readUtf(), buf.readBoolean())
     );
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeCollection(this.rules, (b, v) -> v.write(b));
+        ml.mypals.carpetgui.network.BufUtils.writeList(buf, this.rules, (b, v) -> v.write(b));
         buf.writeUtf(this.defaults);
         buf.writeBoolean(this.isPartial);
     }
@@ -59,13 +59,13 @@ public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean 
     public static final ResourceLocation ID = PacketIDs.SYNC_RULES_ID;
 
     public void write(FriendlyByteBuf buf) {
-        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.rules, (b, v) -> v.write(b));
+        ml.mypals.carpetgui.network.BufUtils.writeList(buf, this.rules, (b, v) -> v.write(b));
         buf.writeUtf(this.defaults);
         buf.writeBoolean(this.isPartial);
     }
 
     public static RulesPacketPayload read(FriendlyByteBuf buf) {
-        return new RulesPacketPayload(ml.mypals.carpetgui.network.BufUtils.readList(buf, RuleData::new), buf.readUtf(), buf.readBoolean());
+        return new RulesPacketPayload(ml.mypals.carpetgui.network.BufUtils.readListSafe(buf, RuleData::new), buf.readUtf(), buf.readBoolean());
     }
 }
 //?}

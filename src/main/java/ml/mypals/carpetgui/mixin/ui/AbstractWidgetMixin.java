@@ -24,7 +24,7 @@ import net.minecraft.client.gui.GuiGraphics;
 *///?}
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent;
 //? if >=1.21.9 {
 /*import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;

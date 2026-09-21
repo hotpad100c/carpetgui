@@ -62,13 +62,13 @@ import static ml.mypals.carpetgui.settings.GamerulesDefaultValueSorter.gamerules
 import net.minecraft.world.level.gamerules.GameRules;
 *///?}
 import net.minecraft.world.level.storage.LevelResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class CarpetGUI implements ModInitializer, CarpetExtension {
    public static final Gson GSON = new Gson();
    public static final String MOD_ID = "carpetgui";
-   public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
+   public static final Logger LOGGER = LogManager.getLogger("carpetgui");
    public static final String VERSION = /*$ mod_version*/ "1.3.6";
    public static final String MINECRAFT = /*$ minecraft*/ "1.16.5";
    private static PrefabManager prefabManager;
