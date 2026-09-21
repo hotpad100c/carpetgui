@@ -143,8 +143,7 @@ public abstract class BaseOwoScreen<R extends ParentUIComponent> extends Screen 
          if (!input.hasControlDown()) {
             UIComponent var3 = this.uiAdapter.rootComponent.carpetGUI$focusHandler().focused();
             if (var3 instanceof GreedyInputUIComponent) {
-               GreedyInputUIComponent inputComponent = (GreedyInputUIComponent)var3;
-               if (inputComponent.carpetGUI$onKeyPress(input)) {
+               if (var3.carpetGUI$onKeyPress(input)) {
                   return true;
                }
             }
@@ -173,8 +172,7 @@ public abstract class BaseOwoScreen<R extends ParentUIComponent> extends Screen 
          if (!input.hasControlDown()) {
             UIComponent var3 = this.uiAdapter.rootComponent.carpetGUI$focusHandler().focused();
             if (var3 instanceof GreedyInputUIComponent) {
-               GreedyInputUIComponent inputComponent = (GreedyInputUIComponent)var3;
-               if (inputComponent.carpetGUI$onKeyPress(input)) {
+               if (var3.carpetGUI$onKeyPress(input)) {
                   return true;
                }
             }

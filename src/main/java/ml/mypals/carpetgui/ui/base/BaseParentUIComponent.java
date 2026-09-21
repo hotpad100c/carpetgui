@@ -244,7 +244,7 @@ public abstract class BaseParentUIComponent extends BaseUIComponent implements P
       super.carpetGUI$updateX(x);
 
       for(UIComponent child : this.children()) {
-         child.carpetGUI$updateX(child.baseX() + offset);
+         child.carpetGUI$updateX(child.carpetGUI$baseX() + offset);
       }
 
    }
@@ -254,7 +254,7 @@ public abstract class BaseParentUIComponent extends BaseUIComponent implements P
       super.carpetGUI$updateY(y);
 
       for(UIComponent child : this.children()) {
-         child.carpetGUI$updateY(child.baseY() + offset);
+         child.carpetGUI$updateY(child.carpetGUI$baseY() + offset);
       }
 
    }
@@ -272,7 +272,7 @@ public abstract class BaseParentUIComponent extends BaseUIComponent implements P
          switch (positioning.type) {
             case LAYOUT -> layoutFunc.accept(child);
             case ABSOLUTE -> child.carpetGUI$mount(this, this.x + positioning.x + componentMargins.left() + padding.left(), this.y + positioning.y + componentMargins.top() + padding.top());
-            case RELATIVE -> child.carpetGUI$mount(this, this.x + padding.left() + componentMargins.left() + Math.round((float)positioning.x / 100.0F * (float)(this.carpetGUI$width() - child.fullSize().width() - padding.horizontal())), this.y + padding.top() + componentMargins.top() + Math.round((float)positioning.y / 100.0F * (float)(this.carpetGUI$height() - child.fullSize().height() - padding.vertical())));
+            case RELATIVE -> child.carpetGUI$mount(this, this.x + padding.left() + componentMargins.left() + Math.round((float)positioning.x / 100.0F * (float)(this.carpetGUI$width() - child.carpetGUI$fullSize().width() - padding.horizontal())), this.y + padding.top() + componentMargins.top() + Math.round((float)positioning.y / 100.0F * (float)(this.carpetGUI$height() - child.carpetGUI$fullSize().height() - padding.vertical())));
          }
 
       }

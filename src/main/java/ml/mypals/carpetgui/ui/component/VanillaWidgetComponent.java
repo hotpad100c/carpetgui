@@ -52,7 +52,7 @@ public class VanillaWidgetComponent extends BaseUIComponent {
    protected void updateHoveredState(int mouseX, int mouseY, boolean nowHovered) {
       this.hovered = nowHovered;
       if (nowHovered) {
-         if (this.root() == null || this.root().childAt(mouseX, mouseY) != this.widget) {
+         if (this.carpetGUI$root() == null || this.carpetGUI$root().childAt(mouseX, mouseY) != this.widget) {
             this.hovered = false;
             return;
          }

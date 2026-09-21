@@ -14,7 +14,7 @@ CarpetGUI 是一个为 [Fabric Carpet](https://github.com/gnembon/fabric-carpet)
 - [Fabric API](https://modrinth.com/mod/fabric-api)
 - [Fabric Carpet](https://modrinth.com/mod/carpet)
 
-> 注：本模组所有版本均**不需要**安装 owo-lib。
+> 注：2.0.0开始，本模组所有版本均**不再需要**安装 owo-lib。
 
 ## 构建与发布 (Building & Publishing)
 

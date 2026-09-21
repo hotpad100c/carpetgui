@@ -81,7 +81,7 @@ public class ScrollContainer<C extends UIComponent> extends BaseParentUIComponen
 
    protected int determineHorizontalContentSize(Sizing sizing) {
       if (this.direction == ScrollContainer.ScrollDirection.VERTICAL) {
-         return this.child.fullSize().width() + ((Insets)this.padding.get()).horizontal();
+         return this.child.carpetGUI$fullSize().width() + ((Insets)this.padding.get()).horizontal();
       } else {
          throw new UnsupportedOperationException("Horizontal ScrollContainer cannot be horizontally content-sized");
       }
@@ -89,7 +89,7 @@ public class ScrollContainer<C extends UIComponent> extends BaseParentUIComponen
 
    protected int determineVerticalContentSize(Sizing sizing) {
       if (this.direction == ScrollContainer.ScrollDirection.HORIZONTAL) {
-         return this.child.fullSize().height() + ((Insets)this.padding.get()).vertical();
+         return this.child.carpetGUI$fullSize().height() + ((Insets)this.padding.get()).vertical();
       } else {
          throw new UnsupportedOperationException("Vertical ScrollContainer cannot be vertically content-sized");
       }
@@ -263,7 +263,7 @@ public class ScrollContainer<C extends UIComponent> extends BaseParentUIComponen
       int minOffset = this.direction == ScrollContainer.ScrollDirection.VERTICAL
          ? this.x + this.width - padding.right() - minThickness
          : this.y + this.height - padding.bottom() - minThickness;
-      return this.isInBoundingBox(mouseX, mouseY) && this.direction.choose(mouseY, mouseX) >= (double)minOffset;
+      return this.carpetGUI$isInBoundingBox(mouseX, mouseY) && this.direction.choose(mouseY, mouseX) >= (double)minOffset;
    }
 
    public ScrollContainer<C> scrollTo(UIComponent component) {

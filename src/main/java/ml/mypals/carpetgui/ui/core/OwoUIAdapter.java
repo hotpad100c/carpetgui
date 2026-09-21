@@ -163,7 +163,7 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    }
 
    public boolean isMouseOver(double mouseX, double mouseY) {
-      return this.rootComponent.isInBoundingBox(mouseX, mouseY);
+      return this.rootComponent.carpetGUI$isInBoundingBox(mouseX, mouseY);
    }
 
    public void setFocused(boolean focused) {

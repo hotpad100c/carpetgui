@@ -320,4 +320,44 @@ public abstract class BaseUIComponent implements UIComponent {
    public int carpetGUI$height() {
       return this.height;
    }
+
+   public int baseX() {
+      return this.carpetGUI$baseX();
+   }
+
+   public int baseY() {
+      return this.carpetGUI$baseY();
+   }
+
+   public boolean hasParent() {
+      return this.carpetGUI$hasParent();
+   }
+
+   public ParentUIComponent root() {
+      return this.carpetGUI$root();
+   }
+
+   public void remove() {
+      this.carpetGUI$remove();
+   }
+
+   public void moveTo(int x, int y) {
+      this.carpetGUI$moveTo(x, y);
+   }
+
+   public Size fullSize() {
+      return this.carpetGUI$fullSize();
+   }
+
+   public boolean isInBoundingBox(double x, double y) {
+      return this.carpetGUI$isInBoundingBox(x, y);
+   }
+
+   public UIComponent tooltip(@org.jetbrains.annotations.NotNull java.util.Collection<net.minecraft.network.chat.Component> tooltip) {
+      return this.carpetGUI$tooltip(tooltip);
+   }
+
+   public UIComponent tooltip(@org.jetbrains.annotations.NotNull net.minecraft.network.chat.Component tooltip) {
+      return this.carpetGUI$tooltip(tooltip);
+   }
 }

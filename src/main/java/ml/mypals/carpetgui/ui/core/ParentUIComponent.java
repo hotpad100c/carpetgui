@@ -57,12 +57,12 @@ public interface ParentUIComponent extends UIComponent {
    ParentUIComponent removeChild(UIComponent var1);
 
    default void drawTooltip(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
-      if (this.hasParent()) {
+      if (this.carpetGUI$hasParent()) {
          UIComponent.super.drawTooltip(context, mouseX, mouseY, partialTicks, delta);
       } else {
          ArrayList<UIComponent> hoveredDescendants = new ArrayList<>();
          Objects.requireNonNull(hoveredDescendants);
-         this.forEachDescendantWhere(hoveredDescendants::add, (component) -> component.isInBoundingBox((double)mouseX, (double)mouseY));
+         this.forEachDescendantWhere(hoveredDescendants::add, (component) -> component.carpetGUI$isInBoundingBox((double)mouseX, (double)mouseY));
          hoveredDescendants.remove(this);
 
          for(int i = hoveredDescendants.size() - 1; i >= 0; --i) {
@@ -103,7 +103,7 @@ public interface ParentUIComponent extends UIComponent {
 
       while(iter.hasPrevious()) {
          UIComponent child = (UIComponent)iter.previous();
-         if (child.isInBoundingBox((double)this.carpetGUI$x() + click.x(), (double)this.carpetGUI$y() + click.y()) && child.carpetGUI$onMouseDown(new MouseButtonEvent((double)this.carpetGUI$x() + click.x() - (double)child.carpetGUI$x(), (double)this.carpetGUI$y() + click.y() - (double)child.carpetGUI$y(), click.buttonInfo()), doubled)) {
+         if (child.carpetGUI$isInBoundingBox((double)this.carpetGUI$x() + click.x(), (double)this.carpetGUI$y() + click.y()) && child.carpetGUI$onMouseDown(new MouseButtonEvent((double)this.carpetGUI$x() + click.x() - (double)child.carpetGUI$x(), (double)this.carpetGUI$y() + click.y() - (double)child.carpetGUI$y(), click.buttonInfo()), doubled)) {
             return true;
          }
       }
@@ -116,7 +116,7 @@ public interface ParentUIComponent extends UIComponent {
 
       while(iter.hasPrevious()) {
          UIComponent child = (UIComponent)iter.previous();
-         if (child.isInBoundingBox((double)this.carpetGUI$x() + mouseX, (double)this.carpetGUI$y() + mouseY) && child.carpetGUI$onMouseScroll((double)this.carpetGUI$x() + mouseX - (double)child.carpetGUI$x(), (double)this.carpetGUI$y() + mouseY - (double)child.carpetGUI$y(), amount)) {
+         if (child.carpetGUI$isInBoundingBox((double)this.carpetGUI$x() + mouseX, (double)this.carpetGUI$y() + mouseY) && child.carpetGUI$onMouseScroll((double)this.carpetGUI$x() + mouseX - (double)child.carpetGUI$x(), (double)this.carpetGUI$y() + mouseY - (double)child.carpetGUI$y(), amount)) {
             return true;
          }
       }
@@ -131,9 +131,9 @@ public interface ParentUIComponent extends UIComponent {
 
    }
 
-   default MutableComponent inspectorDescriptor() {
+   default MutableComponent carpetGUI$inspectorDescriptor() {
       Insets padding = (Insets)this.padding().get();
-      MutableComponent var10000 = UIComponent.super.inspectorDescriptor();
+      MutableComponent var10000 = UIComponent.super.carpetGUI$inspectorDescriptor();
       int var10001 = padding.top();
       return var10000.append(Component.literal(" >" + var10001 + "," + padding.bottom() + "," + padding.left() + "," + padding.right() + "<").setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA)));
    }
@@ -167,7 +167,7 @@ public interface ParentUIComponent extends UIComponent {
 
       while(iter.hasPrevious()) {
          UIComponent child = (UIComponent)iter.previous();
-         if (child.isInBoundingBox((double)x, (double)y)) {
+         if (child.carpetGUI$isInBoundingBox((double)x, (double)y)) {
             if (child instanceof ParentUIComponent parent) {
                 return parent.childAt(x, y);
             }
@@ -176,7 +176,7 @@ public interface ParentUIComponent extends UIComponent {
          }
       }
 
-      return this.isInBoundingBox((double)x, (double)y) ? this : null;
+      return this.carpetGUI$isInBoundingBox((double)x, (double)y) ? this : null;
    }
 
    default void collectDescendants(ArrayList<UIComponent> into) {

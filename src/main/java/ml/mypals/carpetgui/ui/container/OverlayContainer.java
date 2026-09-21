@@ -52,11 +52,11 @@ public class OverlayContainer<C extends UIComponent> extends BaseParentUICompone
    }
 
    protected int determineHorizontalContentSize(Sizing sizing) {
-      return this.child.fullSize().width() + ((Insets)this.padding.get()).horizontal();
+      return this.child.carpetGUI$fullSize().width() + ((Insets)this.padding.get()).horizontal();
    }
 
    protected int determineVerticalContentSize(Sizing sizing) {
-      return this.child.fullSize().height() + ((Insets)this.padding.get()).vertical();
+      return this.child.carpetGUI$fullSize().height() + ((Insets)this.padding.get()).vertical();
    }
 
    public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
@@ -69,9 +69,9 @@ public class OverlayContainer<C extends UIComponent> extends BaseParentUICompone
 
    public void carpetGUI$mount(ParentUIComponent parent, int x, int y) {
       super.carpetGUI$mount(parent, x, y);
-      this.exitSubscription = this.root().carpetGUI$keyPress().subscribe((KeyPress)(input) -> {
+      this.exitSubscription = this.carpetGUI$root().carpetGUI$keyPress().subscribe((KeyPress)(input) -> {
          if (input.isEscape()) {
-            this.remove();
+            this.carpetGUI$remove();
             return true;
          } else {
             return false;
@@ -87,9 +87,9 @@ public class OverlayContainer<C extends UIComponent> extends BaseParentUICompone
    }
 
    public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {
-      boolean handled = super.carpetGUI$onMouseDown(click, doubled) || this.child.isInBoundingBox(click.x(), click.y());
+      boolean handled = super.carpetGUI$onMouseDown(click, doubled) || this.child.carpetGUI$isInBoundingBox(click.x(), click.y());
       if (!handled && this.closeOnClick) {
-         this.remove();
+         this.carpetGUI$remove();
          return true;
       } else {
          return handled;
@@ -106,11 +106,11 @@ public class OverlayContainer<C extends UIComponent> extends BaseParentUICompone
    }
 
    protected int childMountX() {
-      return this.x + ((Insets)this.padding.get()).left() + (this.width - this.child.fullSize().width()) / 2;
+      return this.x + ((Insets)this.padding.get()).left() + (this.width - this.child.carpetGUI$fullSize().width()) / 2;
    }
 
    protected int childMountY() {
-      return this.y + ((Insets)this.padding.get()).top() + (this.carpetGUI$height() - this.child.fullSize().height()) / 2;
+      return this.y + ((Insets)this.padding.get()).top() + (this.carpetGUI$height() - this.child.carpetGUI$fullSize().height()) / 2;
    }
 
    public OverlayContainer<C> closeOnClick(boolean closeOnClick) {

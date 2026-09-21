@@ -155,7 +155,7 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
       //? if <1.21.6 {
       /*return true;
       *///?} else {
-      other = other.transform(this.getMatrixStack());
+      other = other.carpetGUI$transform(this.getMatrixStack());
       ScreenRectangle rect = this.scissorStack.peek();
       if (rect == null) {
          return true;

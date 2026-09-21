@@ -241,7 +241,7 @@ public class LabelComponent extends BaseUIComponent {
 
    public boolean carpetGUI$shouldDrawTooltip(double mouseX, double mouseY) {
       Style hoveredStyle = this.styleAt((int)(mouseX - (double)this.x), (int)(mouseY - (double)this.y));
-      return super.carpetGUI$shouldDrawTooltip(mouseX, mouseY) || hoveredStyle != null && hoveredStyle.getHoverEvent() != null && this.isInBoundingBox(mouseX, mouseY);
+      return super.carpetGUI$shouldDrawTooltip(mouseX, mouseY) || hoveredStyle != null && hoveredStyle.getHoverEvent() != null && this.carpetGUI$isInBoundingBox(mouseX, mouseY);
    }
 
    public boolean carpetGUI$onMouseDown(MouseButtonEvent click, boolean doubled) {

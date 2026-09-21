@@ -96,7 +96,7 @@ public interface UIComponent extends PositionedRectangle {
 
    UIComponent carpetGUI$tooltip(@Nullable List<ClientTooltipComponent> var1);
 
-   default UIComponent tooltip(@NotNull Collection<Component> tooltip) {
+   default UIComponent carpetGUI$tooltip(@NotNull Collection<Component> tooltip) {
       ArrayList<ClientTooltipComponent> components = new ArrayList();
 
       for(Component line : tooltip) {
@@ -107,7 +107,7 @@ public interface UIComponent extends PositionedRectangle {
       return this;
    }
 
-   default UIComponent tooltip(@NotNull Component tooltip) {
+   default UIComponent carpetGUI$tooltip(@NotNull Component tooltip) {
       ArrayList<ClientTooltipComponent> components = new ArrayList();
 
       for(FormattedCharSequence line : Minecraft.getInstance().font.split(tooltip, Integer.MAX_VALUE)) {
@@ -118,13 +118,21 @@ public interface UIComponent extends PositionedRectangle {
       return this;
    }
 
+   default UIComponent tooltip(@NotNull Collection<Component> tooltip) {
+      return this.carpetGUI$tooltip(tooltip);
+   }
+
+   default UIComponent tooltip(@NotNull Component tooltip) {
+      return this.carpetGUI$tooltip(tooltip);
+   }
+
    @Contract(
       pure = true
    )
    @Nullable List<ClientTooltipComponent> carpetGUI$tooltip();
 
    default boolean carpetGUI$shouldDrawTooltip(double mouseX, double mouseY) {
-      return this.carpetGUI$tooltip() != null && !this.carpetGUI$tooltip().isEmpty() && this.isInBoundingBox(mouseX, mouseY);
+      return this.carpetGUI$tooltip() != null && !this.carpetGUI$tooltip().isEmpty() && this.carpetGUI$isInBoundingBox(mouseX, mouseY);
    }
 
    void carpetGUI$inflate(Size var1);
@@ -138,16 +146,16 @@ public interface UIComponent extends PositionedRectangle {
    @Contract(
       pure = true
    )
-   default boolean hasParent() {
+   default boolean carpetGUI$hasParent() {
       return this.carpetGUI$parent() != null;
    }
 
-   default ParentUIComponent root() {
+   default ParentUIComponent carpetGUI$root() {
       ParentUIComponent root = this.carpetGUI$parent();
       if (root == null) {
          return null;
       } else {
-         while(root.hasParent()) {
+         while(root.carpetGUI$hasParent()) {
             root = root.carpetGUI$parent();
          }
 
@@ -155,8 +163,8 @@ public interface UIComponent extends PositionedRectangle {
       }
    }
 
-   default void remove() {
-      if (this.hasParent()) {
+   default void carpetGUI$remove() {
+      if (this.carpetGUI$hasParent()) {
          this.carpetGUI$parent().queue(() -> this.carpetGUI$parent().removeChild(this));
       }
    }
@@ -208,11 +216,11 @@ public interface UIComponent extends PositionedRectangle {
    default void carpetGUI$update(float delta, int mouseX, int mouseY) {
    }
 
-   default boolean isInBoundingBox(double x, double y) {
-      return PositionedRectangle.super.isInBoundingBox(x, y);
+   default boolean carpetGUI$isInBoundingBox(double x, double y) {
+      return PositionedRectangle.super.carpetGUI$isInBoundingBox(x, y);
    }
 
-   default Size fullSize() {
+   default Size carpetGUI$fullSize() {
       Insets margins = (Insets)this.carpetGUI$margins().get();
       return Size.of(this.carpetGUI$width() + margins.horizontal(), this.carpetGUI$height() + margins.vertical());
    }
@@ -232,7 +240,7 @@ public interface UIComponent extends PositionedRectangle {
    )
    int carpetGUI$x();
 
-   default int baseX() {
+   default int carpetGUI$baseX() {
       return this.carpetGUI$x();
    }
 
@@ -243,18 +251,18 @@ public interface UIComponent extends PositionedRectangle {
    )
    int carpetGUI$y();
 
-   default int baseY() {
+   default int carpetGUI$baseY() {
       return this.carpetGUI$y();
    }
 
    void carpetGUI$updateY(int var1);
 
-   default void moveTo(int x, int y) {
+   default void carpetGUI$moveTo(int x, int y) {
       this.carpetGUI$updateX(x);
       this.carpetGUI$updateY(y);
    }
 
-   default MutableComponent inspectorDescriptor() {
+   default MutableComponent carpetGUI$inspectorDescriptor() {
       Insets margins = (Insets)this.carpetGUI$margins().get();
       int var10000 = this.carpetGUI$x();
       MutableComponent var2 = Component.literal(var10000 + "," + this.carpetGUI$y() + " (" + this.carpetGUI$width() + "," + this.carpetGUI$height() + ")");

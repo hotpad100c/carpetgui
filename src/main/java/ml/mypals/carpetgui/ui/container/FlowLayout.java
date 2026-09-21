@@ -107,9 +107,13 @@ public class FlowLayout extends BaseParentUIComponent {
       this.drawChildren(graphics, mouseX, mouseY, partialTicks, delta, this.children);
    }
 
-   public MutableComponent inspectorDescriptor() {
-      MutableComponent descriptor = super.inspectorDescriptor();
+   public MutableComponent carpetGUI$inspectorDescriptor() {
+      MutableComponent descriptor = super.carpetGUI$inspectorDescriptor();
       return this.gap() == 0 ? descriptor : descriptor.append(Component.literal(" [" + this.gap() + "]"));
+   }
+
+   public MutableComponent inspectorDescriptor() {
+      return this.carpetGUI$inspectorDescriptor();
    }
 
    @FunctionalInterface
@@ -125,7 +129,7 @@ public class FlowLayout extends BaseParentUIComponent {
          MountingHelper mountState = MountingHelper.mountEarly((x$0, x$1) -> container.mountChild(x$0, x$1), container.children, (child) -> {
             layout.add(child);
             child.carpetGUI$mount(container, container.x + padding.left() + ((Insets)child.carpetGUI$margins().get()).left() + layoutWidth.intValue(), container.y + padding.top() + ((Insets)child.carpetGUI$margins().get()).top());
-            Size childSize = child.fullSize();
+            Size childSize = child.carpetGUI$fullSize();
             layoutWidth.add(childSize.width() + container.gap());
             if (childSize.height() > layoutHeight.intValue()) {
                layoutHeight.setValue(childSize.height());
@@ -136,16 +140,16 @@ public class FlowLayout extends BaseParentUIComponent {
          container.applySizing();
          if (container.verticalAlignment() != VerticalAlignment.TOP) {
             for(UIComponent component : layout) {
-               component.carpetGUI$updateY(component.baseY() + container.verticalAlignment().align(component.fullSize().height(), container.height - padding.vertical()));
+               component.carpetGUI$updateY(component.carpetGUI$baseY() + container.verticalAlignment().align(component.carpetGUI$fullSize().height(), container.height - padding.vertical()));
             }
          }
 
          if (container.horizontalAlignment() != HorizontalAlignment.LEFT) {
             for(UIComponent component : layout) {
                if (container.horizontalAlignment() == HorizontalAlignment.CENTER) {
-                  component.carpetGUI$updateX(component.baseX() + (container.width - padding.horizontal() - layoutWidth.intValue()) / 2);
+                  component.carpetGUI$updateX(component.carpetGUI$baseX() + (container.width - padding.horizontal() - layoutWidth.intValue()) / 2);
                } else {
-                  component.carpetGUI$updateX(component.baseX() + (container.width - padding.horizontal() - layoutWidth.intValue()));
+                  component.carpetGUI$updateX(component.carpetGUI$baseX() + (container.width - padding.horizontal() - layoutWidth.intValue()));
                }
             }
          }
@@ -164,7 +168,7 @@ public class FlowLayout extends BaseParentUIComponent {
          MountingHelper mountState = MountingHelper.mountEarly((x$0, x$1) -> container.mountChild(x$0, x$1), container.children, (child) -> {
             layout.add(child);
             child.carpetGUI$mount(container, container.x + padding.left() + ((Insets)child.carpetGUI$margins().get()).left(), container.y + padding.top() + ((Insets)child.carpetGUI$margins().get()).top() + layoutHeight.intValue());
-            Size childSize = child.fullSize();
+            Size childSize = child.carpetGUI$fullSize();
             layoutHeight.add(childSize.height() + container.gap());
             if (childSize.width() > layoutWidth.intValue()) {
                layoutWidth.setValue(childSize.width());
@@ -175,16 +179,16 @@ public class FlowLayout extends BaseParentUIComponent {
          container.applySizing();
          if (container.horizontalAlignment() != HorizontalAlignment.LEFT) {
             for(UIComponent component : layout) {
-               component.carpetGUI$updateX(component.baseX() + container.horizontalAlignment().align(component.fullSize().width(), container.width - padding.horizontal()));
+               component.carpetGUI$updateX(component.carpetGUI$baseX() + container.horizontalAlignment().align(component.carpetGUI$fullSize().width(), container.width - padding.horizontal()));
             }
          }
 
          if (container.verticalAlignment() != VerticalAlignment.TOP) {
             for(UIComponent component : layout) {
                if (container.verticalAlignment() == VerticalAlignment.CENTER) {
-                  component.carpetGUI$updateY(component.baseY() + (container.height - padding.vertical() - layoutHeight.intValue()) / 2);
+                  component.carpetGUI$updateY(component.carpetGUI$baseY() + (container.height - padding.vertical() - layoutHeight.intValue()) / 2);
                } else {
-                  component.carpetGUI$updateY(component.baseY() + (container.height - padding.vertical() - layoutHeight.intValue()));
+                  component.carpetGUI$updateY(component.carpetGUI$baseY() + (container.height - padding.vertical() - layoutHeight.intValue()));
                }
             }
          }

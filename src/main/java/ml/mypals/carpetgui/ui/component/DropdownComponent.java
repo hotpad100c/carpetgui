@@ -40,7 +40,7 @@ public class DropdownComponent extends FlowLayout {
 
    public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
       super.carpetGUI$draw(graphics, mouseX, mouseY, partialTicks, delta);
-      if (this.closeWhenNotHovered && !this.isInBoundingBox((double)mouseX, (double)mouseY)) {
+      if (this.closeWhenNotHovered && !this.carpetGUI$isInBoundingBox((double)mouseX, (double)mouseY)) {
          this.queue(() -> {
             this.closeWhenNotHovered(false);
             this.parent.removeChild(this);
@@ -109,7 +109,7 @@ public class DropdownComponent extends FlowLayout {
       }
 
       public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
-         if (this.isInBoundingBox((double)mouseX, (double)mouseY)) {
+         if (this.carpetGUI$isInBoundingBox((double)mouseX, (double)mouseY)) {
             Insets margins = (Insets)this.margins.get();
             graphics.fill(this.x - margins.left(), this.y - margins.top(), this.x + this.width + margins.right(), this.y + this.height + margins.bottom(), 1157627903);
          }
