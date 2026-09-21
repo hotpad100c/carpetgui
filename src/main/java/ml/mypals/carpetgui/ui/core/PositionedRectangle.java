@@ -36,12 +36,12 @@ public interface PositionedRectangle {
    }
 
    //? if >=1.20 {
-   /*default PositionedRectangle transform(org.joml.Matrix3x2f matrix) {
+   default PositionedRectangle transform(org.joml.Matrix3x2f matrix) {
       org.joml.Vector2f pos1 = matrix.transformPosition((float)this.carpetGUI$x(), (float)this.carpetGUI$y(), new org.joml.Vector2f());
       org.joml.Vector2f pos2 = matrix.transformPosition((float)(this.carpetGUI$x() + this.carpetGUI$width()), (float)(this.carpetGUI$y() + this.carpetGUI$height()), new org.joml.Vector2f());
       return of((int)pos1.x, (int)pos1.y, (int)(pos2.x - pos1.x), (int)(pos2.y - pos1.y));
    }
-   *///?}
+   //?}
 
    static PositionedRectangle of(int x, int y, Size size) {
       return of(x, y, size.width(), size.height());

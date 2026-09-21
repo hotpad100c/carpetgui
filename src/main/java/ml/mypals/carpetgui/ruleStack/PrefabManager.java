@@ -226,11 +226,11 @@ public class PrefabManager {
       } else {
          try {
             //? if <=1.17.1 {
-            JsonParser jsonParser = new JsonParser();
+            /*JsonParser jsonParser = new JsonParser();
             JsonObject root = jsonParser.parse(Files.readString(this.saveFile)).getAsJsonObject();
-            //?} else {
-            /*JsonObject root = JsonParser.parseString(Files.readString(this.saveFile)).getAsJsonObject();
-             *///?}
+            *///?} else {
+            JsonObject root = JsonParser.parseString(Files.readString(this.saveFile)).getAsJsonObject();
+             //?}
 
             this.activeName = root.get("active").getAsString();
             this.committedSnapshot = new LinkedHashMap();

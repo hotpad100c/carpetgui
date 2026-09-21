@@ -32,22 +32,22 @@ public class CarpetClientNetworkMixin {
          dataHandlers.put("Rules", (BiConsumer) (player, tag) -> {
             if (tag instanceof CompoundTag ruleset) {
                //? if <1.21.6 {
-               for (String ruleKey : ruleset.getAllKeys()) {
-               //?} else {
-               /*for (String ruleKey : ruleset.keySet()) {
-               *///?}
+               /*for (String ruleKey : ruleset.getAllKeys()) {
+               *///?} else {
+               for (String ruleKey : ruleset.keySet()) {
+               //?}
                   Tag rTag = ruleset.get(ruleKey);
                   if (rTag instanceof CompoundTag ruleNBT) {
                      if (ruleNBT.contains("Manager")) {
                         //? if <1.21.5 {
-                        String ruleName = (String)ruleNBT.getString("Rule");
+                        /*String ruleName = (String)ruleNBT.getString("Rule");
                         String managerName = (String)ruleNBT.getString("Manager");
                         String value = (String)ruleNBT.getString("Value");
-                        //?} else {
-                        /*String ruleName = (String)ruleNBT.getString("Rule").get();
+                        *///?} else {
+                        String ruleName = (String)ruleNBT.getString("Rule").get();
                         String managerName = (String)ruleNBT.getString("Manager").get();
                         String value = (String)ruleNBT.getString("Value").get();
-                        *///?}
+                        //?}
                         RuleData ruleData = new RuleData();
                         ruleData.manager = managerName;
                         ruleData.value = value;

@@ -4,7 +4,7 @@ import ml.mypals.carpetgui.network.PacketIDs;
 import net.minecraft.network.FriendlyByteBuf;
 
 //? if >= 1.20.5 {
-/*import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +24,7 @@ public record RequestRuleStackPayload() implements CustomPacketPayload {
     }
 
 }
-*///?} elif >= 1.19.4 {
+//?} elif >= 1.19.4 {
 /*import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 
@@ -41,10 +41,10 @@ public record RequestRuleStackPayload() implements FabricPacket {
     }
 }
 *///?} else {
-import net.minecraft.resources.ResourceLocation;
+/*import net.minecraft.resources.Identifier;
 
 public record RequestRuleStackPayload() {
-    public static final ResourceLocation ID = PacketIDs.REQUEST_RULE_STACK_ID;
+    public static final Identifier ID = PacketIDs.REQUEST_RULE_STACK_ID;
 
     public void write(FriendlyByteBuf buf) {}
 
@@ -52,4 +52,4 @@ public record RequestRuleStackPayload() {
         return new RequestRuleStackPayload();
     }
 }
-//?}
+*///?}

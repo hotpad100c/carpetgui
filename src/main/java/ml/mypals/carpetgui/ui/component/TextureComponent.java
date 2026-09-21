@@ -5,10 +5,10 @@ import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
 import ml.mypals.carpetgui.ui.core.PositionedRectangle;
 import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.util.Observable;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class TextureComponent extends BaseUIComponent {
-   protected final ResourceLocation texture;
+   protected final Identifier texture;
    protected final int u;
    protected final int v;
    protected final int regionWidth;
@@ -18,7 +18,7 @@ public class TextureComponent extends BaseUIComponent {
    protected final Observable<PositionedRectangle> visibleArea;
    protected boolean blend = false;
 
-   protected TextureComponent(ResourceLocation texture, int u, int v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
+   protected TextureComponent(Identifier texture, int u, int v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
       this.texture = texture;
       this.u = u;
       this.v = v;

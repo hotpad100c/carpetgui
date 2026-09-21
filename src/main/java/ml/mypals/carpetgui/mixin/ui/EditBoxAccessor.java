@@ -11,7 +11,7 @@ public interface EditBoxAccessor {
    boolean carpetGUI$bordered();
 
    //? if >=1.21.6 {
-   /*@Invoker("updateTextPosition")
+   @Invoker("updateTextPosition")
    void carpetGUI$updateTextPosition();
-   *///?}
+   //?}
 }

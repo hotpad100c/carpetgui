@@ -1,6 +1,15 @@
+import java.util.Properties
+
 plugins {
     id("net.fabricmc.fabric-loom")
     id("me.modmuss50.mod-publish-plugin") version "0.3.5"
+}
+
+val localProperties = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) {
+        f.inputStream().use { load(it) }
+    }
 }
 
 
@@ -31,10 +40,6 @@ dependencies {
     implementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
     implementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
-    if (project.hasProperty("deps.owo_version")) {
-        implementation("io.wispforest:owo-lib:${property("deps.owo_version")}")
-    }
-    //include("io.wispforest:owo-sentinel:${property("deps.owo_version")}")
 
     if (project.hasProperty("deps.carpet_dependency")) {
         implementation(property("deps.carpet_dependency") as String)
@@ -97,24 +102,25 @@ tasks {
 publishMods {
     file = tasks.jar.map { it.archiveFile.get() }
     displayName = "${property("mod.name")} ${property("mod.version")} for ${property("mod.mc_title")}"
-    version = property("mod.version") as String
+    version = "${property("mod.version")}+${stonecutter.current.version}"
     changelog = rootProject.file("CHANGELOG.md").readText()
-    type = STABLE
+    type = ALPHA
     modLoaders.add("fabric")
     dryRun = false
 
     modrinth {
         projectId = property("publish.modrinth") as String
-        accessToken = "Modrinth upload token!"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+            .orElse(providers.gradleProperty("modrinth.token"))
+            .orElse(providers.gradleProperty("modrinthToken"))
+            .orElse(providers.provider {
+                localProperties.getProperty("modrinth.token") ?: localProperties.getProperty("modrinthToken")
+            })
         minecraftVersions.addAll(property("mod.mc_targets").toString().split(' '))
         requires {
-            id = "ccKDOlHs"
-        }
-        requires {
-            id = "TQTTVgYE"
+            id = "TQTTVgYE" // carpet
         }
     }
-
 }
 
 // Publishes builds to a maven repository under `com.example:template:0.1.0+mc`

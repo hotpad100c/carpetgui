@@ -54,10 +54,10 @@ public class CarpetGUIClientPacketHandler {
          label22: {
             client = Minecraft.getInstance();
             //? if <26.2 {
-            Screen patt0$temp = client.screen;
-            //?} else {
-            /*Screen patt0$temp = client.gui.screen();
-            *///?}
+            /*Screen patt0$temp = client.screen;
+            *///?} else {
+            Screen patt0$temp = client.gui.screen();
+            //?}
             if (patt0$temp instanceof RuleGroupScreen rgs) {
                if (rgs.requestingRulesForNewGroup) {
                   var10000 = true;
@@ -77,7 +77,7 @@ public class CarpetGUIClientPacketHandler {
          }
 
          CarpetGUIClient.requesting = false;
-         client.setScreen(new RulesEditScreen(!fromRuleGroupScreen));
+         client.setScreenAndShow(new RulesEditScreen(!fromRuleGroupScreen));
       });
    }
 
@@ -103,30 +103,30 @@ public class CarpetGUIClientPacketHandler {
 
    public static String getSelectedLanguage(Minecraft client) {
       //? if <1.19 {
-      return client.getLanguageManager().getSelected().getCode();
-      //?} else {
-      /*return client.getLanguageManager().getSelected();
-      *///?}
+      /*return client.getLanguageManager().getSelected().getCode();
+      *///?} else {
+      return client.getLanguageManager().getSelected();
+      //?}
    }
 
    public static void send(RequestRulesPayload payload) {
       //? if <1.19.4 {
-      net.minecraft.network.FriendlyByteBuf buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+      /*net.minecraft.network.FriendlyByteBuf buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
       payload.write(buf);
       ClientPlayNetworking.send(RequestRulesPayload.ID, buf);
-      //?} else {
-      /*ClientPlayNetworking.send(payload);
-      *///?}
+      *///?} else {
+      ClientPlayNetworking.send(payload);
+      //?}
    }
 
    public static void send(RequestRuleStackPayload payload) {
       //? if <1.19.4 {
-      net.minecraft.network.FriendlyByteBuf buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+      /*net.minecraft.network.FriendlyByteBuf buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
       payload.write(buf);
       ClientPlayNetworking.send(RequestRuleStackPayload.ID, buf);
-      //?} else {
-      /*ClientPlayNetworking.send(payload);
-      *///?}
+      *///?} else {
+      ClientPlayNetworking.send(payload);
+      //?}
    }
 
    private static void handlePartialPacket(RulesPacketPayload payload, boolean fromRuleGroupScreen, Minecraft client) {
@@ -330,14 +330,14 @@ public class CarpetGUIClientPacketHandler {
                            newRule.manager = serverRule.manager;
                            newRule.name = serverRule.name;
                            newRule.value = serverRule.value;
-                           String unknown = new net.minecraft.network.chat.TranslatableComponent("gui.tip.unknown_rule").getString();
+                           String unknown = Component.translatable("gui.tip.unknown_rule").getString();
                            newRule.localName = serverRule.name;
                            newRule.defaultValue = serverRule.value;
                            newRule.description = unknown;
                            newRule.localDescription = unknown;
                            newRule.type = null;
                            newRule.suggestions = !serverRule.value.equals("true") && !serverRule.value.equals("false") ? List.of("") : List.of("true", "false");
-                           newRule.categories = List.of(Map.entry("unkown", new net.minecraft.network.chat.TranslatableComponent("gui.category.unknown").getString()));
+                           newRule.categories = List.of(Map.entry("unkown", Component.translatable("gui.category.unknown").getString()));
                            newRule.isGamerule = false;
                            CarpetGUIClient.cachedCompleteRules.put(newRule.name, newRule);
                            cachedMap.put(newRule.name, newRule);
@@ -355,7 +355,7 @@ public class CarpetGUIClientPacketHandler {
                   }
                }
 
-               client.setScreen(new RulesEditScreen(instantAffect));
+               client.setScreenAndShow(new RulesEditScreen(instantAffect));
             }));
       }
    }

@@ -1,7 +1,7 @@
 package ml.mypals.carpetgui.compat.input;
 
 //? if <1.21.9 {
-import org.lwjgl.glfw.GLFW;
+/*import org.lwjgl.glfw.GLFW;
 
 public record KeyEvent(int key, int scancode, int modifiers) {
     public int input() { return key; }
@@ -15,4 +15,4 @@ public record KeyEvent(int key, int scancode, int modifiers) {
     public boolean isLeft() { return key == GLFW.GLFW_KEY_LEFT; }
     public boolean isRight() { return key == GLFW.GLFW_KEY_RIGHT; }
 }
-//?}
+*///?}

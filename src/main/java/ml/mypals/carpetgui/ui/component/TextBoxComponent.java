@@ -12,10 +12,10 @@ import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 //? if >=1.21.9 {
-/*import net.minecraft.client.input.KeyEvent;
-*///?} else {
-import ml.mypals.carpetgui.compat.input.KeyEvent;
-//?}
+import net.minecraft.client.input.KeyEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.KeyEvent;
+*///?}
 import net.minecraft.network.chat.Component;
 
 public class TextBoxComponent extends EditBox {
@@ -29,14 +29,14 @@ public class TextBoxComponent extends EditBox {
    }
 
    //? if <1.19.3 {
-   @Override
+   /*@Override
    public void setFocused(boolean focused) {
       super.setFocused(focused);
    }
-   //?}
+   *///?}
 
    protected TextBoxComponent(Sizing horizontalSizing) {
-      super(Minecraft.getInstance().font, 0, 0, 0, 0, net.minecraft.network.chat.TextComponent.EMPTY);
+      super(Minecraft.getInstance().font, 0, 0, 0, 0, Component.empty());
       this.textValue.observe(str -> this.changedEvents.sink().onChanged(str));
       this.sizing(horizontalSizing, Sizing.content());
       this.showsBackground.observe((a) -> this.carpetGUI$widgetWrapper().notifyParentIfMounted());
@@ -54,7 +54,7 @@ public class TextBoxComponent extends EditBox {
    }
 
    //? if <1.21.9 {
-   @Override
+   /*@Override
    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
       boolean result = super.keyPressed(keyCode, scanCode, modifiers);
       if (keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_TAB) {
@@ -69,8 +69,8 @@ public class TextBoxComponent extends EditBox {
    public boolean carpetGUI$onKeyPress(KeyEvent input) {
       return this.keyPressed(input.key(), input.scancode(), input.modifiers());
    }
-   //?} else {
-   /*public boolean keyPressed(KeyEvent input) {
+   *///?} else {
+   public boolean keyPressed(KeyEvent input) {
       boolean result = super.keyPressed(input);
       if (input.isCycleFocus()) {
          this.insertText("    ");
@@ -79,20 +79,20 @@ public class TextBoxComponent extends EditBox {
          return result;
       }
    }
-   *///?}
+   //?}
 
    public void updateX(int x) {
       super.carpetGUI$updateX(x);
       //? if >=1.21.6 {
-      /*((EditBoxAccessor)this).carpetGUI$updateTextPosition();
-      *///?}
+      ((EditBoxAccessor)this).carpetGUI$updateTextPosition();
+      //?}
    }
 
    public void updateY(int y) {
       super.carpetGUI$updateY(y);
       //? if >=1.21.6 {
-      /*((EditBoxAccessor)this).carpetGUI$updateTextPosition();
-      *///?}
+      ((EditBoxAccessor)this).carpetGUI$updateTextPosition();
+      //?}
    }
 
    public void setBordered(boolean drawsBackground) {
@@ -107,10 +107,10 @@ public class TextBoxComponent extends EditBox {
    public TextBoxComponent text(String text) {
       this.setValue(text);
       //? if >=1.20.2 {
-      /*this.moveCursorToStart(false);
-      *///?} else {
-      this.moveCursorToStart();
-      //?}
+      this.moveCursorToStart(false);
+      //?} else {
+      /*this.moveCursorToStart();
+      *///?}
       return this;
    }
 

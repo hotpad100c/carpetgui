@@ -109,14 +109,14 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       FlowLayout prefabSection = UIContainers.verticalFlow(Sizing.fill(100), Sizing.content());
       prefabSection.carpetGUI$margins(Insets.bottom(5));
       panel.child(prefabSection);
-      this.prefabNameLabel = UIComponents.label(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.prefab", new Object[]{"…"}).withStyle(ChatFormatting.YELLOW));
+      this.prefabNameLabel = UIComponents.label(Component.translatable("gui.rulestack.prefab", new Object[]{"…"}).withStyle(ChatFormatting.YELLOW));
       this.prefabNameLabel.color(Color.WHITE);
       this.prefabNameLabel.carpetGUI$margins(Insets.bottom(3));
       prefabSection.child(this.prefabNameLabel);
       FlowLayout prefabBtns = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(5));
       prefabBtns.gap(3);
-      prefabBtns.child(ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.btn.switch"), Sizing.fill(20), Sizing.fill(100), () -> this.togglePrefabPanel(RuleStackScreen.PrefabPanel.LIST)));
-      prefabBtns.child(ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.btn.new_prefab"), Sizing.fill(20), Sizing.fill(100), () -> this.togglePrefabPanel(RuleStackScreen.PrefabPanel.NEW_INPUT)));
+      prefabBtns.child(ScreenUtils.btn(Component.translatable("gui.rulestack.btn.switch"), Sizing.fill(20), Sizing.fill(100), () -> this.togglePrefabPanel(RuleStackScreen.PrefabPanel.LIST)));
+      prefabBtns.child(ScreenUtils.btn(Component.translatable("gui.rulestack.btn.new_prefab"), Sizing.fill(20), Sizing.fill(100), () -> this.togglePrefabPanel(RuleStackScreen.PrefabPanel.NEW_INPUT)));
       prefabSection.child(prefabBtns);
       this.prefabDynamic = UIContainers.verticalFlow(Sizing.fill(100), Sizing.content());
       this.prefabDynamic.carpetGUI$margins(Insets.top(3));
@@ -127,7 +127,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       ScrollContainer<FlowLayout> timelineScroll = UIContainers.<FlowLayout>verticalScroll(Sizing.fill(100), Sizing.fill(60), this.timelineLayout);
       timelineScroll.scrollbar(ScrollContainer.Scrollbar.flat(Color.WHITE));
       panel.child(timelineScroll);
-      String hint = new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.message_hint").getString();
+      String hint = Component.translatable("gui.rulestack.message_hint").getString();
       this.pushMessageBox = UIComponents.textBox(Sizing.fill(100));
       this.pushMessageBox.setMaxLength(100);
       this.pushMessageBox.setSuggestion(hint);
@@ -152,20 +152,20 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
    private void buildBottomButtons() {
       this.bottomButtonLayout.clearChildren();
       Component pushTooltip = this.rebuildPushHint();
-      FlowLayout pushButton = ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.btn.push"), Sizing.fill(31), Sizing.fill(100), () -> {
+      FlowLayout pushButton = ScreenUtils.btn(Component.translatable("gui.rulestack.btn.push"), Sizing.fill(31), Sizing.fill(100), () -> {
          String msg = this.pushMessageBox.getValue().trim();
          String var10001 = msg.isEmpty() ? "" : " " + msg;
          this.sendCmd("rulestack push" + var10001);
          this.pushMessageBox.setValue("");
-         this.pushMessageBox.setSuggestion(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.message_hint").getString());
+         this.pushMessageBox.setSuggestion(Component.translatable("gui.rulestack.message_hint").getString());
       });
       if (pushTooltip != null) {
          pushButton.tooltip(pushTooltip);
       }
 
       this.bottomButtonLayout.child(pushButton);
-      this.bottomButtonLayout.child(ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.btn.pop"), Sizing.fill(31), Sizing.fill(100), () -> this.sendCmd("rulestack pop")));
-      this.bottomButtonLayout.child(ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.btn.discard"), Sizing.fill(31), Sizing.fill(100), () -> this.sendCmd("rulestack discard")));
+      this.bottomButtonLayout.child(ScreenUtils.btn(Component.translatable("gui.rulestack.btn.pop"), Sizing.fill(31), Sizing.fill(100), () -> this.sendCmd("rulestack pop")));
+      this.bottomButtonLayout.child(ScreenUtils.btn(Component.translatable("gui.rulestack.btn.discard"), Sizing.fill(31), Sizing.fill(100), () -> this.sendCmd("rulestack discard")));
    }
 
    private void togglePrefabPanel(PrefabPanel target) {
@@ -196,36 +196,22 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
             row.padding(Insets.of(2, 2, 0, 0));
             row.verticalAlignment(VerticalAlignment.CENTER);
             row.surface(Surface.flat(active ? 1084948394 : 285212671));
-            LabelComponent lbl = UIComponents.label(new net.minecraft.network.chat.TextComponent((active ? "> " : "  ") + name));
+            LabelComponent lbl = UIComponents.label(Component.literal((active ? "> " : "  ") + name));
             lbl.color(Color.WHITE);
             if (!data.pendingChanges().isEmpty()) {
-               row.tooltip(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.switch_warning"));
+               row.tooltip(Component.translatable("gui.rulestack.switch_warning"));
             }
-
             row.child(lbl);
             row.carpetGUI$mouseEnter().subscribe((MouseEnter)() -> {
-               if (data.pendingChanges().isEmpty() ||
-                        //? if < 26.3 {
-                        InputConstants.isKeyDown(this.minecraft.getWindow().getWindow(), 340)
-                        //?} else {
-                        /*InputConstants.isKeyDown( 340)
-                        *///?}
-               ) {
+               if (data.pendingChanges().isEmpty() || ScreenUtils.isKeyDown(340)) {
                   row.surface(row.surface().and(Surface.outline(Color.WHITE.argb())));
                }
-
             });
             row.carpetGUI$mouseLeave().subscribe((MouseLeave)() -> row.surface(Surface.flat(active ? 1084948394 : 285212671)));
             if (!active) {
                row.carpetGUI$cursorStyle(CursorStyle.HAND);
                row.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
-                  if (!data.pendingChanges().isEmpty() &&
-                          //? if < 26.3 {
-                          !InputConstants.isKeyDown(this.minecraft.getWindow().getWindow(), 340)
-                          //?} else {
-                          /*!InputConstants.isKeyDown( 340)
-                         *///?}
-                  ) {
+                  if (!data.pendingChanges().isEmpty() && !ScreenUtils.isKeyDown(340)) {
                      return false;
                   } else {
                      this.sendCmd("rulestack prefab switch " + name);
@@ -249,16 +235,15 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       nameBox.setSuggestion("…");
       nameBox.carpetGUI$focusGained().subscribe((FocusGained)(s) -> nameBox.setSuggestion(""));
       row.child(nameBox);
-      FlowLayout newButton = ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulegroups.save"), Sizing.fill(18), Sizing.fill(98), () -> {
+      FlowLayout newButton = ScreenUtils.btn(Component.translatable("gui.rulegroups.save"), Sizing.fill(18), Sizing.fill(98), () -> {
          String n = nameBox.getValue().trim();
          if (!n.isEmpty()) {
-            this.sendCmd("rulestack prefab create " + n + " " + (/*? if < 26.3 {*/InputConstants.isKeyDown(this.minecraft.getWindow().getWindow(), 342)/*?} else {*//*InputConstants.isKeyDown(342)*//*?}*/ ? "true" : "false"));
+            this.sendCmd("rulestack prefab create " + n + " " + (ScreenUtils.isKeyDown(342) ? "true" : "false"));
             this.prefabDynamic.clearChildren();
             this.prefabPanel = RuleStackScreen.PrefabPanel.NONE;
          }
-
       });
-      newButton.tooltip(new net.minecraft.network.chat.TranslatableComponent("gui.tip.fork_current"));
+      newButton.tooltip(Component.translatable("gui.tip.fork_current"));
       row.child(newButton);
       this.prefabDynamic.child(row);
    }
@@ -268,7 +253,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
          this.timelineLayout.clearChildren();
          RuleStackData data = CarpetGUIClient.cachedRuleStackData;
          if (data == null) {
-            this.timelineLayout.child(UIComponents.label(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.loading").withStyle(ChatFormatting.GRAY)));
+            this.timelineLayout.child(UIComponents.label(Component.translatable("gui.rulestack.loading").withStyle(ChatFormatting.GRAY)));
          } else {
             List<RuleStackSyncPayload.LayerInfo> layers = data.layers();
             List<RuleStackSyncPayload.LayerInfo> futureLayers = data.futureLayers();
@@ -282,7 +267,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
                }
 
                boolean sel = Integer.valueOf(-1).equals(this.selectedLayerId);
-               this.timelineLayout.child(this.timelineNode(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.pending_changes", new Object[]{String.valueOf(data.pendingChanges().size())}).withStyle(ChatFormatting.YELLOW), (Long)null, data.pendingChanges().size(), sel, false, pos < total - 1, RuleStackScreen.NodeStyle.PENDING, this::selectPending));
+               this.timelineLayout.child(this.timelineNode(Component.translatable("gui.rulestack.pending_changes", new Object[]{String.valueOf(data.pendingChanges().size())}).withStyle(ChatFormatting.YELLOW), (Long)null, data.pendingChanges().size(), sel, false, pos < total - 1, RuleStackScreen.NodeStyle.PENDING, this::selectPending));
                ++pos;
             }
 
@@ -290,9 +275,9 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
                RuleStackSyncPayload.LayerInfo layer = (RuleStackSyncPayload.LayerInfo)futureLayers.get(i);
                boolean isNextRedo = i == futureLayers.size() - 1;
                int var10000 = layer.id();
-               MutableComponent label = new net.minecraft.network.chat.TextComponent("↩ #" + var10000 + " ").withStyle(isNextRedo ? ChatFormatting.AQUA : ChatFormatting.DARK_AQUA);
+               MutableComponent label = Component.literal("↩ #" + var10000 + " ").withStyle(isNextRedo ? ChatFormatting.AQUA : ChatFormatting.DARK_AQUA);
                if (!layer.message().isEmpty()) {
-                  label.append(new net.minecraft.network.chat.TextComponent("\"" + layer.message() + "\"").withStyle(ChatFormatting.UNDERLINE));
+                  label.append(Component.literal("\"" + layer.message() + "\"").withStyle(ChatFormatting.UNDERLINE));
                }
 
                boolean sel = Integer.valueOf(layer.id()).equals(this.selectedLayerId);
@@ -307,16 +292,16 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
                }
 
                boolean sel = Integer.valueOf(layer.id()).equals(this.selectedLayerId);
-               MutableComponent label = new net.minecraft.network.chat.TextComponent("#" + layer.id() + " ").withStyle(ChatFormatting.YELLOW);
+               MutableComponent label = Component.literal("#" + layer.id() + " ").withStyle(ChatFormatting.YELLOW);
                if (!layer.message().isEmpty()) {
-                  label.append(new net.minecraft.network.chat.TextComponent("\"" + layer.message() + "\"").withStyle(ChatFormatting.UNDERLINE).withStyle(ChatFormatting.WHITE));
+                  label.append(Component.literal("\"" + layer.message() + "\"").withStyle(ChatFormatting.UNDERLINE).withStyle(ChatFormatting.WHITE));
                }
 
                this.timelineLayout.child(this.timelineNode(label, layer.timestamp(), layer.changes().size(), sel, pos > 0, pos < total - 1, i == layers.size() - 1 ? RuleStackScreen.NodeStyle.HEAD : RuleStackScreen.NodeStyle.NORMAL, () -> this.selectLayer(layer, false)));
                ++pos;
             }
 
-            this.timelineLayout.child(this.timelineNode(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.base").withStyle(ChatFormatting.GRAY), (Long)null, 0, false, pos > 0, false, RuleStackScreen.NodeStyle.BASE, (Runnable)null));
+            this.timelineLayout.child(this.timelineNode(Component.translatable("gui.rulestack.base").withStyle(ChatFormatting.GRAY), (Long)null, 0, false, pos > 0, false, RuleStackScreen.NodeStyle.BASE, (Runnable)null));
             this.buildBottomButtons();
          }
       }
@@ -333,9 +318,9 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
             RuleStackSyncPayload.LayerInfo next = (RuleStackSyncPayload.LayerInfo)data.futureLayers().get(data.futureLayers().size() - 1);
             int var10000 = next.id();
             String redoLabel = "#" + var10000 + (next.message().isEmpty() ? "" : " \"" + next.message() + "\"");
-            return new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.push_hint.redo", new Object[]{redoLabel}).withStyle(ChatFormatting.AQUA);
+            return Component.translatable("gui.rulestack.push_hint.redo", new Object[]{redoLabel}).withStyle(ChatFormatting.AQUA);
          } else {
-            return hasFuture ? new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.push_hint.discard_future", new Object[]{String.valueOf(data.futureLayers().size())}).withStyle(ChatFormatting.GOLD) : null;
+            return hasFuture ? Component.translatable("gui.rulestack.push_hint.discard_future", new Object[]{String.valueOf(data.futureLayers().size())}).withStyle(ChatFormatting.GOLD) : null;
          }
       }
    }
@@ -408,7 +393,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       if (changeCount > 0 || timestamp != null) {
          String var10000 = changeCount > 0 ? changeCount + " ch" : "";
          String meta = var10000 + (timestamp != null ? (changeCount > 0 ? "  " : "") + ts(timestamp) : "");
-         content.child(UIComponents.label(new net.minecraft.network.chat.TextComponent(meta).withStyle(ChatFormatting.DARK_GREEN)));
+         content.child(UIComponents.label(Component.literal(meta).withStyle(ChatFormatting.DARK_GREEN)));
       }
 
       entry.child(content);
@@ -426,14 +411,14 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
    private void selectLayer(RuleStackSyncPayload.LayerInfo layer, boolean isFuture) {
       this.selectedLayerId = layer.id();
       this.rebuildTimeline();
-      MutableComponent header = new net.minecraft.network.chat.TextComponent("#" + layer.id() + " ").withStyle(ChatFormatting.YELLOW);
+      MutableComponent header = Component.literal("#" + layer.id() + " ").withStyle(ChatFormatting.YELLOW);
       if (!layer.message().isEmpty()) {
-         header.append(new net.minecraft.network.chat.TextComponent("\"" + layer.message() + "\"").withStyle(ChatFormatting.UNDERLINE).withStyle(ChatFormatting.WHITE));
+         header.append(Component.literal("\"" + layer.message() + "\"").withStyle(ChatFormatting.UNDERLINE).withStyle(ChatFormatting.WHITE));
       }
 
-      header.append(new net.minecraft.network.chat.TextComponent(" (" + layer.changes().size() + " ch)"));
+      header.append(Component.literal(" (" + layer.changes().size() + " ch)"));
       if (isFuture) {
-         header.append(new net.minecraft.network.chat.TextComponent(" ").append(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.future_marker").withStyle(ChatFormatting.AQUA)));
+         header.append(Component.literal(" ").append(Component.translatable("gui.rulestack.future_marker").withStyle(ChatFormatting.AQUA)));
       }
 
       this.rebuildChanges(layer.changes(), header);
@@ -444,7 +429,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       this.rebuildTimeline();
       RuleStackData data = CarpetGUIClient.cachedRuleStackData;
       if (data != null) {
-         this.rebuildChanges(data.pendingChanges(), new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.pending_changes", new Object[]{String.valueOf(data.pendingChanges().size())}).withStyle(ChatFormatting.AQUA));
+         this.rebuildChanges(data.pendingChanges(), Component.translatable("gui.rulestack.pending_changes", new Object[]{String.valueOf(data.pendingChanges().size())}).withStyle(ChatFormatting.AQUA));
       }
    }
 
@@ -456,7 +441,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       if (this.changesLayout != null) {
          this.changesLayout.clearChildren();
          if (changes.isEmpty()) {
-            this.changesLayout.child(UIComponents.label(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.no_changes").withStyle(ChatFormatting.WHITE)));
+            this.changesLayout.child(UIComponents.label(Component.translatable("gui.rulestack.no_changes").withStyle(ChatFormatting.WHITE)));
          } else {
             for(RuleStackSyncPayload.ChangeInfo c : changes) {
                this.changesLayout.child(this.changeCard(c));
@@ -486,24 +471,24 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
          nameLabel.tooltip(ScreenUtils.buildTooltip(ruleData, ""));
       }
 
-      nameLabel.child(UIComponents.label(new net.minecraft.network.chat.TextComponent(translatedName)));
-      nameLabel.child(UIComponents.label(new net.minecraft.network.chat.TextComponent("[" + managerId + "]").withStyle(ChatFormatting.BLUE)));
+      nameLabel.child(UIComponents.label(Component.literal(translatedName)));
+      nameLabel.child(UIComponents.label(Component.literal("[" + managerId + "]").withStyle(ChatFormatting.BLUE)));
       card.child(nameLabel);
       FlowLayout valRow = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.content());
       valRow.gap(5);
       valRow.verticalAlignment(VerticalAlignment.CENTER);
       valRow.padding(Insets.top(3));
       valRow.child(this.valueLabel(c.prevValue(), c.prevIsDefault(), "§c"));
-      valRow.child(UIComponents.label(new net.minecraft.network.chat.TextComponent("->")));
+      valRow.child(UIComponents.label(Component.literal("->")));
       valRow.child(this.valueLabel(c.newValue(), c.newIsDefault(), "§a"));
       card.child(valRow);
       return card;
    }
 
    private LabelComponent valueLabel(String val, boolean isDefault, String color) {
-      MutableComponent comp = new net.minecraft.network.chat.TextComponent(color + val);
+      MutableComponent comp = Component.literal(color + val);
       if (isDefault) {
-         comp.append(new net.minecraft.network.chat.TranslatableComponent("commands.rulestack.change.default_marker"));
+         comp.append(Component.translatable("commands.rulestack.change.default_marker"));
       }
 
       return UIComponents.label(comp);
@@ -513,7 +498,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       RuleStackData data = CarpetGUIClient.cachedRuleStackData;
       if (this.prefabNameLabel != null) {
          String name = data != null ? data.activePrefabName() : "…";
-         this.prefabNameLabel.text(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.prefab", new Object[]{name}).withStyle(ChatFormatting.YELLOW));
+         this.prefabNameLabel.text(Component.translatable("gui.rulestack.prefab", new Object[]{name}).withStyle(ChatFormatting.YELLOW));
       }
 
       if (this.prefabPanel == RuleStackScreen.PrefabPanel.LIST) {
@@ -554,7 +539,7 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
 
    private void clearChangesPane() {
       if (this.changesHeaderLabel != null) {
-         this.changesHeaderLabel.text(new net.minecraft.network.chat.TranslatableComponent("gui.rulestack.select_layer"));
+         this.changesHeaderLabel.text(Component.translatable("gui.rulestack.select_layer"));
       }
 
       if (this.changesLayout != null) {
@@ -571,10 +556,10 @@ public class RuleStackScreen extends BaseOwoScreen<FlowLayout> {
       ClientPacketListener conn = Minecraft.getInstance().getConnection();
       if (conn != null) {
          //? if <1.19 {
-         conn.send(new net.minecraft.network.protocol.game.ServerboundChatPacket("/" + cmd));
-         //?} else {
-         /*conn.sendCommand(cmd);
-         *///?}
+         /*conn.send(new net.minecraft.network.protocol.game.ServerboundChatPacket("/" + cmd));
+         *///?} else {
+         conn.sendCommand(cmd);
+         //?}
          this.pendingRefreshTicks = 3;
       }
 

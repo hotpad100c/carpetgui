@@ -66,9 +66,9 @@ public class RuleData {
       this(buf.readUtf(), buf.readUtf(), buf.readUtf(), getRuleType(buf.readUtf()), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(), BufUtils.readList(buf, FriendlyByteBuf::readUtf), BufUtils.readList(buf, (bf) -> Map.entry(bf.readUtf(), bf.readUtf())));
       if (((String)((Map.Entry)this.categories.get(0)).getKey()).equals("gamerule")) {
          this.isGamerule = true;
-         this.localDescription = new net.minecraft.network.chat.TranslatableComponent(this.localDescription).getString();
+         this.localDescription = Component.translatable(this.localDescription).getString();
          String[] ct = ((String)((Map.Entry)this.categories.get(0)).getValue()).split(" : ");
-         this.categories = List.of(Map.entry((String)((Map.Entry)this.categories.get(0)).getKey(), new net.minecraft.network.chat.TranslatableComponent(ct[0]).getString()));
+         this.categories = List.of(Map.entry((String)((Map.Entry)this.categories.get(0)).getKey(), Component.translatable(ct[0]).getString()));
       }
 
    }

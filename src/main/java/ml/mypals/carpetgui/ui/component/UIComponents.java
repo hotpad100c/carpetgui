@@ -9,7 +9,7 @@ import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.UIComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public final class UIComponents {
    private UIComponents() {
@@ -33,11 +33,11 @@ public final class UIComponents {
       return new LabelComponent(text);
    }
 
-   public static TextureComponent texture(ResourceLocation texture, int u, int v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
+   public static TextureComponent texture(Identifier texture, int u, int v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
       return new TextureComponent(texture, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
    }
 
-   public static TextureComponent texture(ResourceLocation texture, int u, int v, int regionWidth, int regionHeight) {
+   public static TextureComponent texture(Identifier texture, int u, int v, int regionWidth, int regionHeight) {
       return new TextureComponent(texture, u, v, regionWidth, regionHeight, 256, 256);
    }
 

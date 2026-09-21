@@ -173,7 +173,7 @@ public class RuleWidget {
       box.setSuggestion(this.ruleData.value);
 
       for(String suggestion : this.ruleData.suggestions) {
-         dropdown.button(new net.minecraft.network.chat.TextComponent(suggestion), (d) -> {
+         dropdown.button(Component.literal(suggestion), (d) -> {
             box.setSuggestion("");
             box.setValue(suggestion);
             this.sendCommand(this.ruleData.manager + " " + this.orgName + " " + suggestion);
@@ -214,10 +214,10 @@ public class RuleWidget {
       ClientPacketListener conn = Minecraft.getInstance().getConnection();
       if (this.screen.instantAffect && conn != null) {
          //? if <1.19 {
-         conn.send(new net.minecraft.network.protocol.game.ServerboundChatPacket("/" + cmd));
-         //?} else {
-         /*conn.sendCommand(cmd);
-         *///?}
+         /*conn.send(new net.minecraft.network.protocol.game.ServerboundChatPacket("/" + cmd));
+         *///?} else {
+         conn.sendCommand(cmd);
+         //?}
       }
 
    }

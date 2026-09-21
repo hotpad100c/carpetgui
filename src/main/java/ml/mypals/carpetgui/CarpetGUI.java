@@ -4,13 +4,13 @@ import carpet.CarpetExtension;
 import carpet.CarpetServer;
 import carpet.CarpetSettings;
 //? if <1.19 {
-import carpet.settings.ParsedRule;
+/*import carpet.settings.ParsedRule;
 import carpet.settings.SettingsManager;
-//?} else {
-/*import carpet.api.settings.CarpetRule;
+*///?} else {
+import carpet.api.settings.CarpetRule;
 import carpet.api.settings.RuleHelper;
 import carpet.api.settings.SettingsManager;
-*///?}
+//?}
 import carpet.utils.Translations;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -38,69 +38,69 @@ import ml.mypals.carpetgui.ruleStack.PrefabManager;
 import ml.mypals.carpetgui.ruleStack.RuleStackCommand;
 import net.fabricmc.api.ModInitializer;
 //? if <1.19 {
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-//?} else {
-/*import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-*///?}
+/*import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+*///?} else {
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+//?}
 //? if >=1.20.5 {
-/*import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-*///?}
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+//?}
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 //? if < 1.21.11 {
-import net.minecraft.world.level.GameRules;
+/*import net.minecraft.world.level.GameRules;
 import net.minecraft.commands.CommandSourceStack;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import ml.mypals.carpetgui.mixin.accessors.GameRulesAccessor;
 import ml.mypals.carpetgui.mixin.accessors.TypeAccessor;
 import java.util.Objects;
 import static ml.mypals.carpetgui.settings.GamerulesDefaultValueSorter.gamerulesDefaultValues;
-//?} else {
-/*import net.minecraft.world.level.gamerules.GameRule;
+*///?} else {
+import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRules;
-*///?}
+//?}
 import net.minecraft.world.level.storage.LevelResource;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CarpetGUI implements ModInitializer, CarpetExtension {
    public static final Gson GSON = new Gson();
    public static final String MOD_ID = "carpetgui";
-   public static final Logger LOGGER = LogManager.getLogger("carpetgui");
-   public static final String VERSION = /*$ mod_version*/ "1.3.6";
-   public static final String MINECRAFT = /*$ minecraft*/ "1.16.5";
+   public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
+   public static final String VERSION = /*$ mod_version*/ "2.0.0";
+   public static final String MINECRAFT = /*$ minecraft*/ "26.3";
    private static PrefabManager prefabManager;
 
    public void onInitialize() {
       CarpetServer.manageExtension(this);
       //? if <1.19 {
-      CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> RuleStackCommand.register(dispatcher));
-      //?} else {
-      /*CommandRegistrationCallback.EVENT.register((CommandRegistrationCallback)(commandDispatcher, commandBuildContext, commandSelection) -> RuleStackCommand.register(commandDispatcher));
-      *///?}
+      /*CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> RuleStackCommand.register(dispatcher));
+      *///?} else {
+      CommandRegistrationCallback.EVENT.register((CommandRegistrationCallback)(commandDispatcher, commandBuildContext, commandSelection) -> RuleStackCommand.register(commandDispatcher));
+      //?}
       //? if >=1.20.5 {
-      /*PayloadTypeRegistry.playC2S().register(RequestRulesPayload.ID, RequestRulesPayload.CODEC);
-      PayloadTypeRegistry.playC2S().register(RequestRuleStackPayload.ID, RequestRuleStackPayload.CODEC);
-      PayloadTypeRegistry.playS2C().register(RulesPacketPayload.ID, RulesPacketPayload.CODEC);
-      PayloadTypeRegistry.playS2C().register(HelloPacketPayload.ID, HelloPacketPayload.CODEC);
-      PayloadTypeRegistry.playS2C().register(RuleStackSyncPayload.ID, RuleStackSyncPayload.CODEC);
+      PayloadTypeRegistry.serverboundPlay().register(RequestRulesPayload.ID, RequestRulesPayload.CODEC);
+      PayloadTypeRegistry.serverboundPlay().register(RequestRuleStackPayload.ID, RequestRuleStackPayload.CODEC);
+      PayloadTypeRegistry.clientboundPlay().register(RulesPacketPayload.ID, RulesPacketPayload.CODEC);
+      PayloadTypeRegistry.clientboundPlay().register(HelloPacketPayload.ID, HelloPacketPayload.CODEC);
+      PayloadTypeRegistry.clientboundPlay().register(RuleStackSyncPayload.ID, RuleStackSyncPayload.CODEC);
       ServerPlayNetworking.registerGlobalReceiver(RequestRulesPayload.ID, (payload, context) -> CarpetGUIServerPacketHandler.handleRequestRules(payload, context.player(),
          //? if <1.21.9 {
-         java.util.Objects.requireNonNull(context.player().getServer())
-         //?} else {
-         /^context.server()
-         ^///?}
+         /*java.util.Objects.requireNonNull(context.player().getServer())
+         *///?} else {
+         context.server()
+         //?}
       ));
       ServerPlayNetworking.registerGlobalReceiver(RequestRuleStackPayload.ID, (payload, context) -> CarpetGUIServerPacketHandler.handleRequestRuleStack(payload, context.player(),
          //? if <1.21.9 {
-         java.util.Objects.requireNonNull(context.player().getServer())
-         //?} else {
-         /^context.server()
-         ^///?}
+         /*java.util.Objects.requireNonNull(context.player().getServer())
+         *///?} else {
+         context.server()
+         //?}
       ));
-      *///?} elif >=1.19.4 {
+      //?} elif >=1.19.4 {
       /*ServerPlayNetworking.registerGlobalReceiver(RequestRuleStackPayload.ID.getId(),
               (server, player, handler, buf, responseSender) ->
                       CarpetGUIServerPacketHandler.handleRequestRuleStack(RequestRuleStackPayload.ID.read(buf), player, java.util.Objects.requireNonNull(player.getServer()))
@@ -110,7 +110,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                       CarpetGUIServerPacketHandler.handleRequestRules(RequestRulesPayload.ID.read(buf), player, java.util.Objects.requireNonNull(player.getServer()))
       );
       *///?} else {
-      ServerPlayNetworking.registerGlobalReceiver(RequestRuleStackPayload.ID,
+      /*ServerPlayNetworking.registerGlobalReceiver(RequestRuleStackPayload.ID,
               (server, player, handler, buf, responseSender) ->
                       CarpetGUIServerPacketHandler.handleRequestRuleStack(RequestRuleStackPayload.read(buf), player, java.util.Objects.requireNonNull(player.getServer()))
       );
@@ -118,16 +118,16 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
               (server, player, handler, buf, responseSender) ->
                       CarpetGUIServerPacketHandler.handleRequestRules(RequestRulesPayload.read(buf), player, java.util.Objects.requireNonNull(player.getServer()))
       );
-      //?}
+      *///?}
       //? if <1.19.4 {
-      ServerPlayConnectionEvents.JOIN.register((impl, sender, server) -> {
+      /*ServerPlayConnectionEvents.JOIN.register((impl, sender, server) -> {
          net.minecraft.network.FriendlyByteBuf buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
          new HelloPacketPayload().write(buf);
          sender.sendPacket(HelloPacketPayload.ID, buf);
       });
-      //?} else {
-      /*ServerPlayConnectionEvents.JOIN.register((ServerPlayConnectionEvents.Join)(impl, sender, server) -> sender.sendPacket(new HelloPacketPayload()));
-      *///?}
+      *///?} else {
+      ServerPlayConnectionEvents.JOIN.register((ServerPlayConnectionEvents.Join)(impl, sender, server) -> sender.sendPacket(new HelloPacketPayload()));
+      //?}
    }
 
    public static List<RuleData> getRules(String lang) {
@@ -135,10 +135,10 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
       for(CarpetExtension carpetExtension : CarpetServer.extensions) {
          //? if <1.19 {
-         SettingsManager settingsManager = carpetExtension.customSettingsManager();
-         //?} else {
-         /*SettingsManager settingsManager = carpetExtension.extensionSettingsManager();
-         *///?}
+         /*SettingsManager settingsManager = carpetExtension.customSettingsManager();
+         *///?} else {
+         SettingsManager settingsManager = carpetExtension.extensionSettingsManager();
+         //?}
          if (settingsManager != null && !settingsManager.equals(CarpetServer.settingsManager)) {
             rules.addAll(getRules(settingsManager, lang));
          }
@@ -155,7 +155,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
          return new ArrayList<>();
       } else {
          //? if <1.21.11 {
-         GameRulesAccessor rulesAccessor = ((GameRulesAccessor) getGamerules());
+         /*GameRulesAccessor rulesAccessor = ((GameRulesAccessor) getGamerules());
          for (Map.Entry<GameRules.Key<?>, GameRules.Value<?>> entry : rulesAccessor.carpetGUI$getRules().entrySet()) {
             GameRules.Key<?> rule = entry.getKey();
             GameRules.Value<?> value = entry.getValue();
@@ -175,13 +175,13 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
                     List.of(Map.entry("gamerule", "gui.category.gamerules : " + rule.getCategory().getDescriptionId()))
             ));
          }
-         //?} else {
-         /*GameRules gameRules = getGamerules();
+         *///?} else {
+         GameRules gameRules = getGamerules();
 
          for(GameRule<?> rule : gameRules.availableRules().toList()) {
             fakeCarpetRules.add(new RuleData("gamerule", rule.id(), rule.id(), rule.valueClass(), rule.defaultValue().toString(), String.valueOf(gameRules.get(rule)), rule.getDescriptionId(), rule.getDescriptionId(), rule.argument().getExamples().stream().toList(), List.of(Map.entry("gamerule", "gui.category.gamerules : " + String.valueOf(rule.category().getDescriptionId())))));
          }
-         *///?}
+         //?}
 
          return fakeCarpetRules;
       }
@@ -190,30 +190,30 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
    public static GameRules getGamerules() {
       MinecraftServer server = CarpetServer.minecraft_server;
       //? if <1.21.11 {
-      return server.getGameRules();
-      //?} else if <26.1 {
+      /*return server.getGameRules();
+      *///?} else if <26.1 {
       /*return server.getWorldData().getGameRules();
       *///?} else {
-      /*return server.getGameRules();
-      *///?}
+      return server.getGameRules();
+      //?}
    }
 
-   public static String getManagerResourceLocation(SettingsManager manager) {
+   public static String getManagerIdentifier(SettingsManager manager) {
       //? if <1.19 {
-      try {
-         return (String) manager.getClass().getMethod("get" + "ResourceLocation").invoke(manager);
+      /*try {
+         return (String) manager.getClass().getMethod("get" + "Identifier").invoke(manager);
       } catch (Exception e) {
          return "carpet";
       }
-      //?} else {
-      /*return manager.identifier();
-      *///?}
+      *///?} else {
+      return manager.identifier();
+      //?}
    }
 
    //? if <1.19 {
-   public static List<RuleData> getRules(SettingsManager settingsManager, String lang) {
+   /*public static List<RuleData> getRules(SettingsManager settingsManager, String lang) {
       List<RuleData> rules = new ArrayList<>();
-      String managerID = getManagerResourceLocation(settingsManager);
+      String managerID = getManagerIdentifier(settingsManager);
       String originalLang = CarpetSettings.language;
       CarpetSettings.language = "none";
       try {
@@ -251,8 +251,8 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
       } catch (Exception ignored) {}
       return rules;
    }
-   //?} else {
-   /*public static List<RuleData> getRules(SettingsManager settingsManager, String lang) {
+   *///?} else {
+   public static List<RuleData> getRules(SettingsManager settingsManager, String lang) {
       List<RuleData> rules = new ArrayList<>();
       String managerID = settingsManager.identifier();
       String originalLang = CarpetSettings.language;
@@ -279,7 +279,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
       Translations.updateLanguage();
       return rules;
    }
-   *///?}
+   //?}
 
    public static String getDefaults() {
       StringBuilder defaults = new StringBuilder();
@@ -319,11 +319,11 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
             List<String> var9;
             try {
                //? if <=1.17.1 {
-               JsonParser parser = new JsonParser();
+               /*JsonParser parser = new JsonParser();
                JsonObject root = parser.parse(new JsonReader(reader)).getAsJsonObject();
-               //?} else {
-               /*JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-               *///?}
+               *///?} else {
+               JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+               //?}
                JsonObject rules = root.getAsJsonObject("rules");
                List<String> result = new ArrayList<>();
                if (rules != null) {
@@ -357,7 +357,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
    }
 
    public static Path getCarpetDefaultsConfigFile(SettingsManager settingsManager) {
-      return CarpetServer.minecraft_server.getWorldPath(LevelResource.ROOT).resolve(getManagerResourceLocation(settingsManager) + ".conf");
+      return CarpetServer.minecraft_server.getWorldPath(LevelResource.ROOT).resolve(getManagerIdentifier(settingsManager) + ".conf");
    }
 
    public static Path getOrgDefaultsConfigFile() {
@@ -382,10 +382,10 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
 
       for(CarpetExtension e : CarpetServer.extensions) {
          //? if <1.19 {
-         SettingsManager manager = e.customSettingsManager();
-         //?} else {
-         /*SettingsManager manager = e.extensionSettingsManager();
-         *///?}
+         /*SettingsManager manager = e.customSettingsManager();
+         *///?} else {
+         SettingsManager manager = e.extensionSettingsManager();
+         //?}
          if (manager != null) {
             consumer.accept(manager);
          }

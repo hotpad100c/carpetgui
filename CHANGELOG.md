@@ -1,19 +1,14 @@
-## **Bug Fixes:**
+# IMPORTANT!
 
-- Added compatibility with mods like `CrystalCarpetAddition` that use custom default rules `.conf` formats.
-- Added support for `CarpetOrgAddition`’s non-standard `default rules` storage.
-- Improved compatibility with potential non-standard `rule translations` from mods like CarpetOrgAddition.
-- Fixed an issue where clicking a button during search would reset the list to the top.
-- Fixed an issue where custom `rule.value()` were always displayed in uppercase (correctness uncertain).
-- Fixed an issue where `rollback/deprecated` modifications stopped working in 1.21.11 and later versions.
+> Currently, the dependency on owo-lib has been completely removed as it no longer meets the mod's development requirements. However, 
+due to the pre-established UI design, the built-in UI component system references and ports the
+architecture of [owo-lib](https://github.com/wisp-forest/owo-lib) in both design and implementation. Owo-lib is licensed under the MIT License.
 
----
+After removing owo-lib:
 
-## *Bug 修复:**
-
-- 兼容`CrystalCarpetAddition`等自定义`默认规则`.conf的模组。
-- 兼容`CarpetOrgAddition`的非常规`默认规则`存储。
-- 兼容`CarpetOrgAddition`等潜在的非常规`规则翻译`。
-- 修复搜索时点击按钮会回到列表顶部。
-- 修复自定义输入的规则的rule.value()总是表现为大写（正确性存疑）
-- 修复1.21.11以后 回退 / 废弃 修改不工作的问题
+* The relevant branch is located at "26.2".
+* The mod will be able to participate in Minecraft updates in a timely manner.
+* The mod will support all versions from 1.16.5 to 26.3.
+* Due to heavy modifications and streamlining of the original architecture, the new stability is currently unknown.
+* The interface has now been changed to full screen.
+* If you encounter any issues, please feel free to contact me through any means, including GitHub, email, or Discord.

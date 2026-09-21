@@ -10,16 +10,16 @@ import ml.mypals.carpetgui.ui.util.FocusHandler;
 import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 //? if >=1.21.9 {
-/*import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-*///?} else {
-import ml.mypals.carpetgui.compat.input.CharacterEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
 import ml.mypals.carpetgui.compat.input.KeyEvent;
 import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
-//?}
+*///?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -257,9 +257,9 @@ public interface UIComponent extends PositionedRectangle {
    default MutableComponent inspectorDescriptor() {
       Insets margins = (Insets)this.carpetGUI$margins().get();
       int var10000 = this.carpetGUI$x();
-      MutableComponent var2 = new net.minecraft.network.chat.TextComponent(var10000 + "," + this.carpetGUI$y() + " (" + this.carpetGUI$width() + "," + this.carpetGUI$height() + ")");
+      MutableComponent var2 = Component.literal(var10000 + "," + this.carpetGUI$y() + " (" + this.carpetGUI$width() + "," + this.carpetGUI$height() + ")");
       int var10001 = margins.top();
-      return var2.append(new net.minecraft.network.chat.TextComponent(" <" + var10001 + "," + margins.bottom() + "," + margins.left() + "," + margins.right() + ">").setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)));
+      return var2.append(Component.literal(" <" + var10001 + "," + margins.bottom() + "," + margins.left() + "," + margins.right() + ">").setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)));
    }
 
    public static enum FocusSource {

@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 import ml.mypals.carpetgui.network.RuleData;
 import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.fabricmc.loader.api.FabricLoader;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RulesCacheManager {
-   private static final Logger LOGGER = LogManager.getLogger("carpetgui-cache");
+   private static final Logger LOGGER = LoggerFactory.getLogger("carpetgui-cache");
    private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
    private static final Path CACHE_DIR;
    private static final Path KNOWN_MANAGERS_FILE;
@@ -65,10 +65,10 @@ public class RulesCacheManager {
                         JsonElement val = obj.get("value");
                         if (val != null && val.isJsonObject()) {
                            //? if <=1.17.1 {
-                           oldCategoryValues.put(key, deepCopy(val.getAsJsonObject()));
-                           //?} else {
-                           /*oldCategoryValues.put(key, val.getAsJsonObject().deepCopy());
-                            *///?}
+                           /*oldCategoryValues.put(key, deepCopy(val.getAsJsonObject()));
+                           *///?} else {
+                           oldCategoryValues.put(key, val.getAsJsonObject().deepCopy());
+                            //?}
                         }
                      }
                   }
@@ -519,20 +519,20 @@ public class RulesCacheManager {
       if (el != null) {
          if (el.isJsonObject()) {
             //? if <=1.17.1 {
-            target.put(ruleName, deepCopy(el.getAsJsonObject()));
-            //?} else {
-            /*target.put(ruleName, el.getAsJsonObject().deepCopy());
-            *///?}
+            /*target.put(ruleName, deepCopy(el.getAsJsonObject()));
+            *///?} else {
+            target.put(ruleName, el.getAsJsonObject().deepCopy());
+            //?}
          }
 
       }
    }
 
    //? if <=1.17.1 {
-   private static JsonObject deepCopy(JsonObject jsonObject) {
+   /*private static JsonObject deepCopy(JsonObject jsonObject) {
       return GSON.fromJson(GSON.toJson(jsonObject), JsonObject.class);
    }
-   //?}
+   *///?}
 
    private static String sanitize(String address) {
       return address.replaceAll("[^a-zA-Z0-9._\\-]", "_");

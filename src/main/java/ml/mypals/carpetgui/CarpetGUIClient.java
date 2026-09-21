@@ -17,26 +17,26 @@ import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 //? if <26.1 {
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-//?} else {
-/*import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-*///?}
+/*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+*///?} else {
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+//?}
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 //? if >=1.21.9 {
-/*import net.minecraft.client.KeyMapping.Category;
-*///?}
+import net.minecraft.client.KeyMapping.Category;
+//?}
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.resources.ResourceLocation;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import net.minecraft.resources.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CarpetGUIClient implements ClientModInitializer {
-   public static final Logger LOGGER = LogManager.getLogger("carpetgui");
-   public static final String VERSION = /*$ mod_version*/ "1.3.6";
-   public static final String MINECRAFT = /*$ minecraft*/ "1.16.5";
+   public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
+   public static final String VERSION = /*$ mod_version*/ "2.0.0";
+   public static final String MINECRAFT = /*$ minecraft*/ "26.3";
    public static KeyMapping carpetRulesKeyBind;
    public static RuleStackData cachedRuleStackData;
    public static Map<String, RuleData> cachedCompleteRules = new HashMap();
@@ -51,22 +51,22 @@ public class CarpetGUIClient implements ClientModInitializer {
    public void onInitializeClient() {
       CarpetGUIConfigManager.initializeConfig();
       //? if <26.1 {
-      carpetRulesKeyBind = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-      //?} else {
-      /*carpetRulesKeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-      *///?}
+      /*carpetRulesKeyBind = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+      *///?} else {
+      carpetRulesKeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+      //?}
          "carpetgui.key.carpetRulesKeyBind",
          //? if < 26.3 {
-         Type.KEYSYM,
-         //?} else {
-         /*Type.KEYBOARD,
-         *///?}
+         /*Type.KEYSYM,
+         *///?} else {
+         Type.KEYBOARD,
+         //?}
          298,
          //? if <1.21.9 {
-         "key.category.carpetgui.main"
-         //?} else {
-         /*Category.register(new ResourceLocation("carpetgui", "main"))
-         *///?}
+         /*"key.category.carpetgui.main"
+         *///?} else {
+         Category.register(Identifier.fromNamespaceAndPath("carpetgui", "main"))
+         //?}
       ));
       ClientTickEvents.END_CLIENT_TICK.register((ClientTickEvents.EndTick)(client) -> {
          if (carpetRulesKeyBind.consumeClick()) {
@@ -79,10 +79,10 @@ public class CarpetGUIClient implements ClientModInitializer {
          incompleteRulesFromServer.clear();
       });
       //? if >=1.20.5 {
-      /*ClientPlayNetworking.registerGlobalReceiver(HelloPacketPayload.ID, (payload, context) -> CarpetGUIClientPacketHandler.handleHelloPacket(payload));
+      ClientPlayNetworking.registerGlobalReceiver(HelloPacketPayload.ID, (payload, context) -> CarpetGUIClientPacketHandler.handleHelloPacket(payload));
       ClientPlayNetworking.registerGlobalReceiver(RuleStackSyncPayload.ID, (payload, context) -> CarpetGUIClientPacketHandler.handleRuleStackSync(payload));
       ClientPlayNetworking.registerGlobalReceiver(RulesPacketPayload.ID, (payload, context) -> CarpetGUIClientPacketHandler.handleRulesPacket(payload));
-      *///?} elif >=1.19.4 {
+      //?} elif >=1.19.4 {
       /*ClientPlayNetworking.registerGlobalReceiver(
               HelloPacketPayload.ID,
               (helloPacketPayload, localPlayer, packetSender) -> {
@@ -104,7 +104,7 @@ public class CarpetGUIClient implements ClientModInitializer {
               }
       );
       *///?} else {
-      ClientPlayNetworking.registerGlobalReceiver(
+      /*ClientPlayNetworking.registerGlobalReceiver(
               HelloPacketPayload.ID,
               (client, handler, buf, responseSender) -> {
                   CarpetGUIClientPacketHandler.handleHelloPacket(HelloPacketPayload.read(buf));
@@ -124,7 +124,7 @@ public class CarpetGUIClient implements ClientModInitializer {
                   CarpetGUIClientPacketHandler.handleRulesPacket(RulesPacketPayload.read(buf));
               }
       );
-      //?}
+      *///?}
    }
 
    public static String getServerAddress(Minecraft client) {

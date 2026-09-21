@@ -5,40 +5,40 @@ import java.util.function.BiFunction;
 
 import net.minecraft.client.Minecraft;
 //? if <26.1 {
-import net.minecraft.client.gui.GuiGraphics;
-//?} else {
-/*import net.minecraft.client.gui.GuiGraphicsExtractor;
-*///?}
+/*import net.minecraft.client.gui.GuiGraphics;
+*///?} else {
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?}
 //? if <1.19 {
-import net.minecraft.client.gui.components.Widget;
-//?} else {
-/*import net.minecraft.client.gui.components.Renderable;
-*///?}
+/*import net.minecraft.client.gui.components.Widget;
+*///?} else {
+import net.minecraft.client.gui.components.Renderable;
+//?}
 import net.minecraft.client.gui.components.events.GuiEventListener;
 //? if >=1.17 {
-/*import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-*///?}
+//?}
 import net.minecraft.client.gui.screens.Screen;
 //? if >=1.21.9 {
-/*import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-*///?} else {
-import ml.mypals.carpetgui.compat.input.CharacterEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
 import ml.mypals.carpetgui.compat.input.KeyEvent;
 import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
-//?}
+*///?}
 
 public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListener
 //? if <1.19 {
-, Widget
-//?} else {
-/*, Renderable
-*///?}
+/*, Widget
+*///?} else {
+, Renderable
+//?}
 //? if >=1.17 {
-/*, NarratableEntry
-*///?}
+, NarratableEntry
+//?}
 {
    private static boolean isRendering = false;
    public final R rootComponent;
@@ -101,24 +101,24 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 
    private static float getDeltaTicks() {
       //? if >=1.21.2 {
-      /*return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
-      *///?} elif >=1.21 {
+      return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
+      //?} elif >=1.21 {
       /*return Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
       *///?} else {
-      return Minecraft.getInstance().getDeltaFrameTime();
-      //?}
+      /*return Minecraft.getInstance().getDeltaFrameTime();
+      *///?}
    }
 
    //? if <1.20 {
-   public void render(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float a) {
+   /*public void render(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float a) {
       this.render(new GuiGraphics(Minecraft.getInstance(), poseStack, Minecraft.getInstance().renderBuffers().bufferSource()), mouseX, mouseY, a);
    }
    public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
-   //?} elif <26.1 {
+   *///?} elif <26.1 {
    /*public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
    *///?} else {
-   /*public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-   *///?}
+   public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+   //?}
       if (!(graphics instanceof OwoUIGraphics)) {
          graphics = OwoUIGraphics.of(graphics);
       }
@@ -144,10 +144,10 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    }
 
    //? if <26.1 {
-   public void drawTooltip(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-   //?} else {
-   /*public void drawTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
-   *///?}
+   /*public void drawTooltip(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+   *///?} else {
+   public void drawTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+   //?}
       if (!(graphics instanceof OwoUIGraphics)) {
          graphics = OwoUIGraphics.of(graphics);
       }
@@ -156,8 +156,8 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
       float delta = getDeltaTicks();
       this.rootComponent.drawTooltip(owoContext, mouseX, mouseY, partialTicks, delta);
       //? if >=26.1 {
-      /*graphics.extractDeferredElements(mouseX, mouseY, partialTicks);
-      *///?} elif >=1.21.9 {
+      graphics.extractDeferredElements(mouseX, mouseY, partialTicks);
+      //?} elif >=1.21.9 {
       /*graphics.renderDeferredElements();
       *///?}
    }
@@ -174,7 +174,7 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    }
 
    //? if <1.21.9 {
-   public boolean mouseClicked(double mouseX, double mouseY, int button) {
+   /*public boolean mouseClicked(double mouseX, double mouseY, int button) {
       return this.rootComponent.carpetGUI$onMouseDown(new MouseButtonEvent(mouseX, mouseY, button), false);
    }
 
@@ -193,8 +193,8 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    public boolean charTyped(char chr, int modifiers) {
       return this.rootComponent.carpetGUI$onCharTyped(new CharacterEvent(chr, modifiers));
    }
-   //?} else {
-   /*public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
+   *///?} else {
+   public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
       return this.rootComponent.carpetGUI$onMouseDown(click, doubled);
    }
 
@@ -213,26 +213,26 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    public boolean charTyped(CharacterEvent input) {
       return this.rootComponent.carpetGUI$onCharTyped(input);
    }
-   *///?}
-
-   //? if >=1.20.2 {
-   /*public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, verticalAmount);
-   }
-   *///?} else {
-   public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
-   }
    //?}
 
+   //? if >=1.20.2 {
+   public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, verticalAmount);
+   }
+   //?} else {
+   /*public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
+   }
+   *///?}
+
    //? if >=1.17 {
-   /*public NarratableEntry.NarrationPriority narrationPriority() {
+   public NarratableEntry.NarrationPriority narrationPriority() {
       return NarrationPriority.NONE;
    }
 
    public void updateNarration(NarrationElementOutput builder) {
    }
-   *///?}
+   //?}
 
    public static boolean isRendering() {
       return isRendering;
@@ -240,7 +240,7 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 
    public static class CursorAdapter {
 //? if <26.3 {
-      protected static final CursorStyle[] ACTIVE_STYLES = new CursorStyle[]{CursorStyle.POINTER, CursorStyle.TEXT, CursorStyle.HAND, CursorStyle.CROSSHAIR, CursorStyle.MOVE, CursorStyle.HORIZONTAL_RESIZE, CursorStyle.VERTICAL_RESIZE, CursorStyle.NWSE_RESIZE, CursorStyle.NESW_RESIZE, CursorStyle.NOT_ALLOWED};
+      /*protected static final CursorStyle[] ACTIVE_STYLES = new CursorStyle[]{CursorStyle.POINTER, CursorStyle.TEXT, CursorStyle.HAND, CursorStyle.CROSSHAIR, CursorStyle.MOVE, CursorStyle.HORIZONTAL_RESIZE, CursorStyle.VERTICAL_RESIZE, CursorStyle.NWSE_RESIZE, CursorStyle.NESW_RESIZE, CursorStyle.NOT_ALLOWED};
       protected final java.util.EnumMap<CursorStyle, Long> cursors = new java.util.EnumMap<>(CursorStyle.class);
       protected final long windowHandle;
       protected CursorStyle lastCursorStyle;
@@ -260,11 +260,11 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
       }
 
       public static CursorAdapter ofClientWindow() {
-         return new CursorAdapter(Minecraft.getInstance().getWindow().getWindow());
+         return new CursorAdapter(Minecraft.getInstance().getWindow().handle());
       }
 
       public static CursorAdapter ofWindow(Window window) {
-         return new CursorAdapter(window.getWindow());
+         return new CursorAdapter(window.handle());
       }
 
       public static CursorAdapter ofWindow(long windowHandle) {
@@ -288,8 +288,8 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
             this.disposed = true;
          }
       }
-//?} else {
-      /*protected CursorStyle lastCursorStyle = CursorStyle.POINTER;
+*///?} else {
+      protected CursorStyle lastCursorStyle = CursorStyle.POINTER;
       protected boolean disposed = false;
 
       protected CursorAdapter() {}
@@ -330,6 +330,6 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
             this.disposed = true;
          }
       }
-*///?}
+//?}
    }
 }

@@ -1,5 +1,5 @@
 //? if <1.20 {
-package net.minecraft.client.gui;
+/*package net.minecraft.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -10,14 +10,14 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.Tesselator;
 import ml.mypals.carpetgui.mixin.ui.ScreenAccessor;
 import net.minecraft.client.Minecraft;
-import ml.mypals.carpetgui.compat.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 //? if >=1.19.3 {
-/*import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
-*///?}
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+//?}
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 
 public class GuiGraphics {
@@ -53,7 +53,7 @@ public class GuiGraphics {
     public void fillGradient(int minX, int minY, int maxX, int maxY, int color1, int color2) {
         //? if <=1.16.5 {
 
-        RenderSystem.disableTexture();
+        /^RenderSystem.disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.disableAlphaTest();
         RenderSystem.defaultBlendFunc();
@@ -69,9 +69,9 @@ public class GuiGraphics {
         RenderSystem.disableBlend();
         RenderSystem.enableAlphaTest();
         RenderSystem.enableTexture();
-        //?} else {
-        /*GuiComponent.fillGradient(this.pose, minX, minY, maxX, maxY, color1, color2, 0);
-        *///?}
+        ^///?} else {
+        GuiComponent.fillGradient(this.pose, minX, minY, maxX, maxY, color1, color2, 0);
+        //?}
     }
 
     public void renderOutline(int x, int y, int width, int height, int color) {
@@ -102,7 +102,7 @@ public class GuiGraphics {
     }
 
     //? if <1.19 {
-    private static final java.util.Deque<int[]> SCISSOR_STACK = new java.util.ArrayDeque<>();
+    /^private static final java.util.Deque<int[]> SCISSOR_STACK = new java.util.ArrayDeque<>();
 
     private void applyScissor(int[] rect) {
         if (rect == null) {
@@ -118,13 +118,13 @@ public class GuiGraphics {
         int height = Math.max(0, (int)((rect[3] - rect[1]) * scale));
         RenderSystem.enableScissor(x, y, width, height);
     }
-    //?}
+    ^///?}
 
     public void enableScissor(int minX, int minY, int maxX, int maxY) {
         //? if >=1.19 {
-        /*GuiComponent.enableScissor(minX, minY, maxX, maxY);
-        *///?} else {
-        int[] parent = SCISSOR_STACK.peek();
+        GuiComponent.enableScissor(minX, minY, maxX, maxY);
+        //?} else {
+        /^int[] parent = SCISSOR_STACK.peek();
         int[] next;
         if (parent != null) {
             int x1 = Math.max(parent[0], minX);
@@ -139,44 +139,44 @@ public class GuiGraphics {
         }
         SCISSOR_STACK.push(next);
         this.applyScissor(next);
-        //?}
+        ^///?}
     }
 
     public void disableScissor() {
         //? if >=1.19 {
-        /*GuiComponent.disableScissor();
-        *///?} else {
-        if (!SCISSOR_STACK.isEmpty()) {
+        GuiComponent.disableScissor();
+        //?} else {
+        /^if (!SCISSOR_STACK.isEmpty()) {
             SCISSOR_STACK.pop();
         }
         this.applyScissor(SCISSOR_STACK.peek());
-        //?}
+        ^///?}
     }
 
-    public void blit(ResourceLocation texture, int x, int y, int u, int v, int width, int height) {
+    public void blit(Identifier texture, int x, int y, int u, int v, int width, int height) {
         //? if <1.17 {
-        this.minecraft.getTextureManager().bind(texture);
-        //?} else {
-        /*RenderSystem.setShaderTexture(0, texture);
-        *///?}
+        /^this.minecraft.getTextureManager().bind(texture);
+        ^///?} else {
+        RenderSystem.setShaderTexture(0, texture);
+        //?}
         GuiComponent.blit(this.pose, x, y, 0, (float)u, (float)v, width, height, 256, 256);
     }
 
-    public void blit(ResourceLocation texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
+    public void blit(Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
         //? if <1.17 {
-        this.minecraft.getTextureManager().bind(texture);
-        //?} else {
-        /*RenderSystem.setShaderTexture(0, texture);
-        *///?}
+        /^this.minecraft.getTextureManager().bind(texture);
+        ^///?} else {
+        RenderSystem.setShaderTexture(0, texture);
+        //?}
         GuiComponent.blit(this.pose, x, y, u, v, width, height, textureWidth, textureHeight);
     }
 
-    public void blit(ResourceLocation texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int textureWidth, int textureHeight) {
+    public void blit(Identifier texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int textureWidth, int textureHeight) {
         //? if <1.17 {
-        this.minecraft.getTextureManager().bind(texture);
-        //?} else {
-        /*RenderSystem.setShaderTexture(0, texture);
-        *///?}
+        /^this.minecraft.getTextureManager().bind(texture);
+        ^///?} else {
+        RenderSystem.setShaderTexture(0, texture);
+        //?}
         GuiComponent.blit(this.pose, x, y, width, height, u, v, uWidth, vHeight, textureWidth, textureHeight);
     }
 
@@ -187,7 +187,7 @@ public class GuiGraphics {
     }
 
     //? if <1.17 {
-    public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y) {
+    /^public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y) {
         if (this.minecraft.screen != null) {
             List<FormattedCharSequence> lines = new java.util.ArrayList<>();
             for (ClientTooltipComponent comp : components) {
@@ -198,14 +198,14 @@ public class GuiGraphics {
             this.minecraft.screen.renderTooltip(this.pose, lines, x, y);
         }
     }
-    //?} elif <1.19.3 {
-    /*public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y) {
+    ^///?} elif <1.19.3 {
+    /^public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y) {
         if (this.minecraft.screen != null) {
             ((ScreenAccessor)this.minecraft.screen).carpetGUI$renderTooltipInternal(this.pose, components, x, y);
         }
     }
-    *///?} else {
-    /*public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y) {
+    ^///?} else {
+    public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y) {
         this.renderTooltip(font, components, x, y, net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner.INSTANCE);
     }
     public void renderTooltip(Font font, List<ClientTooltipComponent> components, int x, int y, ClientTooltipPositioner positioner) {
@@ -213,6 +213,6 @@ public class GuiGraphics {
             ((ScreenAccessor)this.minecraft.screen).carpetGUI$renderTooltipInternal(this.pose, components, x, y, positioner);
         }
     }
-    *///?}
+    //?}
 }
-//?}
+*///?}

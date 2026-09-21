@@ -36,7 +36,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 @Environment(EnvType.CLIENT)
@@ -112,14 +112,14 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
       bar.horizontalAlignment(HorizontalAlignment.CENTER);
       bar.padding(Insets.of(2));
       bar.gap(6);
-      FlowLayout exec = ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulegroups.execute"), Sizing.content(), Sizing.fill(100), this::executeCurrent);
-      FlowLayout file = ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulegroups.file"), Sizing.content(), Sizing.fill(100), () ->
-              Util.getPlatform().openFile(RuleGroupLoader.GROUPS_DIR.toFile()));
-      FlowLayout newGroup = ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulegroups.new"), Sizing.content(), Sizing.fill(100), () -> {
+      FlowLayout exec = ScreenUtils.btn(Component.translatable("gui.rulegroups.execute"), Sizing.content(), Sizing.fill(100), this::executeCurrent);
+      FlowLayout file = ScreenUtils.btn(Component.translatable("gui.rulegroups.file"), Sizing.content(), Sizing.fill(100), () ->
+              com.mojang.blaze3d.Blaze3D.openPath(RuleGroupLoader.GROUPS_DIR));
+      FlowLayout newGroup = ScreenUtils.btn(Component.translatable("gui.rulegroups.new"), Sizing.content(), Sizing.fill(100), () -> {
          this.requestingRulesForNewGroup = true;
          CarpetGUIClientPacketHandler.openRuleEditScreen(false);
       });
-      FlowLayout addCmd = ScreenUtils.btn(new net.minecraft.network.chat.TranslatableComponent("gui.rulegroups.addcommand"), Sizing.content(), Sizing.fill(100), this::addCommandToCurrentGroup);
+      FlowLayout addCmd = ScreenUtils.btn(Component.translatable("gui.rulegroups.addcommand"), Sizing.content(), Sizing.fill(100), this::addCommandToCurrentGroup);
       bar.child(exec);
       bar.child(addCmd);
       bar.child(file);
@@ -160,14 +160,14 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
                String val = i < this.currentBoxes.size() ? ((TextBoxComponent)this.currentBoxes.get(i)).getValue() : null;
                String result = cmd.toCommand(val);
                //? if <1.19 {
-               mc.getConnection().send(new net.minecraft.network.protocol.game.ServerboundChatPacket(result));
-               //?} else {
-               /*if (result.startsWith("/")) {
+               /*mc.getConnection().send(new net.minecraft.network.protocol.game.ServerboundChatPacket(result));
+               *///?} else {
+               if (result.startsWith("/")) {
                   mc.getConnection().sendCommand(result.substring(1));
                } else {
                   mc.getConnection().sendChat(result);
                }
-               *///?}
+               //?}
             }
 
          }
@@ -182,8 +182,8 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
       row.horizontalAlignment(HorizontalAlignment.CENTER);
       row.carpetGUI$cursorStyle(CursorStyle.HAND);
       String displayName = ScreenUtils.truncateWithEllipsis(group.name(), Minecraft.getInstance().font, 150);
-      UIComponent nameLabel = UIComponents.label(new net.minecraft.network.chat.TextComponent(displayName)).color(Color.WHITE).carpetGUI$horizontalSizing(Sizing.fill(80));
-      nameLabel.tooltip(new net.minecraft.network.chat.TextComponent(group.name()));
+      UIComponent nameLabel = UIComponents.label(Component.literal(displayName)).color(Color.WHITE).carpetGUI$horizontalSizing(Sizing.fill(80));
+      nameLabel.tooltip(Component.literal(group.name()));
       row.child(nameLabel);
       row.carpetGUI$mouseDown().subscribe((MouseDown)(mouseButtonEvent, btn) -> {
          Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
@@ -229,7 +229,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
       String text = cmd.value() != null ? cmd.value() : "";
       TextBoxComponent box;
       if (cmd.prefix() != null) {
-         row.child(UIComponents.label(new net.minecraft.network.chat.TextComponent(cmd.prefix()).withStyle(ChatFormatting.BLUE)).carpetGUI$horizontalSizing(Sizing.fill(12)));
+         row.child(UIComponents.label(Component.literal(cmd.prefix()).withStyle(ChatFormatting.BLUE)).carpetGUI$horizontalSizing(Sizing.fill(12)));
          String translatedName = cmd.ruleName();
          RuleData ruleData = (RuleData)CarpetGUIClient.cachedCompleteRules.get(cmd.ruleName());
          if (ruleData != null) {
@@ -237,9 +237,9 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
          }
 
          String displayName = ScreenUtils.truncateWithEllipsis(translatedName, Minecraft.getInstance().font, 150);
-         UIComponent nameLabel = UIComponents.label(new net.minecraft.network.chat.TextComponent(displayName)).color(cmd.locked() ? Color.ofArgb(-10496) : Color.WHITE).carpetGUI$horizontalSizing(Sizing.fill(50));
-         String defaultHint = cmd.locked() ? new net.minecraft.network.chat.TranslatableComponent("gui.tip.default").getString() : "";
-         nameLabel.tooltip(new net.minecraft.network.chat.TextComponent(defaultHint + translatedName));
+         UIComponent nameLabel = UIComponents.label(Component.literal(displayName)).color(cmd.locked() ? Color.ofArgb(-10496) : Color.WHITE).carpetGUI$horizontalSizing(Sizing.fill(50));
+         String defaultHint = cmd.locked() ? Component.translatable("gui.tip.default").getString() : "";
+         nameLabel.tooltip(Component.literal(defaultHint + translatedName));
          row.child(nameLabel);
          box = UIComponents.textBox(Sizing.fill(30));
       } else {

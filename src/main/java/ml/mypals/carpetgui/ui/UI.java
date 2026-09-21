@@ -5,22 +5,22 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class UI {
    public static final String NAMESPACE = "carpetgui";
-   public static final Logger LOGGER = LogManager.getLogger("carpetgui/ui");
+   public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui/ui");
    public static final boolean DEBUG;
 
    private UI() {
    }
 
-   public static ResourceLocation id(String path) {
-      return new ResourceLocation("carpetgui", path);
+   public static Identifier id(String path) {
+      return Identifier.fromNamespaceAndPath("carpetgui", path);
    }
 
    public static void debugWarn(Logger logger, String message) {
@@ -37,10 +37,10 @@ public final class UI {
 
    public static final class Sounds {
       //? if <1.19 {
-      public static final SoundEvent UI_INTERACTION = new SoundEvent(UI.id("ui.carpetgui.interaction"));
-      //?} else {
-      /*public static final SoundEvent UI_INTERACTION = SoundEvent.createVariableRangeEvent(UI.id("ui.carpetgui.interaction"));
-      *///?}
+      /*public static final SoundEvent UI_INTERACTION = new SoundEvent(UI.id("ui.carpetgui.interaction"));
+      *///?} else {
+      public static final SoundEvent UI_INTERACTION = SoundEvent.createVariableRangeEvent(UI.id("ui.carpetgui.interaction"));
+      //?}
 
       private Sounds() {
       }
@@ -53,10 +53,10 @@ public final class UI {
       @Environment(EnvType.CLIENT)
       public static void playButtonSound() {
          //? if <1.19 {
-         play(SoundEvents.UI_BUTTON_CLICK);
-         //?} else {
-         /*play((SoundEvent)SoundEvents.UI_BUTTON_CLICK.value());
-         *///?}
+         /*play(SoundEvents.UI_BUTTON_CLICK);
+         *///?} else {
+         play((SoundEvent)SoundEvents.UI_BUTTON_CLICK.value());
+         //?}
       }
 
       @Environment(EnvType.CLIENT)

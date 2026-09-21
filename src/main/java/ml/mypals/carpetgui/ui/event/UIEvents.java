@@ -3,14 +3,14 @@ package ml.mypals.carpetgui.ui.event;
 import ml.mypals.carpetgui.ui.core.UIComponent;
 import ml.mypals.carpetgui.ui.util.EventStream;
 //? if >=1.21.9 {
-/*import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-*///?} else {
-import ml.mypals.carpetgui.compat.input.CharacterEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.CharacterEvent;
 import ml.mypals.carpetgui.compat.input.KeyEvent;
 import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
-//?}
+*///?}
 
 public final class UIEvents {
    private UIEvents() {

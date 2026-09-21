@@ -1,5 +1,5 @@
 //? if <1.17 {
-package ml.mypals.carpetgui.compat.tooltip;
+/*package ml.mypals.carpetgui.compat.tooltip;
 
 import net.minecraft.util.FormattedCharSequence;
 
@@ -10,4 +10,4 @@ public interface ClientTooltipComponent {
 
     FormattedCharSequence getText();
 }
-//?}
+*///?}

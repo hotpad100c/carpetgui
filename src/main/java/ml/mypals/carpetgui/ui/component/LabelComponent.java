@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 //? if >=1.21.11 {
-/*import ml.mypals.carpetgui.mixin.ui.ClickableStyleFinderAccessor;
+import ml.mypals.carpetgui.mixin.ui.ClickableStyleFinderAccessor;
 import net.minecraft.client.gui.ActiveTextCollector;
-*///?}
+//?}
 import ml.mypals.carpetgui.ui.base.BaseUIComponent;
 import ml.mypals.carpetgui.ui.core.Color;
 import ml.mypals.carpetgui.ui.core.HorizontalAlignment;
@@ -19,10 +19,10 @@ import ml.mypals.carpetgui.ui.util.Observable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 //? if >=1.21.9 {
-/*import net.minecraft.client.input.MouseButtonEvent;
-*///?} else {
-import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
-//?}
+import net.minecraft.client.input.MouseButtonEvent;
+//?} else {
+/*import ml.mypals.carpetgui.compat.input.MouseButtonEvent;
+*///?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
@@ -50,10 +50,10 @@ public class LabelComponent extends BaseUIComponent {
       this.lineHeight = Observable.<Integer>of(9);
       this.lineSpacing = Observable.<Integer>of(2);
       //? if <26.2 {
-      this.textClickHandler = (style) -> style != null && OwoUIGraphics.utilityScreen().handleTextClick(style, Minecraft.getInstance().screen);
-      //?} else {
-      /*this.textClickHandler = (style) -> style != null && OwoUIGraphics.utilityScreen().handleTextClick(style, Minecraft.getInstance().gui.screen());
-      *///?}
+      /*this.textClickHandler = (style) -> style != null && OwoUIGraphics.utilityScreen().handleTextClick(style, Minecraft.getInstance().screen);
+      *///?} else {
+      this.textClickHandler = (style) -> style != null && OwoUIGraphics.utilityScreen().handleTextClick(style, Minecraft.getInstance().gui.screen());
+      //?}
       this.text = text;
       this.wrappedText = new ArrayList();
       this.shadow = false;
@@ -184,10 +184,10 @@ public class LabelComponent extends BaseUIComponent {
    public void carpetGUI$draw(OwoUIGraphics graphics, int mouseX, int mouseY, float partialTicks, float delta) {
       graphics.push().translate(0.0F, 1.0F / (float)Minecraft.getInstance().getWindow().getGuiScale());
       //? if <26.1 {
-      this.drawText((renderX, renderY, text, shadow, color) -> graphics.drawString(Minecraft.getInstance().font, text, renderX, renderY, color.argb(), shadow));
-      //?} else {
-      /*this.drawText((renderX, renderY, text, shadow, color) -> graphics.text(Minecraft.getInstance().font, text, renderX, renderY, color.argb(), shadow));
-      *///?}
+      /*this.drawText((renderX, renderY, text, shadow, color) -> graphics.drawString(Minecraft.getInstance().font, text, renderX, renderY, color.argb(), shadow));
+      *///?} else {
+      this.drawText((renderX, renderY, text, shadow, color) -> graphics.text(Minecraft.getInstance().font, text, renderX, renderY, color.argb(), shadow));
+      //?}
       graphics.pop();
    }
 
@@ -232,10 +232,10 @@ public class LabelComponent extends BaseUIComponent {
       if (style != null) {
          super.drawTooltip(context, mouseX, mouseY, partialTicks, delta);
          //? if <26.1 {
-         context.renderComponentHoverEffect(this.textRenderer, style, mouseX, mouseY);
-         //?} else {
-         /*context.componentHoverEffect(this.textRenderer, style, mouseX, mouseY);
-         *///?}
+         /*context.renderComponentHoverEffect(this.textRenderer, style, mouseX, mouseY);
+         *///?} else {
+         context.componentHoverEffect(this.textRenderer, style, mouseX, mouseY);
+         //?}
       }
    }
 
@@ -249,19 +249,19 @@ public class LabelComponent extends BaseUIComponent {
    }
 
    //? if >=1.21.11 {
-   /*protected @Nullable Style styleAt(int mouseX, int mouseY) {
+   protected @Nullable Style styleAt(int mouseX, int mouseY) {
       StyleCollector clickHandler = new StyleCollector(this.textRenderer, this.x + mouseX, this.y + mouseY);
       this.drawText((renderX, renderY, text, $, $$) -> clickHandler.accept(renderX, renderY, text));
       return clickHandler.result();
    }
-   *///?} else {
-   protected @Nullable Style styleAt(int mouseX, int mouseY) {
+   //?} else {
+   /*protected @Nullable Style styleAt(int mouseX, int mouseY) {
       if (this.wrappedText.isEmpty()) return null;
       int lineIndex = Math.min(mouseY / (this.lineHeight() + this.lineSpacing()), this.wrappedText.size() - 1);
       if (lineIndex < 0 || lineIndex >= this.wrappedText.size()) return null;
       return this.textRenderer.getSplitter().componentStyleAtWidth(this.wrappedText.get(lineIndex), mouseX);
    }
-   //?}
+   *///?}
 
    @FunctionalInterface
    protected interface LabelDrawFunction {
@@ -269,12 +269,12 @@ public class LabelComponent extends BaseUIComponent {
    }
 
    //? if >=1.21.11 {
-   /*private static class StyleCollector extends ActiveTextCollector.ClickableStyleFinder {
+   private static class StyleCollector extends ActiveTextCollector.ClickableStyleFinder {
       public StyleCollector(Font font, int clickX, int clickY) {
          super(font, clickX, clickY);
          ClickableStyleFinderAccessor accessor = (ClickableStyleFinderAccessor) this;
          accessor.carpetGUI$setStyleScanner(accessor::carpetGUI$setResult);
       }
    }
-   *///?}
+   //?}
 }

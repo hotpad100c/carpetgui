@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import java.util.List;
 
 //? if >= 1.20.5 {
-/*import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,11 +16,11 @@ public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean 
     public static final StreamCodec<FriendlyByteBuf, RulesPacketPayload> CODEC = StreamCodec.ofMember(RulesPacketPayload::write, RulesPacketPayload::new);
 
     public RulesPacketPayload(FriendlyByteBuf buf) {
-        this(ml.mypals.carpetgui.network.BufUtils.readListSafe(buf, RuleData::new), buf.readUtf(), buf.readBoolean());
+        this(ml.mypals.carpetgui.network.BufUtils.readList(buf, RuleData::new), buf.readUtf(), buf.readBoolean());
     }
 
     public void write(FriendlyByteBuf buf) {
-        ml.mypals.carpetgui.network.BufUtils.writeList(buf, this.rules(), ((buf1, value) -> value.write(buf1)));
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.rules(), ((buf1, value) -> value.write(buf1)));
         buf.writeUtf(this.defaults);
         buf.writeBoolean(this.isPartial);
     }
@@ -30,7 +30,7 @@ public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean 
         return ID;
     }
 }
-*///?} elif >= 1.19.4 {
+//?} elif >= 1.19.4 {
 /*import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 
@@ -38,11 +38,11 @@ public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean 
 
     public static final PacketType<RulesPacketPayload> ID = PacketType.create(
             PacketIDs.SYNC_RULES_ID,
-            buf -> new RulesPacketPayload(ml.mypals.carpetgui.network.BufUtils.readListSafe(buf, RuleData::new), buf.readUtf(), buf.readBoolean())
+            buf -> new RulesPacketPayload(ml.mypals.carpetgui.network.BufUtils.readList(buf, RuleData::new), buf.readUtf(), buf.readBoolean())
     );
 
     public void write(FriendlyByteBuf buf) {
-        ml.mypals.carpetgui.network.BufUtils.writeList(buf, this.rules, (b, v) -> v.write(b));
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.rules, (b, v) -> v.write(b));
         buf.writeUtf(this.defaults);
         buf.writeBoolean(this.isPartial);
     }
@@ -53,19 +53,19 @@ public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean 
     }
 }
 *///?} else {
-import net.minecraft.resources.ResourceLocation;
+/*import net.minecraft.resources.Identifier;
 
 public record RulesPacketPayload(List<RuleData> rules, String defaults, boolean isPartial) {
-    public static final ResourceLocation ID = PacketIDs.SYNC_RULES_ID;
+    public static final Identifier ID = PacketIDs.SYNC_RULES_ID;
 
     public void write(FriendlyByteBuf buf) {
-        ml.mypals.carpetgui.network.BufUtils.writeList(buf, this.rules, (b, v) -> v.write(b));
+        ml.mypals.carpetgui.network.BufUtils.writeCollection(buf, this.rules, (b, v) -> v.write(b));
         buf.writeUtf(this.defaults);
         buf.writeBoolean(this.isPartial);
     }
 
     public static RulesPacketPayload read(FriendlyByteBuf buf) {
-        return new RulesPacketPayload(ml.mypals.carpetgui.network.BufUtils.readListSafe(buf, RuleData::new), buf.readUtf(), buf.readBoolean());
+        return new RulesPacketPayload(ml.mypals.carpetgui.network.BufUtils.readList(buf, RuleData::new), buf.readUtf(), buf.readBoolean());
     }
 }
-//?}
+*///?}
