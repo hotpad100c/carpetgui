@@ -30,6 +30,10 @@ public class CarpetGUIConfigManager {
    public static final int MIN_UI_SCALE = 50;
    public static final int MAX_UI_SCALE = 150;
    public static int uiScale = DEFAULT_UI_SCALE;
+   public static final int DEFAULT_INPUT_WIDTH = 65;
+   public static final int MIN_INPUT_WIDTH = 30;
+   public static final int MAX_INPUT_WIDTH = 80;
+   public static int inputWidth = DEFAULT_INPUT_WIDTH;
 
    public static void initializeConfig() {
       try {
@@ -66,6 +70,7 @@ public class CarpetGUIConfigManager {
       menuHeight = clamp(readInt(props, "menuHeight", DEFAULT_MENU_SIZE), MIN_MENU_SIZE, DEFAULT_MENU_SIZE);
       categoryPanelWidth = clamp(readInt(props, "categoryPanelWidth", DEFAULT_CATEGORY_PANEL_WIDTH), MIN_CATEGORY_PANEL_WIDTH, MAX_CATEGORY_PANEL_WIDTH);
       setUiScale(readInt(props, "uiScale", DEFAULT_UI_SCALE));
+      inputWidth = clamp(readInt(props, "inputWidth", DEFAULT_INPUT_WIDTH), MIN_INPUT_WIDTH, MAX_INPUT_WIDTH);
    }
 
    public static void saveUiConfig() {
@@ -74,6 +79,7 @@ public class CarpetGUIConfigManager {
       props.setProperty("menuHeight", String.valueOf(menuHeight));
       props.setProperty("categoryPanelWidth", String.valueOf(categoryPanelWidth));
       props.setProperty("uiScale", String.valueOf(uiScale));
+      props.setProperty("inputWidth", String.valueOf(inputWidth));
 
       try {
          if (!Files.exists(CarpetGUI_DIR, new LinkOption[0])) {
@@ -107,11 +113,16 @@ public class CarpetGUIConfigManager {
       OwoUIAdapter.setGlobalScale((float)uiScale / 100.0F);
    }
 
+   public static void setInputWidth(int value) {
+      inputWidth = clamp(value, MIN_INPUT_WIDTH, MAX_INPUT_WIDTH);
+   }
+
    public static void resetUiConfig() {
       menuWidth = DEFAULT_MENU_SIZE;
       menuHeight = DEFAULT_MENU_SIZE;
       categoryPanelWidth = DEFAULT_CATEGORY_PANEL_WIDTH;
       setUiScale(DEFAULT_UI_SCALE);
+      inputWidth = DEFAULT_INPUT_WIDTH;
       saveUiConfig();
    }
 

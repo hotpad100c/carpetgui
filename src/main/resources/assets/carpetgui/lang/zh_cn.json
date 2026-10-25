@@ -23,6 +23,7 @@
   "gui.settings.menu_width": "菜单宽度",
   "gui.settings.menu_height": "菜单高度",
   "gui.settings.category_width": "分类栏宽度",
+  "gui.settings.input_width": "文本输入框宽度",
   "gui.settings.reset": "重置",
   "gui.settings.close": "关闭",
   "gui.tab.rules": "规则浏览",

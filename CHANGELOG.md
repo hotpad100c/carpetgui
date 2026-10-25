@@ -12,6 +12,6 @@
 
 ### Features
 
-* **Configurable menu size and combined filters** ([#7](https://github.com/hotpad100c/carpetgui/issues/7)):
+* **Configurable menu size and combined filters** ([#7](https://github.com/hotpad100c/carpetgui/issues/7), [#25](https://github.com/hotpad100c/carpetgui/issues/25)):
   * A new settings panel adjusts UI scale (50%–150%), menu width, menu height and category panel width.
   * Hold Shift or Ctrl while clicking categories to combine several filters, for example *modified* + a category. Only rules that match every selected filter are shown.

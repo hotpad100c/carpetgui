@@ -25,12 +25,15 @@ import ml.mypals.carpetgui.ui.core.VerticalAlignment;
 import ml.mypals.carpetgui.ui.event.UIEvents.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 
 public class RuleWidget {
+   private static final int NARROW_INPUT_WIDTH = 70;
+   private static final int INPUT_TEXT_PADDING = 12;
    private final RuleData ruleData;
    private final RulesEditScreen screen;
    private final String orgName;
@@ -44,6 +47,7 @@ public class RuleWidget {
    private FlowLayout row;
    private LabelComponent nameLabel;
    private LabelComponent catsLabel;
+   private FlowLayout wideInputWrapper;
 
    public RuleWidget(RuleData ruleData, RulesEditScreen screen) {
       this.query = "";
@@ -232,12 +236,34 @@ public class RuleWidget {
          content.child(dropdown);
       }
 
-      FlowLayout wrapper = UIContainers.verticalFlow(Sizing.fixed(70), Sizing.fill(100));
+      boolean wide = this.needsWideInput();
+      FlowLayout wrapper = UIContainers.verticalFlow(wide ? Sizing.fill(CarpetGUIConfigManager.inputWidth) : Sizing.fixed(NARROW_INPUT_WIDTH), Sizing.fill(100));
+      this.wideInputWrapper = wide ? wrapper : null;
       wrapper.verticalAlignment(VerticalAlignment.CENTER);
       ScrollContainer<FlowLayout> scroll = UIContainers.<FlowLayout>verticalScroll(Sizing.fill(100), Sizing.fill(100), content);
       scroll.scrollbarThiccness(5);
       wrapper.child(scroll);
       rightCol.child(wrapper);
+   }
+
+   public void applyInputWidth() {
+      if (this.wideInputWrapper != null) {
+         this.wideInputWrapper.sizing(Sizing.fill(CarpetGUIConfigManager.inputWidth), Sizing.fill(100));
+      }
+   }
+
+   private boolean needsWideInput() {
+      if (this.ruleData.type == String.class) {
+         return true;
+      }
+
+      Font font = Minecraft.getInstance().font;
+      int widest = Math.max(font.width(this.ruleData.value), font.width(this.ruleData.defaultValue));
+      for(String suggestion : this.ruleData.suggestions) {
+         widest = Math.max(widest, font.width(suggestion));
+      }
+
+      return widest + INPUT_TEXT_PADDING > NARROW_INPUT_WIDTH;
    }
 
    private void sendCommand(String cmd) {

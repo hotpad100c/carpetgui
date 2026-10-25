@@ -222,6 +222,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
    private void applyPanelWidths() {
       this.leftPanel.sizing(Sizing.fill(100 - CarpetGUIConfigManager.categoryPanelWidth), Sizing.fill(100));
       this.rightPanel.sizing(Sizing.fill(CarpetGUIConfigManager.categoryPanelWidth), Sizing.fill(100));
+      this.ruleWidgets.values().forEach(RuleWidget::applyInputWidth);
    }
 
    private void toggleFilter(String name, boolean additive) {

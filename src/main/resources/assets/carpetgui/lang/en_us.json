@@ -23,6 +23,7 @@
   "gui.settings.menu_width": "Menu width",
   "gui.settings.menu_height": "Menu height",
   "gui.settings.category_width": "Category panel",
+  "gui.settings.input_width": "Text input width",
   "gui.settings.reset": "Reset",
   "gui.settings.close": "Close",
   "gui.rulestack.select_layer": "Select a layer to view its changes",

@@ -18,6 +18,8 @@ import ml.mypals.carpetgui.ui.core.ParentUIComponent;
 import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.Surface;
 import ml.mypals.carpetgui.ui.core.VerticalAlignment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 
 public class SettingsPanel {
@@ -51,8 +53,20 @@ public class SettingsPanel {
       }
    }
 
+   private static final int SLIDER_WIDTH = 80;
+   private static final int COLUMN_GAP = 6;
+   private static final String[] SLIDER_KEYS = new String[]{"gui.settings.ui_scale", "gui.settings.menu_width", "gui.settings.menu_height", "gui.settings.category_width", "gui.settings.input_width"};
+
    private static OverlayContainer<FlowLayout> create(FlowLayout outline, Runnable onLayoutChanged) {
-      FlowLayout panel = UIContainers.verticalFlow(Sizing.fixed(180), Sizing.content());
+      Font font = Minecraft.getInstance().font;
+      int labelWidth = 0;
+      for(String key : SLIDER_KEYS) {
+         labelWidth = Math.max(labelWidth, font.width(Component.translatable(key)));
+      }
+
+      int valueWidth = font.width(percent(CarpetGUIConfigManager.MAX_UI_SCALE));
+      int innerWidth = labelWidth + SLIDER_WIDTH + valueWidth + COLUMN_GAP * 2;
+      FlowLayout panel = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
       panel.surface(Surface.VANILLA_TRANSLUCENT.and(Surface.outline(2010107855))).alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
       panel.padding(Insets.of(6));
       panel.gap(4);
@@ -62,19 +76,21 @@ public class SettingsPanel {
          onLayoutChanged.run();
       };
       List<Runnable> syncs = new ArrayList();
-      panel.child(sliderRow("gui.settings.ui_scale", CarpetGUIConfigManager.MIN_UI_SCALE, CarpetGUIConfigManager.MAX_UI_SCALE, () -> CarpetGUIConfigManager.uiScale, CarpetGUIConfigManager::setUiScale, () -> {}, syncs, true));
-      panel.child(sliderRow("gui.settings.menu_width", CarpetGUIConfigManager.MIN_MENU_SIZE, CarpetGUIConfigManager.DEFAULT_MENU_SIZE, () -> CarpetGUIConfigManager.menuWidth, CarpetGUIConfigManager::setMenuWidth, onChanged, syncs, false));
-      panel.child(sliderRow("gui.settings.menu_height", CarpetGUIConfigManager.MIN_MENU_SIZE, CarpetGUIConfigManager.DEFAULT_MENU_SIZE, () -> CarpetGUIConfigManager.menuHeight, CarpetGUIConfigManager::setMenuHeight, onChanged, syncs, false));
-      panel.child(sliderRow("gui.settings.category_width", CarpetGUIConfigManager.MIN_CATEGORY_PANEL_WIDTH, CarpetGUIConfigManager.MAX_CATEGORY_PANEL_WIDTH, () -> CarpetGUIConfigManager.categoryPanelWidth, CarpetGUIConfigManager::setCategoryPanelWidth, onChanged, syncs, false));
-      FlowLayout buttons = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fixed(16));
-      buttons.gap(6).horizontalAlignment(HorizontalAlignment.CENTER);
+      panel.child(sliderRow(labelWidth, valueWidth, "gui.settings.ui_scale", CarpetGUIConfigManager.MIN_UI_SCALE, CarpetGUIConfigManager.MAX_UI_SCALE, () -> CarpetGUIConfigManager.uiScale, CarpetGUIConfigManager::setUiScale, () -> {}, syncs, true));
+      panel.child(sliderRow(labelWidth, valueWidth, "gui.settings.menu_width", CarpetGUIConfigManager.MIN_MENU_SIZE, CarpetGUIConfigManager.DEFAULT_MENU_SIZE, () -> CarpetGUIConfigManager.menuWidth, CarpetGUIConfigManager::setMenuWidth, onChanged, syncs, false));
+      panel.child(sliderRow(labelWidth, valueWidth, "gui.settings.menu_height", CarpetGUIConfigManager.MIN_MENU_SIZE, CarpetGUIConfigManager.DEFAULT_MENU_SIZE, () -> CarpetGUIConfigManager.menuHeight, CarpetGUIConfigManager::setMenuHeight, onChanged, syncs, false));
+      panel.child(sliderRow(labelWidth, valueWidth, "gui.settings.category_width", CarpetGUIConfigManager.MIN_CATEGORY_PANEL_WIDTH, CarpetGUIConfigManager.MAX_CATEGORY_PANEL_WIDTH, () -> CarpetGUIConfigManager.categoryPanelWidth, CarpetGUIConfigManager::setCategoryPanelWidth, onChanged, syncs, false));
+      panel.child(sliderRow(labelWidth, valueWidth, "gui.settings.input_width", CarpetGUIConfigManager.MIN_INPUT_WIDTH, CarpetGUIConfigManager.MAX_INPUT_WIDTH, () -> CarpetGUIConfigManager.inputWidth, CarpetGUIConfigManager::setInputWidth, onChanged, syncs, false));
+      int buttonWidth = (innerWidth - COLUMN_GAP) / 2;
+      FlowLayout buttons = UIContainers.horizontalFlow(Sizing.fixed(innerWidth), Sizing.fixed(16));
+      buttons.gap(COLUMN_GAP).horizontalAlignment(HorizontalAlignment.CENTER);
       buttons.carpetGUI$margins(Insets.top(4));
-      buttons.child(ScreenUtils.btn(Component.translatable("gui.settings.reset"), Sizing.fill(45), Sizing.fill(100), () -> {
+      buttons.child(ScreenUtils.btn(Component.translatable("gui.settings.reset"), Sizing.fixed(buttonWidth), Sizing.fill(100), () -> {
          CarpetGUIConfigManager.resetUiConfig();
          syncs.forEach(Runnable::run);
          onChanged.run();
       }));
-      buttons.child(ScreenUtils.btn(Component.translatable("gui.settings.close"), Sizing.fill(45), Sizing.fill(100), SettingsPanel::close));
+      buttons.child(ScreenUtils.btn(Component.translatable("gui.settings.close"), Sizing.fixed(buttonWidth), Sizing.fill(100), SettingsPanel::close));
       panel.child(buttons);
       OverlayContainer<FlowLayout> overlay = UIContainers.<FlowLayout>overlay(panel);
       overlay.surface(Surface.flat(0));
@@ -82,17 +98,17 @@ public class SettingsPanel {
       return overlay;
    }
 
-   // applyOnRelease: the UI scale resizes this very panel, so it only takes effect once the drag ends.
-   private static FlowLayout sliderRow(String key, int min, int max, IntSupplier getter, IntConsumer setter, Runnable onChanged, List<Runnable> syncs, boolean applyOnRelease) {
-      FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fixed(14));
+   private static FlowLayout sliderRow(int labelWidth, int valueWidth, String key, int min, int max, IntSupplier getter, IntConsumer setter, Runnable onChanged, List<Runnable> syncs, boolean applyOnRelease) {
+      FlowLayout row = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(14));
       row.verticalAlignment(VerticalAlignment.CENTER);
-      FlowLayout labelBox = UIContainers.horizontalFlow(Sizing.fill(42), Sizing.fill(100));
+      row.gap(COLUMN_GAP);
+      FlowLayout labelBox = UIContainers.horizontalFlow(Sizing.fixed(labelWidth), Sizing.fill(100));
       labelBox.verticalAlignment(VerticalAlignment.CENTER);
       labelBox.child(UIComponents.label(Component.translatable(key)).color(Color.WHITE));
       row.child(labelBox);
       LabelComponent valueLabel = UIComponents.label(percent(getter.getAsInt()));
       valueLabel.color(Color.WHITE);
-      SliderComponent slider = UIComponents.slider(Sizing.fill(40), min, max, getter.getAsInt());
+      SliderComponent slider = UIComponents.slider(Sizing.fixed(SLIDER_WIDTH), min, max, getter.getAsInt());
       slider.onChanged((value) -> {
          if (applyOnRelease) {
             valueLabel.text(percent(value));
@@ -111,7 +127,7 @@ public class SettingsPanel {
          CarpetGUIConfigManager.saveUiConfig();
       });
       row.child(slider);
-      FlowLayout valueBox = UIContainers.horizontalFlow(Sizing.fill(18), Sizing.fill(100));
+      FlowLayout valueBox = UIContainers.horizontalFlow(Sizing.fixed(valueWidth), Sizing.fill(100));
       valueBox.alignment(HorizontalAlignment.RIGHT, VerticalAlignment.CENTER);
       valueBox.child(valueLabel);
       row.child(valueBox);
