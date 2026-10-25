@@ -288,24 +288,22 @@ public class CarpetGUIClientPacketHandler {
       if (addr != null) {
          String lang = getSelectedLanguage(client);
          Optional<RulesCacheManager.CacheResult> cacheOpt = RulesCacheManager.loadCache(lang);
-         cacheOpt.ifPresent((cache) -> client.execute(() -> {
+         boolean hasServerRules = CarpetGUIClient.incompleteRulesFromServer != null && !CarpetGUIClient.incompleteRulesFromServer.isEmpty();
+         if (!cacheOpt.isPresent() && !hasServerRules) {
+            showOverlayMessage(client, Component.translatable("gui.tip.no_rules_available"));
+            return;
+         }
+
+         client.execute(() -> {
                CarpetGUIClient.cachedCompleteRules.clear();
-
-               for(RuleData ruleData : cache.rules()) {
-                  CarpetGUIClient.cachedCompleteRules.put(ruleData.name, ruleData);
-               }
-
-               CarpetGUIClient.cachedCategories.clear();
-
-               for(RulesEditScreen.DefaultCategory entry : RulesEditScreen.DefaultCategory.values()) {
-                  if (!entry.equals(RulesEditScreen.DefaultCategory.SEARCHING)) {
-                     CarpetGUIClient.cachedCategories.add(entry.getName());
+               cacheOpt.ifPresent((cache) -> {
+                  for(RuleData ruleData : cache.rules()) {
+                     CarpetGUIClient.cachedCompleteRules.put(ruleData.name, ruleData);
                   }
-               }
+               });
 
-               CarpetGUIClient.cachedCategories.addAll(cache.rules().stream().flatMap((r) -> r.categories.stream()).distinct().map(Map.Entry::getValue).toList());
                CarpetGUIClient.defaultRules.clear();
-               CarpetGUIClient.defaultRules.addAll(Arrays.stream(cache.defaults().split(";")).toList());
+               cacheOpt.ifPresent((cache) -> CarpetGUIClient.defaultRules.addAll(Arrays.stream(cache.defaults().split(";")).toList()));
                CarpetGUIClient.favoriteRules.clear();
                CarpetGUIClient.favoriteRules.addAll(CarpetGUIConfigManager.readFavoriteRules());
                if (CarpetGUIClient.incompleteRulesFromServer != null && !CarpetGUIClient.incompleteRulesFromServer.isEmpty()) {
@@ -355,8 +353,27 @@ public class CarpetGUIClientPacketHandler {
                   }
                }
 
+               CarpetGUIClient.cachedCategories.clear();
+
+               for(RulesEditScreen.DefaultCategory entry : RulesEditScreen.DefaultCategory.values()) {
+                  if (!entry.equals(RulesEditScreen.DefaultCategory.SEARCHING)) {
+                     CarpetGUIClient.cachedCategories.add(entry.getName());
+                  }
+               }
+
+               CarpetGUIClient.cachedCategories.addAll(CarpetGUIClient.cachedCompleteRules.values().stream().flatMap((r) -> r.categories.stream()).distinct().map(Map.Entry::getValue).toList());
                client.setScreenAndShow(new RulesEditScreen(instantAffect));
-            }));
+            });
+      }
+   }
+
+   private static void showOverlayMessage(Minecraft client, Component message) {
+      if (client.player != null) {
+         //? if <26.1 {
+         /*client.player.displayClientMessage(message, true);
+         *///?} else {
+         client.player.sendOverlayMessage(message);
+         //?}
       }
    }
 }

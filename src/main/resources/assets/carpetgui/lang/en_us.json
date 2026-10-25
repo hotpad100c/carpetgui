@@ -7,6 +7,7 @@
   "gui.screen.tooltip.extra": "Press Shift to show more",
   "key.category.carpetgui.main": "Carpet GUI",
   "gui.tip.unknown_rule": "This rule is unknown. It usually indicates that CarpetGUI is not installed on the server. \nThe information displayed here is based on guesses from previously cached rules",
+  "gui.tip.no_rules_available": "CarpetGUI is not installed on this server, and there is no local rule cache or Carpet-synced rule list to show",
   "gui.tip.default": "(Set as default) ",
   "gui.tip.fork_current": "Press Alt to create prefab based on current state",
   "gui.category.all": "all",
