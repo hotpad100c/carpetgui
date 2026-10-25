@@ -16,6 +16,7 @@ import ml.mypals.carpetgui.network.server.RulesPacketPayload;
 import ml.mypals.carpetgui.screen.ruleStack.RuleStackData;
 import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 //? if <26.1 {
 /*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -78,6 +79,7 @@ public class CarpetGUIClient implements ClientModInitializer {
               Category.register(Identifier.fromNamespaceAndPath("carpetgui", "main"))
               //?}
       ));
+      ClientLifecycleEvents.CLIENT_STOPPING.register((ClientLifecycleEvents.ClientStopping)(client) -> CarpetGUIClientPacketHandler.shutdown());
       ClientTickEvents.END_CLIENT_TICK.register((ClientTickEvents.EndTick)(client) -> {
          if (carpetRulesKeyBind.consumeClick()) {
             CarpetGUIClientPacketHandler.openRuleEditScreen(true);
