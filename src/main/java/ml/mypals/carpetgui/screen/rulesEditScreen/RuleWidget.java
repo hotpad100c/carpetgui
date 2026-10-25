@@ -166,8 +166,8 @@ public class RuleWidget {
             CarpetGUIClient.favoriteRules.remove(this.orgName);
          }
 
-         if (Objects.equals(this.screen.currentCategory, RulesEditScreen.DefaultCategory.FAVORITE.getName())) {
-            this.screen.setCurrentCategory(RulesEditScreen.DefaultCategory.FAVORITE.getName());
+         if (this.screen.isFilterActive(RulesEditScreen.DefaultCategory.FAVORITE)) {
+            this.screen.refreshScreen();
          }
 
          ScreenUtils.swapTexture(wrapper, this.isFavorited ? ScreenUtils.LOVE_ON : ScreenUtils.LOVE_OFF, 10, 11);

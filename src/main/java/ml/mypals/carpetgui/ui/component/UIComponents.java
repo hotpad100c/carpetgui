@@ -45,6 +45,12 @@ public final class UIComponents {
       return new DropdownComponent(horizontalSizing);
    }
 
+   public static SliderComponent slider(Sizing horizontalSizing, int min, int max, int value) {
+      SliderComponent slider = new SliderComponent(min, max, value);
+      slider.carpetGUI$horizontalSizing(horizontalSizing);
+      return slider;
+   }
+
 
    public static <T, C extends UIComponent> FlowLayout list(List<T> data, Consumer<FlowLayout> layoutConfigurator, Function<T, C> componentMaker, boolean vertical) {
       FlowLayout layout = vertical ? UIContainers.verticalFlow(Sizing.content(), Sizing.content()) : UIContainers.horizontalFlow(Sizing.content(), Sizing.content());

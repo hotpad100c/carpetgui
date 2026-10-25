@@ -226,9 +226,7 @@ public class CarpetGUIClientPacketHandler {
       CarpetGUIClient.cachedCategories.clear();
 
       for(RulesEditScreen.DefaultCategory entry : RulesEditScreen.DefaultCategory.values()) {
-         if (!entry.equals(RulesEditScreen.DefaultCategory.SEARCHING)) {
-            CarpetGUIClient.cachedCategories.add(entry.getName());
-         }
+         CarpetGUIClient.cachedCategories.add(entry.getName());
       }
 
       for(RuleData data : rules) {
@@ -356,9 +354,7 @@ public class CarpetGUIClientPacketHandler {
                CarpetGUIClient.cachedCategories.clear();
 
                for(RulesEditScreen.DefaultCategory entry : RulesEditScreen.DefaultCategory.values()) {
-                  if (!entry.equals(RulesEditScreen.DefaultCategory.SEARCHING)) {
-                     CarpetGUIClient.cachedCategories.add(entry.getName());
-                  }
+                  CarpetGUIClient.cachedCategories.add(entry.getName());
                }
 
                CarpetGUIClient.cachedCategories.addAll(CarpetGUIClient.cachedCompleteRules.values().stream().flatMap((r) -> r.categories.stream()).distinct().map(Map.Entry::getValue).toList());

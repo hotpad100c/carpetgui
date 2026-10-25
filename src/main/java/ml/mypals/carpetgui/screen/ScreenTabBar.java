@@ -11,6 +11,7 @@ import ml.mypals.carpetgui.ui.container.UIContainers;
 import ml.mypals.carpetgui.ui.core.Color;
 import ml.mypals.carpetgui.ui.core.CursorStyle;
 import ml.mypals.carpetgui.ui.core.Insets;
+import ml.mypals.carpetgui.ui.core.Positioning;
 import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.Surface;
 import ml.mypals.carpetgui.ui.core.VerticalAlignment;
@@ -23,6 +24,9 @@ import net.minecraft.sounds.SoundEvents;
 
 public class ScreenTabBar {
    public static void build(FlowLayout root, Tab activeTab) {
+      build(root, activeTab, () -> {});
+   }
+   public static void build(FlowLayout root, Tab activeTab, Runnable onLayoutChanged) {
       FlowLayout tabBar = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(7));
       tabBar.surface(Surface.flat(1712986650));
       tabBar.verticalAlignment(VerticalAlignment.CENTER);
@@ -50,6 +54,10 @@ public class ScreenTabBar {
          tabBar.child(btn);
       }
 
+      FlowLayout settings = ScreenUtils.btn(Component.literal("⚙"), Sizing.fixed(16), Sizing.fill(80), () -> SettingsPanel.toggle(root, onLayoutChanged));
+      settings.carpetGUI$positioning(Positioning.relative(100, 50));
+      settings.carpetGUI$tooltip(Component.translatable("gui.settings.title"));
+      tabBar.child(settings);
       root.child(0, tabBar);
    }
 

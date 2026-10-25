@@ -3,6 +3,7 @@ package ml.mypals.carpetgui.screen;
 import java.util.Map;
 import java.util.function.Consumer;
 import ml.mypals.carpetgui.network.RuleData;
+import ml.mypals.carpetgui.settings.CarpetGUIConfigManager;
 import ml.mypals.carpetgui.ui.component.ButtonComponent;
 import ml.mypals.carpetgui.ui.component.TextBoxComponent;
 import ml.mypals.carpetgui.ui.component.TextureComponent;
@@ -65,15 +66,20 @@ public class ScreenUtils {
 
    public static Map.Entry<FlowLayout, FlowLayout> makeMasterContainer(int w, int h, FlowLayout root) {
       FlowLayout outline = UIContainers.verticalFlow(Sizing.fill(100), Sizing.fill(100));
+      applyMenuSize(outline);
       outline.surface(Surface.flat(1996488704));
       FlowLayout content = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(93));
       outline.padding(Insets.none());
       root.padding(Insets.none());
-      root.horizontalAlignment(HorizontalAlignment.LEFT);
-      root.verticalAlignment(VerticalAlignment.TOP);
+      root.horizontalAlignment(HorizontalAlignment.CENTER);
+      root.verticalAlignment(VerticalAlignment.CENTER);
       root.surface(Surface.blur(4.0F, 4.0F));
       outline.child(content);
       return Map.entry(outline, content);
+   }
+
+   public static void applyMenuSize(FlowLayout outline) {
+      outline.sizing(Sizing.fill(CarpetGUIConfigManager.menuWidth), Sizing.fill(CarpetGUIConfigManager.menuHeight));
    }
 
    public static Identifier rl(String path) {
