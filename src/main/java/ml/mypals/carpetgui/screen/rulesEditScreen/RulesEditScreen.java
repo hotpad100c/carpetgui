@@ -39,6 +39,7 @@ import ml.mypals.carpetgui.ui.core.Sizing;
 import ml.mypals.carpetgui.ui.core.Surface;
 import ml.mypals.carpetgui.ui.core.UIComponent;
 import ml.mypals.carpetgui.ui.core.VerticalAlignment;
+import ml.mypals.carpetgui.ui.util.FocusHandler;
 import ml.mypals.carpetgui.ui.event.UIEvents.*;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.Minecraft;
@@ -89,6 +90,16 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       ScreenTabBar.build(this.buildMain(root), ScreenTabBar.Tab.RULES, this::applyPanelWidths);
    }
 
+   protected void init() {
+      super.init();
+      if (this.uiAdapter != null && this.searchBox != null) {
+         FocusHandler focusHandler = this.uiAdapter.rootComponent.carpetGUI$focusHandler();
+         if (focusHandler != null && focusHandler.focused() == null) {
+            focusHandler.focus(this.searchBox, UIComponent.FocusSource.MOUSE_CLICK);
+         }
+      }
+   }
+
    protected FlowLayout buildMain(FlowLayout root) {
       Map.Entry<FlowLayout, FlowLayout> master = ScreenUtils.makeMasterContainer(this.width, this.height, root);
       ScreenUtils.DialogResult dialogResult = ScreenUtils.createSaveGroupDialog(this::saveModifiedRulesAsGroup, (ingnored) -> {
@@ -112,7 +123,6 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       searchRow.child(searchIcon);
       this.searchBox = UIComponents.textBox(Sizing.fill(100));
       this.searchBox.setMaxLength(100);
-      this.searchBox.setFocused(true);
       this.searchBox.onChanged().subscribe(this::onSearch);
       this.searchBox.carpetGUI$focusGained().subscribe((FocusGained)(source) -> this.onSearch(this.searchBox.getValue()));
       searchRow.child(this.searchBox);
@@ -196,7 +206,6 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
          return;
       }
 
-      Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
       // Keep the scroll position while refining a query; start from the top otherwise.
       boolean refining = !input.isEmpty() && !this.lastQuery.isEmpty();
       this.remountRules(refining);
@@ -344,14 +353,12 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
          widget.applyQuery(query);
          return (UIComponent)widget.getRow();
       }).toList();
-      // Mount in one batch: child() per row would re-layout the whole list each time.
       this.rulesListLayout.clearChildren();
       this.rulesListLayout.children(rows);
    }
 
    private RuleWidget getRuleWidget(RuleData rule) {
       RuleWidget widget = this.ruleWidgets.get(rule.name);
-      // cachedCompleteRules may have been replaced since the widget was built
       if (widget == null || widget.getRuleData() != rule) {
          widget = new RuleWidget(rule, this);
          this.ruleWidgets.put(rule.name, widget);

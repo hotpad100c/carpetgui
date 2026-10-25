@@ -31,7 +31,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 public class CarpetGUIClientPacketHandler {
-   private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+   private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor((runnable) -> {
+      Thread thread = new Thread(runnable, "carpetgui-cache-io");
+      thread.setDaemon(true);
+      return thread;
+   });
 
    public static void handleHelloPacket(HelloPacketPayload payload) {
       Minecraft.getInstance().execute(() -> CarpetGUIClient.hasModOnServer = true);
