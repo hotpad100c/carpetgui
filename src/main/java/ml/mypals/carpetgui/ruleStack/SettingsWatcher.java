@@ -46,7 +46,7 @@ public final class SettingsWatcher {
             Set<String> defaults = defaultedRules.getOrDefault(id, Set.of());
             for (ParsedRule<?> rule : mgr.getRules()) {
                 String key = id + ":" + rule.name;
-                String val = String.valueOf(rule.get());
+                String val = String.valueOf(rule.get()).toLowerCase(Locale.ROOT);
                 boolean isDefault = defaults.contains(rule.name);
                 snap.put(key, new RuleValueSnapshot(val, isDefault));
             }
@@ -55,7 +55,7 @@ public final class SettingsWatcher {
             Set<String> defaults = defaultedRules.getOrDefault(id, Set.of());
             for (CarpetRule<?> rule : mgr.getCarpetRules()) {
                 String key = id + ":" + rule.name();
-                String val = String.valueOf(rule.value());
+                String val = String.valueOf(rule.value()).toLowerCase(Locale.ROOT);
                 boolean isDefault = defaults.contains(rule.name());
                 snap.put(key, new RuleValueSnapshot(val, isDefault));
             }
@@ -128,7 +128,7 @@ public final class SettingsWatcher {
         gameRules.availableRules().toList().forEach(
                 (rule) -> {
                     String key = "gamerule$" + rule.category() + ":" + rule.id();
-                    snap.put(key, new RuleValueSnapshot(rule.defaultValue().toString(), false));
+                    snap.put(key, new RuleValueSnapshot(rule.defaultValue().toString().toLowerCase(Locale.ROOT), false));
                 }
         );
         //?}

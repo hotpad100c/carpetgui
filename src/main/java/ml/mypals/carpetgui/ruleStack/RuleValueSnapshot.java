@@ -1,6 +1,7 @@
 package ml.mypals.carpetgui.ruleStack;
 
 import com.google.gson.JsonObject;
+import java.util.Locale;
 
 public record RuleValueSnapshot(String value, boolean isDefault) {
    public JsonObject toJson() {
@@ -11,7 +12,7 @@ public record RuleValueSnapshot(String value, boolean isDefault) {
    }
 
    public static RuleValueSnapshot fromJson(JsonObject o) {
-      return new RuleValueSnapshot(o.get("value").getAsString(), o.get("isDefault").getAsBoolean());
+      return new RuleValueSnapshot(o.get("value").getAsString().toLowerCase(Locale.ROOT), o.get("isDefault").getAsBoolean());
    }
 
    public boolean equals(Object obj) {
