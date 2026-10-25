@@ -19,6 +19,7 @@
   "gui.category.unknown": "unknown",
   "gui.category.multiselect_hint": "Shift/Ctrl + click to combine filters",
   "gui.settings.title": "Settings",
+  "gui.settings.ui_scale": "UI scale",
   "gui.settings.menu_width": "Menu width",
   "gui.settings.menu_height": "Menu height",
   "gui.settings.category_width": "Category panel",

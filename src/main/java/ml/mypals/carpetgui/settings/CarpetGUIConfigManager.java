@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import ml.mypals.carpetgui.ui.core.OwoUIAdapter;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class CarpetGUIConfigManager {
@@ -25,6 +26,10 @@ public class CarpetGUIConfigManager {
    public static int menuWidth = DEFAULT_MENU_SIZE;
    public static int menuHeight = DEFAULT_MENU_SIZE;
    public static int categoryPanelWidth = DEFAULT_CATEGORY_PANEL_WIDTH;
+   public static final int DEFAULT_UI_SCALE = 100;
+   public static final int MIN_UI_SCALE = 50;
+   public static final int MAX_UI_SCALE = 150;
+   public static int uiScale = DEFAULT_UI_SCALE;
 
    public static void initializeConfig() {
       try {
@@ -60,6 +65,7 @@ public class CarpetGUIConfigManager {
       menuWidth = clamp(readInt(props, "menuWidth", DEFAULT_MENU_SIZE), MIN_MENU_SIZE, DEFAULT_MENU_SIZE);
       menuHeight = clamp(readInt(props, "menuHeight", DEFAULT_MENU_SIZE), MIN_MENU_SIZE, DEFAULT_MENU_SIZE);
       categoryPanelWidth = clamp(readInt(props, "categoryPanelWidth", DEFAULT_CATEGORY_PANEL_WIDTH), MIN_CATEGORY_PANEL_WIDTH, MAX_CATEGORY_PANEL_WIDTH);
+      setUiScale(readInt(props, "uiScale", DEFAULT_UI_SCALE));
    }
 
    public static void saveUiConfig() {
@@ -67,6 +73,7 @@ public class CarpetGUIConfigManager {
       props.setProperty("menuWidth", String.valueOf(menuWidth));
       props.setProperty("menuHeight", String.valueOf(menuHeight));
       props.setProperty("categoryPanelWidth", String.valueOf(categoryPanelWidth));
+      props.setProperty("uiScale", String.valueOf(uiScale));
 
       try {
          if (!Files.exists(CarpetGUI_DIR, new LinkOption[0])) {
@@ -95,10 +102,16 @@ public class CarpetGUIConfigManager {
       categoryPanelWidth = clamp(value, MIN_CATEGORY_PANEL_WIDTH, MAX_CATEGORY_PANEL_WIDTH);
    }
 
+   public static void setUiScale(int value) {
+      uiScale = clamp(value, MIN_UI_SCALE, MAX_UI_SCALE);
+      OwoUIAdapter.setGlobalScale((float)uiScale / 100.0F);
+   }
+
    public static void resetUiConfig() {
       menuWidth = DEFAULT_MENU_SIZE;
       menuHeight = DEFAULT_MENU_SIZE;
       categoryPanelWidth = DEFAULT_CATEGORY_PANEL_WIDTH;
+      setUiScale(DEFAULT_UI_SCALE);
       saveUiConfig();
    }
 

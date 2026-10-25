@@ -41,6 +41,9 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 //?}
 {
    private static boolean isRendering = false;
+   private static float globalScale = 1.0F;
+   private static float activeScale = 1.0F;
+   protected float layoutScale = 1.0F;
    public final R rootComponent;
    public final CursorAdapter cursorAdapter;
    protected boolean disposed = false;
@@ -66,8 +69,29 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    }
 
    public void inflateAndMount() {
-      this.rootComponent.carpetGUI$inflate(Size.of(this.width, this.height));
+      this.layoutScale = globalScale;
+      this.rootComponent.carpetGUI$inflate(Size.of(Math.round((float)this.width / this.layoutScale), Math.round((float)this.height / this.layoutScale)));
       this.rootComponent.carpetGUI$mount((ParentUIComponent)null, this.x, this.y);
+   }
+
+   public static void setGlobalScale(float scale) {
+      globalScale = scale;
+   }
+
+   public static float activeScale() {
+      return activeScale;
+   }
+
+   public static int toScreen(int value) {
+      return Math.round((float)value * activeScale);
+   }
+
+   protected double toVirtualX(double mouseX) {
+      return (mouseX - (double)this.x) / (double)this.layoutScale + (double)this.x;
+   }
+
+   protected double toVirtualY(double mouseY) {
+      return (mouseY - (double)this.y) / (double)this.layoutScale + (double)this.y;
    }
 
    public void moveAndResize(int x, int y, int width, int height) {
@@ -124,21 +148,32 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
       }
 
       OwoUIGraphics owoGraphics = (OwoUIGraphics)graphics;
+      if (this.layoutScale != globalScale) {
+         this.inflateAndMount();
+      }
+
+      int virtualMouseX = (int)this.toVirtualX((double)mouseX);
+      int virtualMouseY = (int)this.toVirtualY((double)mouseY);
 
       try {
          isRendering = true;
+         activeScale = this.layoutScale;
          float delta = getDeltaTicks();
          Window window = Minecraft.getInstance().getWindow();
-         this.rootComponent.carpetGUI$update(delta, mouseX, mouseY);
-         graphics.enableScissor(0, 0, window.getGuiScaledWidth(), window.getGuiScaledHeight());
-         this.rootComponent.carpetGUI$draw(owoGraphics, mouseX, mouseY, a, delta);
-         graphics.disableScissor();
-         UIComponent hovered = this.rootComponent.childAt(mouseX, mouseY);
+         this.rootComponent.carpetGUI$update(delta, virtualMouseX, virtualMouseY);
+         owoGraphics.push();
+         owoGraphics.scale(this.layoutScale, this.layoutScale);
+         owoGraphics.enableScissor(0, 0, Math.round((float)window.getGuiScaledWidth() / this.layoutScale), Math.round((float)window.getGuiScaledHeight() / this.layoutScale));
+         this.rootComponent.carpetGUI$draw(owoGraphics, virtualMouseX, virtualMouseY, a, delta);
+         owoGraphics.disableScissor();
+         owoGraphics.pop();
+         UIComponent hovered = this.rootComponent.childAt(virtualMouseX, virtualMouseY);
          if (!this.disposed && hovered != null) {
             this.cursorAdapter.applyStyle(hovered.carpetGUI$cursorStyle());
          }
       } finally {
          isRendering = false;
+         activeScale = 1.0F;
       }
 
    }
@@ -154,7 +189,15 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 
       OwoUIGraphics owoContext = (OwoUIGraphics)graphics;
       float delta = getDeltaTicks();
-      this.rootComponent.drawTooltip(owoContext, mouseX, mouseY, partialTicks, delta);
+      // Tooltips stay at Minecraft's own scale: hit-test in virtual space, draw at the real cursor.
+      activeScale = this.layoutScale;
+
+      try {
+         this.rootComponent.drawTooltip(owoContext, (int)this.toVirtualX((double)mouseX), (int)this.toVirtualY((double)mouseY), partialTicks, delta);
+      } finally {
+         activeScale = 1.0F;
+      }
+
       //? if >=26.1 {
       graphics.extractDeferredElements(mouseX, mouseY, partialTicks);
       //?} elif >=1.21.9 {
@@ -163,7 +206,7 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    }
 
    public boolean isMouseOver(double mouseX, double mouseY) {
-      return this.rootComponent.carpetGUI$isInBoundingBox(mouseX, mouseY);
+      return this.rootComponent.carpetGUI$isInBoundingBox(this.toVirtualX(mouseX), this.toVirtualY(mouseY));
    }
 
    public void setFocused(boolean focused) {
@@ -175,15 +218,15 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 
    //? if <1.21.9 {
    /*public boolean mouseClicked(double mouseX, double mouseY, int button) {
-      return this.rootComponent.carpetGUI$onMouseDown(new MouseButtonEvent(mouseX, mouseY, button), false);
+      return this.rootComponent.carpetGUI$onMouseDown(new MouseButtonEvent(this.toVirtualX(mouseX), this.toVirtualY(mouseY), button), false);
    }
 
    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-      return this.rootComponent.carpetGUI$onMouseUp(new MouseButtonEvent(mouseX, mouseY, button));
+      return this.rootComponent.carpetGUI$onMouseUp(new MouseButtonEvent(this.toVirtualX(mouseX), this.toVirtualY(mouseY), button));
    }
 
    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-      return this.rootComponent.carpetGUI$onMouseDrag(new MouseButtonEvent(mouseX, mouseY, button), deltaX, deltaY);
+      return this.rootComponent.carpetGUI$onMouseDrag(new MouseButtonEvent(this.toVirtualX(mouseX), this.toVirtualY(mouseY), button), deltaX / (double)this.layoutScale, deltaY / (double)this.layoutScale);
    }
 
    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -195,15 +238,19 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
    }
    *///?} else {
    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
-      return this.rootComponent.carpetGUI$onMouseDown(click, doubled);
+      return this.rootComponent.carpetGUI$onMouseDown(this.toVirtual(click), doubled);
    }
 
    public boolean mouseReleased(MouseButtonEvent click) {
-      return this.rootComponent.carpetGUI$onMouseUp(click);
+      return this.rootComponent.carpetGUI$onMouseUp(this.toVirtual(click));
    }
 
    public boolean mouseDragged(MouseButtonEvent click, double deltaX, double deltaY) {
-      return this.rootComponent.carpetGUI$onMouseDrag(click, deltaX, deltaY);
+      return this.rootComponent.carpetGUI$onMouseDrag(this.toVirtual(click), deltaX / (double)this.layoutScale, deltaY / (double)this.layoutScale);
+   }
+
+   protected MouseButtonEvent toVirtual(MouseButtonEvent click) {
+      return new MouseButtonEvent(this.toVirtualX(click.x()), this.toVirtualY(click.y()), click.buttonInfo());
    }
 
    public boolean keyPressed(KeyEvent input) {
@@ -217,11 +264,11 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 
    //? if >=1.20.2 {
    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, verticalAmount);
+      return this.rootComponent.carpetGUI$onMouseScroll(this.toVirtualX(mouseX), this.toVirtualY(mouseY), verticalAmount);
    }
    //?} else {
    /*public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-      return this.rootComponent.carpetGUI$onMouseScroll(mouseX, mouseY, amount);
+      return this.rootComponent.carpetGUI$onMouseScroll(this.toVirtualX(mouseX), this.toVirtualY(mouseY), amount);
    }
    *///?}
 

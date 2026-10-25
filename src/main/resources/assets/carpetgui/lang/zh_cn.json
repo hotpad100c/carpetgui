@@ -19,6 +19,7 @@
   "gui.category.unknown": "未知",
   "gui.category.multiselect_hint": "按住 Shift/Ctrl 点击可组合多个过滤",
   "gui.settings.title": "设置",
+  "gui.settings.ui_scale": "界面缩放",
   "gui.settings.menu_width": "菜单宽度",
   "gui.settings.menu_height": "菜单高度",
   "gui.settings.category_width": "分类栏宽度",

@@ -11,6 +11,7 @@ import net.minecraft.client.gui.ActiveTextCollector;
 import ml.mypals.carpetgui.ui.base.BaseUIComponent;
 import ml.mypals.carpetgui.ui.core.Color;
 import ml.mypals.carpetgui.ui.core.HorizontalAlignment;
+import ml.mypals.carpetgui.ui.core.OwoUIAdapter;
 import ml.mypals.carpetgui.ui.core.OwoUIGraphics;
 import ml.mypals.carpetgui.ui.core.Size;
 import ml.mypals.carpetgui.ui.core.Sizing;
@@ -232,9 +233,9 @@ public class LabelComponent extends BaseUIComponent {
       if (style != null) {
          super.drawTooltip(context, mouseX, mouseY, partialTicks, delta);
          //? if <26.1 {
-         /*context.renderComponentHoverEffect(this.textRenderer, style, mouseX, mouseY);
+         /*context.renderComponentHoverEffect(this.textRenderer, style, OwoUIAdapter.toScreen(mouseX), OwoUIAdapter.toScreen(mouseY));
          *///?} else {
-         context.componentHoverEffect(this.textRenderer, style, mouseX, mouseY);
+         context.componentHoverEffect(this.textRenderer, style, OwoUIAdapter.toScreen(mouseX), OwoUIAdapter.toScreen(mouseY));
          //?}
       }
    }

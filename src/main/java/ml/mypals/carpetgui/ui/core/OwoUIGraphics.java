@@ -151,6 +151,14 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
       return this;
    }
 
+   //? if <1.21.6 {
+   /*// Before 1.21.6 vanilla scissor ignores the pose, so apply the adapter's virtual scale here.
+   public void enableScissor(int minX, int minY, int maxX, int maxY) {
+      float scale = OwoUIAdapter.activeScale();
+      super.enableScissor((int)Math.floor((float)minX * scale), (int)Math.floor((float)minY * scale), (int)Math.ceil((float)maxX * scale), (int)Math.ceil((float)maxY * scale));
+   }
+   *///?}
+
    public boolean intersectsScissor(PositionedRectangle other) {
       //? if <1.21.6 {
       /*return true;
@@ -225,6 +233,9 @@ public class OwoUIGraphics extends GuiGraphicsExtractor {
    }
 
    public void drawTooltip(Font textRenderer, int x, int y, List<ClientTooltipComponent> components, @Nullable Identifier texture) {
+      // Callers pass virtual coordinates; tooltips are drawn unscaled at the real cursor.
+      x = OwoUIAdapter.toScreen(x);
+      y = OwoUIAdapter.toScreen(y);
       //? if >=26.3 {
       /*this.tooltip(textRenderer, components, x, y, DefaultTooltipPositioner.INSTANCE, texture,false);
       *///?} else if >=1.21.4 {

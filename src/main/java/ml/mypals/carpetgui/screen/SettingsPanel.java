@@ -62,9 +62,10 @@ public class SettingsPanel {
          onLayoutChanged.run();
       };
       List<Runnable> syncs = new ArrayList();
-      panel.child(sliderRow("gui.settings.menu_width", CarpetGUIConfigManager.MIN_MENU_SIZE, CarpetGUIConfigManager.DEFAULT_MENU_SIZE, () -> CarpetGUIConfigManager.menuWidth, CarpetGUIConfigManager::setMenuWidth, onChanged, syncs));
-      panel.child(sliderRow("gui.settings.menu_height", CarpetGUIConfigManager.MIN_MENU_SIZE, CarpetGUIConfigManager.DEFAULT_MENU_SIZE, () -> CarpetGUIConfigManager.menuHeight, CarpetGUIConfigManager::setMenuHeight, onChanged, syncs));
-      panel.child(sliderRow("gui.settings.category_width", CarpetGUIConfigManager.MIN_CATEGORY_PANEL_WIDTH, CarpetGUIConfigManager.MAX_CATEGORY_PANEL_WIDTH, () -> CarpetGUIConfigManager.categoryPanelWidth, CarpetGUIConfigManager::setCategoryPanelWidth, onChanged, syncs));
+      panel.child(sliderRow("gui.settings.ui_scale", CarpetGUIConfigManager.MIN_UI_SCALE, CarpetGUIConfigManager.MAX_UI_SCALE, () -> CarpetGUIConfigManager.uiScale, CarpetGUIConfigManager::setUiScale, () -> {}, syncs, true));
+      panel.child(sliderRow("gui.settings.menu_width", CarpetGUIConfigManager.MIN_MENU_SIZE, CarpetGUIConfigManager.DEFAULT_MENU_SIZE, () -> CarpetGUIConfigManager.menuWidth, CarpetGUIConfigManager::setMenuWidth, onChanged, syncs, false));
+      panel.child(sliderRow("gui.settings.menu_height", CarpetGUIConfigManager.MIN_MENU_SIZE, CarpetGUIConfigManager.DEFAULT_MENU_SIZE, () -> CarpetGUIConfigManager.menuHeight, CarpetGUIConfigManager::setMenuHeight, onChanged, syncs, false));
+      panel.child(sliderRow("gui.settings.category_width", CarpetGUIConfigManager.MIN_CATEGORY_PANEL_WIDTH, CarpetGUIConfigManager.MAX_CATEGORY_PANEL_WIDTH, () -> CarpetGUIConfigManager.categoryPanelWidth, CarpetGUIConfigManager::setCategoryPanelWidth, onChanged, syncs, false));
       FlowLayout buttons = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fixed(16));
       buttons.gap(6).horizontalAlignment(HorizontalAlignment.CENTER);
       buttons.carpetGUI$margins(Insets.top(4));
@@ -81,7 +82,8 @@ public class SettingsPanel {
       return overlay;
    }
 
-   private static FlowLayout sliderRow(String key, int min, int max, IntSupplier getter, IntConsumer setter, Runnable onChanged, List<Runnable> syncs) {
+   // applyOnRelease: the UI scale resizes this very panel, so it only takes effect once the drag ends.
+   private static FlowLayout sliderRow(String key, int min, int max, IntSupplier getter, IntConsumer setter, Runnable onChanged, List<Runnable> syncs, boolean applyOnRelease) {
       FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fixed(14));
       row.verticalAlignment(VerticalAlignment.CENTER);
       FlowLayout labelBox = UIContainers.horizontalFlow(Sizing.fill(42), Sizing.fill(100));
@@ -92,11 +94,22 @@ public class SettingsPanel {
       valueLabel.color(Color.WHITE);
       SliderComponent slider = UIComponents.slider(Sizing.fill(40), min, max, getter.getAsInt());
       slider.onChanged((value) -> {
-         setter.accept(value);
-         valueLabel.text(percent(getter.getAsInt()));
-         onChanged.run();
+         if (applyOnRelease) {
+            valueLabel.text(percent(value));
+         } else {
+            setter.accept(value);
+            valueLabel.text(percent(getter.getAsInt()));
+            onChanged.run();
+         }
       });
-      slider.onReleased(CarpetGUIConfigManager::saveUiConfig);
+      slider.onReleased(() -> {
+         if (applyOnRelease) {
+            setter.accept(slider.value());
+            onChanged.run();
+         }
+
+         CarpetGUIConfigManager.saveUiConfig();
+      });
       row.child(slider);
       FlowLayout valueBox = UIContainers.horizontalFlow(Sizing.fill(18), Sizing.fill(100));
       valueBox.alignment(HorizontalAlignment.RIGHT, VerticalAlignment.CENTER);
