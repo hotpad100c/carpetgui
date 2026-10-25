@@ -40,10 +40,10 @@ public class ScreenUtils {
 
    public static boolean isKeyDown(int keyCode) {
       //? if >=26.3 {
-      return InputConstants.isKeyDown(keyCode);
-      //?} elif >=1.21.9 {
-      /*return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), keyCode);
-      *///?} else {
+      /*return InputConstants.isKeyDown(keyCode);
+      *///?} elif >=1.21.9 {
+      return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), keyCode);
+      //?} else {
       /*com.mojang.blaze3d.platform.Window win = Minecraft.getInstance().getWindow();
       return InputConstants.isKeyDown(win.getWindow(), keyCode);
       *///?}

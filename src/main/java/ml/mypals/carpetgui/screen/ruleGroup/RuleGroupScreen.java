@@ -114,7 +114,7 @@ public class RuleGroupScreen extends BaseOwoScreen<FlowLayout> {
       bar.gap(6);
       FlowLayout exec = ScreenUtils.btn(Component.translatable("gui.rulegroups.execute"), Sizing.content(), Sizing.fill(100), this::executeCurrent);
       FlowLayout file = ScreenUtils.btn(Component.translatable("gui.rulegroups.file"), Sizing.content(), Sizing.fill(100), () ->
-              com.mojang.blaze3d.Blaze3D.openPath(RuleGroupLoader.GROUPS_DIR));
+              Util.getPlatform().openFile(RuleGroupLoader.GROUPS_DIR.toFile()));
       FlowLayout newGroup = ScreenUtils.btn(Component.translatable("gui.rulegroups.new"), Sizing.content(), Sizing.fill(100), () -> {
          this.requestingRulesForNewGroup = true;
          CarpetGUIClientPacketHandler.openRuleEditScreen(false);

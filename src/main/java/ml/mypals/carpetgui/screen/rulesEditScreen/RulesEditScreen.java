@@ -3,6 +3,7 @@ package ml.mypals.carpetgui.screen.rulesEditScreen;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,6 +66,7 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
    private TextBoxComponent searchBox;
    private ScrollContainer<FlowLayout> categoriesScroll;
    private ScrollContainer<FlowLayout> rulesScroll;
+   private final Map<String, RuleWidget> ruleWidgets = new HashMap();
 
    public RulesEditScreen(boolean instantAffect) {
       this.lastCategoryBeforeSearching = this.currentCategory;
@@ -184,19 +186,33 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
    }
 
    public void onSearch(String input) {
-      Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-      if (!Objects.equals(this.currentCategory, RulesEditScreen.DefaultCategory.SEARCHING.getName())) {
-         this.lastCategoryBeforeSearching = this.currentCategory;
+      boolean inSearching = Objects.equals(this.currentCategory, RulesEditScreen.DefaultCategory.SEARCHING.getName());
+      if (input.isEmpty() && !inSearching) {
+        return;
       }
 
+      Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
       if (input.isEmpty()) {
          this.searching = false;
          this.setCurrentCategory(this.lastCategoryBeforeSearching);
       } else {
          this.searching = true;
-         double roffset = this.rulesScroll.scrollOffset();
-         int rmax = this.rulesScroll.maxScroll();
-         this.setCurrentCategory(RulesEditScreen.DefaultCategory.SEARCHING.getName());
+         if (inSearching) {
+            double roffset = this.rulesScroll.scrollOffset();
+            int rmax = this.rulesScroll.maxScroll();
+            this.lastRuleListScroll = rmax == 0 ? (double)0.0F : roffset / (double)rmax;
+         } else {
+            this.lastCategoryBeforeSearching = this.currentCategory;
+            this.currentCategory = RulesEditScreen.DefaultCategory.SEARCHING.getName();
+            this.lastRuleListScroll = (double)0.0F;
+            this.currentCategoryLabel.text(RulesEditScreen.DefaultCategory.getDisplayName(this.currentCategory));
+            double offset = this.categoriesScroll.scrollOffset();
+            double max = (double)this.categoriesScroll.maxScroll();
+            this.lastCategoryScroll = max == (double)0.0F ? (double)0.0F : offset / max;
+            this.rebuildCategoriesList();
+            this.categoriesScroll.scrollTo(this.lastCategoryScroll);
+         }
+
          this.rebuildRulesList(CarpetGUIClient.cachedCompleteRules.values().stream().filter((r) -> {
             List<String> parts = new ArrayList();
             parts.add(r.name);
@@ -243,9 +259,9 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
          this.currentCategoryLabel.text(RulesEditScreen.DefaultCategory.getDisplayName(this.currentCategory));
       }
 
-      if (this.categoriesListLayout != null) {
-         this.categoriesListLayout.clearChildren();
-         CarpetGUIClient.cachedCategories.forEach((c) -> this.categoriesListLayout.child(this.buildCategoryRow(c)));
+      // Selection highlight only changes when the category does.
+      if (!justRefresh || this.categoriesListLayout.children().isEmpty()) {
+         this.rebuildCategoriesList();
       }
 
       Stream<RuleData> stream = this.getRuleDataStream();
@@ -282,12 +298,36 @@ public class RulesEditScreen extends BaseOwoScreen<FlowLayout> {
       return stream;
    }
 
+   private void rebuildCategoriesList() {
+      List<UIComponent> rows = new ArrayList();
+      CarpetGUIClient.cachedCategories.forEach((c) -> rows.add(this.buildCategoryRow(c)));
+      this.categoriesListLayout.clearChildren();
+      this.categoriesListLayout.children(rows);
+   }
+
    private void rebuildRulesList(Stream<RuleData> stream, String query) {
-      this.rulesListLayout.clearChildren();
-      stream.sorted(Comparator.comparing((rule) -> {
+      List<UIComponent> rows = stream.sorted(Comparator.comparing((rule) -> {
          String en = rule.name;
          return en.isEmpty() ? "" : en.toLowerCase().substring(0, 1);
-      })).forEach((r) -> this.rulesListLayout.child((new RuleWidget(r, this, query)).buildComponent()));
+      })).map((r) -> {
+         RuleWidget widget = this.getRuleWidget(r);
+         widget.applyQuery(query);
+         return (UIComponent)widget.getRow();
+      }).toList();
+      // Mount in one batch: child() per row would re-layout the whole list each time.
+      this.rulesListLayout.clearChildren();
+      this.rulesListLayout.children(rows);
+   }
+
+   private RuleWidget getRuleWidget(RuleData rule) {
+      RuleWidget widget = this.ruleWidgets.get(rule.name);
+      // cachedCompleteRules may have been replaced since the widget was built
+      if (widget == null || widget.getRuleData() != rule) {
+         widget = new RuleWidget(rule, this);
+         this.ruleWidgets.put(rule.name, widget);
+      }
+
+      return widget;
    }
 
    private FlowLayout buildCategoryRow(String name) {

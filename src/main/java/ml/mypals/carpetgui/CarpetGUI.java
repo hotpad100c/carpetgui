@@ -70,7 +70,7 @@ public class CarpetGUI implements ModInitializer, CarpetExtension {
    public static final String MOD_ID = "carpetgui";
    public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
    public static final String VERSION = /*$ mod_version*/ "2.0.0";
-   public static final String MINECRAFT = /*$ minecraft*/ "26.3";
+   public static final String MINECRAFT = /*$ minecraft*/ "26.2";
    private static PrefabManager prefabManager;
 
    public void onInitialize() {

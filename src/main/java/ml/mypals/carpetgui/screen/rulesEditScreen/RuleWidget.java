@@ -35,16 +35,15 @@ public class RuleWidget {
    private final RulesEditScreen screen;
    private final String orgName;
    private final boolean isTrueFalseRule;
+   private final String catsText;
    private String query;
    private boolean isGamerule;
    private boolean isLocked;
    private boolean isFavorited;
    private boolean currentBoolValue;
-
-   public RuleWidget(RuleData ruleData, RulesEditScreen screen, String query) {
-      this(ruleData, screen);
-      this.query = query;
-   }
+   private FlowLayout row;
+   private LabelComponent nameLabel;
+   private LabelComponent catsLabel;
 
    public RuleWidget(RuleData ruleData, RulesEditScreen screen) {
       this.query = "";
@@ -52,27 +51,10 @@ public class RuleWidget {
       this.screen = screen;
       this.orgName = ruleData.name;
       this.isGamerule = ruleData.isGamerule;
-      this.isLocked = CarpetGUIClient.defaultRules.contains(this.orgName);
-      this.isFavorited = CarpetGUIClient.favoriteRules.contains(this.orgName);
-      this.currentBoolValue = ruleData.value.equalsIgnoreCase("true");
       this.isTrueFalseRule = ruleData.suggestions.size() == 2 && ((Set)ruleData.suggestions.stream().map(String::toLowerCase).collect(Collectors.toSet())).equals(Set.of("true", "false"));
-   }
-
-   public FlowLayout buildComponent() {
-      FlowLayout row = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fixed(25));
-      row.surface(Surface.flat(-1727855869).and(Surface.outline(301989887)));
-      row.padding(Insets.of(2, 2, 5, 5));
-      row.verticalAlignment(VerticalAlignment.CENTER);
-      FlowLayout leftCol = UIContainers.verticalFlow(Sizing.fill(50), Sizing.fill(100));
-      leftCol.verticalAlignment(VerticalAlignment.CENTER);
-      String displayName = this.ruleData.localName;
-      LabelComponent nameLabel = UIComponents.label(ScreenUtils.highlight(displayName + " : ", this.query));
-      nameLabel.color(Color.WHITE);
-      nameLabel.tooltip(ScreenUtils.buildTooltip(this.ruleData, this.query));
-      leftCol.child(nameLabel);
       StringBuilder cats = new StringBuilder();
 
-      for(String c : this.ruleData.categories.stream().map(Map.Entry::getValue).toList()) {
+      for(String c : ruleData.categories.stream().map(Map.Entry::getValue).toList()) {
          cats.append(c).append(" | ");
       }
 
@@ -80,9 +62,59 @@ public class RuleWidget {
          cats.setLength(cats.length() - 3);
       }
 
-      LabelComponent catsLabel = UIComponents.label(ScreenUtils.highlight(cats.toString(), this.query).copy().withStyle(ChatFormatting.BLUE));
-      catsLabel.color(Color.ofArgb(-5592406));
-      leftCol.child(catsLabel);
+      this.catsText = cats.toString();
+   }
+
+   public RuleData getRuleData() {
+      return this.ruleData;
+   }
+
+   // The row is built once and reused across searches/category switches.
+   public FlowLayout getRow() {
+      if (this.row == null) {
+         this.row = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fixed(25));
+         this.row.surface(Surface.flat(-1727855869).and(Surface.outline(301989887)));
+         this.row.padding(Insets.of(2, 2, 5, 5));
+         this.row.verticalAlignment(VerticalAlignment.CENTER);
+         this.buildContent();
+      }
+
+      return this.row;
+   }
+
+   // Highlight depends on the query, so this must be called before every mount.
+   public void applyQuery(String newQuery) {
+      if (Objects.equals(this.query, newQuery)) {
+         return;
+      }
+
+      this.query = newQuery;
+      if (this.row != null) {
+         this.nameLabel.text(ScreenUtils.highlight(this.ruleData.localName + " : ", newQuery));
+         this.catsLabel.text(ScreenUtils.highlight(this.catsText, newQuery).copy().withStyle(ChatFormatting.BLUE));
+         this.nameLabel.tooltip(ScreenUtils.buildTooltip(this.ruleData, newQuery));
+      }
+   }
+
+   private void refresh() {
+      this.row.clearChildren();
+      this.buildContent();
+   }
+
+   private void buildContent() {
+      this.isLocked = CarpetGUIClient.defaultRules.contains(this.orgName);
+      this.isFavorited = CarpetGUIClient.favoriteRules.contains(this.orgName);
+      this.currentBoolValue = this.ruleData.value.equalsIgnoreCase("true");
+      FlowLayout row = this.row;
+      FlowLayout leftCol = UIContainers.verticalFlow(Sizing.fill(50), Sizing.fill(100));
+      leftCol.verticalAlignment(VerticalAlignment.CENTER);
+      this.nameLabel = UIComponents.label(ScreenUtils.highlight(this.ruleData.localName + " : ", this.query));
+      this.nameLabel.color(Color.WHITE);
+      this.nameLabel.tooltip(ScreenUtils.buildTooltip(this.ruleData, this.query));
+      leftCol.child(this.nameLabel);
+      this.catsLabel = UIComponents.label(ScreenUtils.highlight(this.catsText, this.query).copy().withStyle(ChatFormatting.BLUE));
+      this.catsLabel.color(Color.ofArgb(-5592406));
+      leftCol.child(this.catsLabel);
       row.child(leftCol);
       FlowLayout rightCol = UIContainers.horizontalFlow(Sizing.fill(50), Sizing.fill(100));
       rightCol.horizontalAlignment(HorizontalAlignment.RIGHT);
@@ -99,6 +131,7 @@ public class RuleWidget {
             String cmd = !this.isGamerule && this.isLocked ? this.ruleData.manager + " setDefault " : this.ruleData.manager + " ";
             this.sendCommand(cmd + this.orgName + " " + this.ruleData.defaultValue);
             this.ruleData.value = this.ruleData.defaultValue;
+            this.refresh();
             this.screen.refreshScreen();
          }));
       }
@@ -116,10 +149,6 @@ public class RuleWidget {
                CarpetGUIClient.defaultRules.add(this.orgName);
             } else {
                CarpetGUIClient.defaultRules.remove(this.orgName);
-            }
-
-            if (Objects.equals(this.screen.currentCategory, RulesEditScreen.DefaultCategory.DEFAULT.getName())) {
-               this.screen.setCurrentCategory(RulesEditScreen.DefaultCategory.DEFAULT.getName());
             }
 
             ScreenUtils.swapTexture(wrapper, this.isLocked ? ScreenUtils.LOCK_ON : ScreenUtils.LOCK_OFF, 10, 11);
@@ -144,7 +173,6 @@ public class RuleWidget {
          ScreenUtils.swapTexture(wrapper, this.isFavorited ? ScreenUtils.LOVE_ON : ScreenUtils.LOVE_OFF, 10, 11);
       }));
       row.child(rightCol);
-      return row;
    }
 
    private FlowLayout buildBoolToggle() {
@@ -157,7 +185,7 @@ public class RuleWidget {
          String var10001 = this.ruleData.manager;
          this.sendCommand(var10001 + " " + this.orgName + " " + this.currentBoolValue);
          this.ruleData.value = this.currentBoolValue ? "true" : "false";
-         ScreenUtils.swapTexture(wrapper, this.currentBoolValue ? ScreenUtils.TRUE_TEX : ScreenUtils.FALSE_TEX, 30, 13);
+         this.refresh();
          this.screen.refreshScreen();
          return true;
       });
@@ -178,6 +206,7 @@ public class RuleWidget {
             box.setValue(suggestion);
             this.sendCommand(this.ruleData.manager + " " + this.orgName + " " + suggestion);
             this.ruleData.value = suggestion;
+            this.refresh();
             this.screen.refreshScreen();
          });
       }
@@ -193,6 +222,7 @@ public class RuleWidget {
             this.ruleData.value = val;
             box.setValue("");
             box.setSuggestion(this.ruleData.value);
+            this.refresh();
             this.screen.refreshScreen();
          }
 

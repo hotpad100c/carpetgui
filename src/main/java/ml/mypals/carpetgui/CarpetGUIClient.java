@@ -1,5 +1,6 @@
 package ml.mypals.carpetgui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.InputConstants.Type;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 //? if <26.1 {
 /*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-*///?} else {
+ *///?} else {
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 //?}
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -30,13 +31,16 @@ import net.minecraft.client.KeyMapping.Category;
 //?}
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.resources.Identifier;
+//?if<26.3{
+import org.lwjgl.glfw.GLFW;
+//?}
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CarpetGUIClient implements ClientModInitializer {
    public static final Logger LOGGER = LoggerFactory.getLogger("carpetgui");
    public static final String VERSION = /*$ mod_version*/ "2.0.0";
-   public static final String MINECRAFT = /*$ minecraft*/ "26.3";
+   public static final String MINECRAFT = /*$ minecraft*/ "26.2";
    public static KeyMapping carpetRulesKeyBind;
    public static RuleStackData cachedRuleStackData;
    public static Map<String, RuleData> cachedCompleteRules = new HashMap();
@@ -52,21 +56,27 @@ public class CarpetGUIClient implements ClientModInitializer {
       CarpetGUIConfigManager.initializeConfig();
       //? if <26.1 {
       /*carpetRulesKeyBind = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-      *///?} else {
+       *///?} else {
       carpetRulesKeyBind = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-      //?}
-         "carpetgui.key.carpetRulesKeyBind",
-         //? if < 26.3 {
-         /*Type.KEYSYM,
-         *///?} else {
-         Type.KEYBOARD,
-         //?}
-         298,
-         //? if <1.21.9 {
-         /*"key.category.carpetgui.main"
-         *///?} else {
-         Category.register(Identifier.fromNamespaceAndPath("carpetgui", "main"))
-         //?}
+              //?}
+              "carpetgui.key.carpetRulesKeyBind",
+              //? if < 26.3 {
+              Type.KEYSYM,
+               //?} else {
+              /*Type.KEYBOARD,
+              *///?}
+
+              //? if < 26.3 {
+              GLFW.GLFW_KEY_F9,
+               //?} else {
+              /*InputConstants.KEY_F9,
+              *///?}
+
+              //? if <1.21.9 {
+              /*"key.category.carpetgui.main"
+               *///?} else {
+              Category.register(Identifier.fromNamespaceAndPath("carpetgui", "main"))
+              //?}
       ));
       ClientTickEvents.END_CLIENT_TICK.register((ClientTickEvents.EndTick)(client) -> {
          if (carpetRulesKeyBind.consumeClick()) {

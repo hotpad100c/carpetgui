@@ -240,7 +240,7 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
 
    public static class CursorAdapter {
 //? if <26.3 {
-      /*protected static final CursorStyle[] ACTIVE_STYLES = new CursorStyle[]{CursorStyle.POINTER, CursorStyle.TEXT, CursorStyle.HAND, CursorStyle.CROSSHAIR, CursorStyle.MOVE, CursorStyle.HORIZONTAL_RESIZE, CursorStyle.VERTICAL_RESIZE, CursorStyle.NWSE_RESIZE, CursorStyle.NESW_RESIZE, CursorStyle.NOT_ALLOWED};
+      protected static final CursorStyle[] ACTIVE_STYLES = new CursorStyle[]{CursorStyle.POINTER, CursorStyle.TEXT, CursorStyle.HAND, CursorStyle.CROSSHAIR, CursorStyle.MOVE, CursorStyle.HORIZONTAL_RESIZE, CursorStyle.VERTICAL_RESIZE, CursorStyle.NWSE_RESIZE, CursorStyle.NESW_RESIZE, CursorStyle.NOT_ALLOWED};
       protected final java.util.EnumMap<CursorStyle, Long> cursors = new java.util.EnumMap<>(CursorStyle.class);
       protected final long windowHandle;
       protected CursorStyle lastCursorStyle;
@@ -288,8 +288,8 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
             this.disposed = true;
          }
       }
-*///?} else {
-      protected CursorStyle lastCursorStyle = CursorStyle.POINTER;
+//?} else {
+      /*protected CursorStyle lastCursorStyle = CursorStyle.POINTER;
       protected boolean disposed = false;
 
       protected CursorAdapter() {}
@@ -330,6 +330,6 @@ public class OwoUIAdapter<R extends ParentUIComponent> implements GuiEventListen
             this.disposed = true;
          }
       }
-//?}
+*///?}
    }
 }
